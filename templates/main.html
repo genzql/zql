@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>String Transpiler</title>
+</head>
+<body>
+    <h1>String Transpiler</h1>
+
+    <form method="POST" action="/transpile">
+        <label for="inputString">Input String:</label>
+        <textarea id="inputString" name="inputString" rows="4" cols="50"></textarea>
+
+        <button type="submit">Transpile</button>
+    </form>
+
+    <h2>Transpilation Result:</h2>
+    <pre>{{ transpilation_result }}</pre>
+</body>
+</html>

@@ -132,3 +132,32 @@ def test_render_from_ast()
     """
     assert is_same_query(actual, expected) 
 ```
+
+## Grammar
+
+- [x] Simple select queries
+- [ ] Simple create queries
+- [ ] Simple insert queries
+- [ ] Inline comments
+
+```
+TERMINAL = (no cap)
+EXPR = [a-Z]+
+INT = [0-9]+
+
+COMMA = ,
+SELECT = (its giving)
+FROM = (yass)
+LIMIT = (say less)
+KEYWORD = SELECT|FROM|LIMIT
+
+EXPR_LIST   : (EXPR)+
+            ;
+SELECT      : EXPR_LIST FROM_CLAUSE
+            ;
+FROM_CLAUSE : EXPR TERMINAL
+            | EXPR LIMIT_CLAUSE
+            ;
+LIMIT_CLAUSE: INT TERMINAL
+            ;
+```

@@ -134,6 +134,7 @@ def test_parse_to_ast_simple_select():
     }
     assert actual == expected
 
+
 def test_parse_to_ast_simple_select_with_limit():
     raw_query = """
     its giving a, b
@@ -165,6 +166,7 @@ def test_parse_to_ast_simple_select_with_limit():
     }
     assert actual == expected
 
+
 def test_parse_to_ast_select_with_no_from():
     raw_query = """
     its giving 6
@@ -179,6 +181,115 @@ def test_parse_to_ast_select_with_no_from():
                 "children": [
                     {"type": "expression", "value": "6"},
                 ],
+            },
+            {"type": "terminal"},
+        ]
+    }
+    assert actual == expected
+
+
+def test_parse_to_ast_where_clause_single_filter():
+    raw_query = """
+    its giving a
+    yass example
+    tfw a be b
+    no cap
+    """
+    actual = parse_to_ast(raw_query)
+    expected = {
+        "type": "query",
+        "children": [
+            {
+                "type": "select",
+                "children": [
+                    {"type": "expression", "value": "a"},
+                ],
+            },
+            {
+                "type": "from",
+                "children": [{"type": "expression", "value": "example"}],
+            },
+            {
+                "type": "where",
+                "children": [
+                    {
+                        "type": "filter",
+                        "value": "=",
+                        "children": [
+                            {"type": "expression", "value": "a"},
+                            {"type": "expression", "value": "b"}
+                        ]
+                    }
+                ]
+            },
+            {"type": "terminal"},
+        ]
+    }
+    assert actual == expected
+
+
+def test_parse_to_ast_where_clause_multi_filter():
+    raw_query = """
+    its giving a
+    yass example
+    tfw a be b
+    fax a sike c
+    uh b be c
+    no cap
+    """
+    actual = parse_to_ast(raw_query)
+    expected_where = {
+        "type": "filter_branch",
+        "value": "OR",
+        "children": [
+            {
+                "type": "filter_branch",
+                "value": "AND",
+                "children": [
+                    {
+                        "type": "filter",
+                        "value": "=",
+                        "children": [
+                            {"type": "expression", "value": "a"},
+                            {"type": "expression", "value": "b"}
+                        ]
+                    },
+                    {
+                        "type": "filter",
+                        "value": "!=",
+                        "children": [
+                            {"type": "expression", "value": "a"},
+                            {"type": "expression", "value": "c"}
+                        ]
+                    }
+                ]
+            },
+            {
+                "type": "filter",
+                "value": "=",
+                "children": [
+                    {"type": "expression", "value": "b"},
+                    {"type": "expression", "value": "c"}
+                ]
+            }
+        ]
+    }
+    expected = {
+        "type": "query",
+        "children": [
+            {
+                "type": "select",
+                "children": [
+                    {"type": "expression", "value": "a"},
+                ],
+            },
+            {
+                "type": "from",
+                "children": [{"type": "expression", "value": "example"}],
+            },
+            {
+                "type": "where",
+                "children": [expected_where]
             },
             {"type": "terminal"},
         ]

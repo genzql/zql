@@ -8,4 +8,4 @@ SQL for Gen Z.
 
 1. Install poetry and Docker.
 2. Run application: `docker compose up`
-3. Run tests: `poetry run pytest`
+3. Run tests: `docker compose -f test-docker-compose.yml up --build`

@@ -151,13 +151,14 @@ FROM = (yass)
 LIMIT = (say less)
 KEYWORD = SELECT|FROM|LIMIT
 
-EXPR_LIST   : (EXPR)+
-            ;
-SELECT      : EXPR_LIST FROM_CLAUSE
-            ;
-FROM_CLAUSE : EXPR TERMINAL
-            | EXPR LIMIT_CLAUSE
-            ;
-LIMIT_CLAUSE: INT TERMINAL
-            ;
+QUERY        : SELECT_CLAUSE
+EXPR_LIST    : (EXPR)+
+             ;
+SELECT_CLAUSE: EXPR_LIST FROM_CLAUSE
+             ;
+FROM_CLAUSE  : EXPR TERMINAL
+             | EXPR LIMIT_CLAUSE
+             ;
+LIMIT_CLAUSE : INT TERMINAL
+             ;
 ```

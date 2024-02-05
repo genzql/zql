@@ -1,4 +1,5 @@
 import sqlite3
+
 import pytest
 
 
@@ -18,10 +19,3 @@ def setup_db(session):
     )
     session.execute('INSERT INTO apples VALUES ("Vinesh", 5)')
     session.connection.commit()
-
-
-@pytest.mark.usefixtures("setup_db")
-def test_get(session):
-    session.execute("SELECT num_apples FROM apples WHERE owner=?", ("Vinesh",))
-    vinesh_apples = session.fetchone()
-    assert vinesh_apples[0] == 5

@@ -41,7 +41,7 @@ def test_create_query():
     """
     assert is_same_query(actual, expected)
 
-def test_insert_query()
+def test_insert_query():
     raw_query = """
     pushin p into example ('A', 1) no cap
     """
@@ -51,7 +51,7 @@ def test_insert_query()
     """
     assert is_same_query(actual, expected)
 
-def test_select_query()
+def test_select_query():
     raw_query = """
     its giving a, b
     yass example
@@ -61,7 +61,7 @@ def test_select_query()
     expected = """
     SELECT a, b FROM example;
     """
-    assert is_same_query(actual, expected) 
+    assert is_same_query(actual, expected)
 ```
 
 ### Tests for (Internal) API
@@ -70,7 +70,7 @@ def test_select_query()
 from zql import Zql
 
 
-def test_parse_to_ast()
+def test_parse_to_ast():
     raw_query = """
     its giving a, b
     yass example
@@ -102,7 +102,7 @@ def test_parse_to_ast()
     }
     assert actual == expected
 
-def test_render_from_ast()
+def test_render_from_ast():
     ast = {
         "children": [
             {
@@ -130,7 +130,7 @@ def test_render_from_ast()
     expected = """
     SELECT a, b FROM example;
     """
-    assert is_same_query(actual, expected) 
+    assert is_same_query(actual, expected)
 ```
 
 ## Grammar

@@ -164,3 +164,23 @@ def test_parse_to_ast_simple_select_with_limit():
         ]
     }
     assert actual == expected
+
+def test_parse_to_ast_select_with_no_from():
+    raw_query = """
+    its giving 6
+    no cap
+    """
+    actual = parse_to_ast(raw_query)
+    expected = {
+        "type": "query",
+        "children": [
+            {
+                "type": "select",
+                "children": [
+                    {"type": "expression", "value": "6"},
+                ],
+            },
+            {"type": "terminal"},
+        ]
+    }
+    assert actual == expected

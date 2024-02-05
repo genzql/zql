@@ -78,25 +78,28 @@ def safe_peek(tokens: list[Token]) -> Token:
     return tokens[0] if tokens else BLANK
 
 
-def add_child_to_parent(parent: AstNode, child: AstNode):
-    """Adds a node to its parent's children."""
-    if parent.get("children") is None:
-        parent["children"] = []
-    
-    parent["children"].append(child)
+def parse_expression_list(tokens: list[Token]) -> list[AstNode]:
+    nodes: list[AstNode] = []
+    while tokens:
+        token = safe_pop(tokens)
+        if not EXPR_RE.match(token):
+            raise ZqlParserError(f"Expected expression, not `{token}`.")
 
+        expr_node = {"type": NodeType.EXPRESSION.value, "value": token}
+        nodes.append(expr_node)
+        
+        next_token = safe_peek(tokens)
+        if next_token == COMMA:
+            tokens.pop(0)
+        else:
+            break
+    return nodes
 
 def parse_to_ast(raw: ZqlQuery) -> AstNode:
     """Converts a raw ZQL query to an abstract syntax tree."""
     tokens = query_to_tokens(raw)
 
-    final_ast = {"type": "query"}
-    # Stack to track the current parent node that can accumulate children.
-    # - The last element is the current parent.
-    # - After the parser finds all possible children, pop the last element to
-    #   return to the previous parent so that it can find more children.
-    parent_stack: list[AstNode] = [final_ast]
-
+    ast_children: list[AstNode] = []
     expected_tokens = [SELECT_CLAUSE]
     while tokens or expected_tokens:
         expecting = expected_tokens.pop(0)
@@ -108,28 +111,19 @@ def parse_to_ast(raw: ZqlQuery) -> AstNode:
                 )
 
             pop_tokens(tokens, len(SELECT_CLAUSE_TOKENS))
-            expected_tokens.extend([EXPRESSION_LIST, FROM_CLAUSE])
-
-            select_node = {"type": NodeType.SELECT.value}
-            parent = parent_stack[-1]
-            add_child_to_parent(parent, select_node)
-            parent_stack.append(select_node)
-
-        if expecting == EXPRESSION_LIST:
-            token = safe_pop(tokens)
-            if not EXPR_RE.match(token):
-                raise ZqlParserError(f"Expected expression, not `{token}`.")
-
-            expr_node = {"type": NodeType.EXPRESSION.value, "value": token}
-            parent = parent_stack[-1]
-            add_child_to_parent(parent, expr_node)
-            
+            expression_nodes = parse_expression_list(tokens)
+        
             next_token = safe_peek(tokens)
-            if next_token == COMMA:
-                tokens.pop(0)
-                expected_tokens.insert(0, EXPRESSION_LIST)
+            if next_token == FROM_CLAUSE_TOKEN:
+                expected_tokens.append(FROM_CLAUSE)
             else:
-                parent_stack.pop(-1)
+                expected_tokens.append(TERMINAL)
+
+            select_node = {
+                "type": NodeType.SELECT.value,
+                "children": expression_nodes
+            }
+            ast_children.append(select_node)
         
         if expecting == FROM_CLAUSE:
             token = safe_pop(tokens)
@@ -146,8 +140,7 @@ def parse_to_ast(raw: ZqlQuery) -> AstNode:
                     {"type": "expression", "value": token}
                 ]
             }
-            parent = parent_stack[-1]
-            add_child_to_parent(parent, from_node)
+            ast_children.append(from_node)
             
             if has_tokens_next(tokens, TERMINAL_TOKENS):
                 expected_tokens.append(TERMINAL)
@@ -174,8 +167,7 @@ def parse_to_ast(raw: ZqlQuery) -> AstNode:
                     {"type": "integer", "value": token}
                 ]
             }
-            parent = parent_stack[-1]
-            add_child_to_parent(parent, limit_node)
+            ast_children.append(limit_node)
             
         if expecting == TERMINAL:
             if not has_tokens_next(tokens, TERMINAL_TOKENS):
@@ -187,7 +179,7 @@ def parse_to_ast(raw: ZqlQuery) -> AstNode:
             pop_tokens(tokens, len(TERMINAL_TOKENS))
 
             terminal_node = {"type": NodeType.TERMINAL.value}
-            parent = parent_stack[-1]
-            add_child_to_parent(parent, terminal_node)
+            ast_children.append(terminal_node)
 
+    final_ast = {"type": "query", "children": ast_children}
     return final_ast

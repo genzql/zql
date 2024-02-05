@@ -119,22 +119,17 @@ def test_parse_to_ast_simple_select():
         "type": "query",
         "children": [
             {
-                "type": "keyword",
-                "value": "SELECT",
+                "type": "select",
                 "children": [
                     {"type": "expression", "value": "a"},
                     {"type": "expression", "value": "b"},
                 ],
             },
             {
-                "type": "keyword",
-                "value": "FROM",
+                "type": "from",
                 "children": [{"type": "expression", "value": "example"}],
             },
-            {
-                "type": "terminal",
-                "value": ";",
-            },
+            {"type": "terminal"},
         ]
     }
     assert actual == expected
@@ -151,27 +146,21 @@ def test_parse_to_ast_simple_select_with_limit():
         "type": "query",
         "children": [
             {
-                "type": "keyword",
-                "value": "SELECT",
+                "type": "select",
                 "children": [
                     {"type": "expression", "value": "a"},
                     {"type": "expression", "value": "b"},
                 ],
             },
             {
-                "type": "keyword",
-                "value": "FROM",
+                "type": "from",
                 "children": [{"type": "expression", "value": "example"}],
             },
             {
-                "type": "keyword",
-                "value": "LIMIT",
+                "type": "limit",
                 "children": [{"type": "integer", "value": "10"}],
             },
-            {
-                "type": "terminal",
-                "value": ";",
-            },
+            {"type": "terminal"},
         ]
     }
     assert actual == expected

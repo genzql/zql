@@ -1,4 +1,6 @@
-from zql.type_hints import ZqlQuery, SqlQuery
+from zql.types import ZqlQuery, SqlQuery
+from zql.parser import parse_to_ast
+from zql.renderer import render_from_ast
 
 
 class Zql:
@@ -8,10 +10,6 @@ class Zql:
         pass
 
     def parse(self, raw: ZqlQuery) -> SqlQuery:
-        # TODO(vinesh): connect to renderer
-        sql = raw.replace("its giving", "select")
-        sql = sql.replace(" no cap", ";")
-        sql = sql.replace("yass", "from")
-        sql = sql.replace("facts", "where")
-        sql = sql.replace("yass", "from")
+        ast = parse_to_ast(raw)
+        sql = render_from_ast(ast)
         return sql

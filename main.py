@@ -4,11 +4,29 @@ from sqlite3 import Cursor
 from fastapi import FastAPI, Request, Form, Depends
 from fastapi.templating import Jinja2Templates
 
-from zql.main import Zql
+from zql import Zql, ZqlParserError
+
+
+def setup_db(session):
+    session.execute("DROP TABLE IF EXISTS apples;")
+    session.execute("""
+        CREATE TABLE apples(
+            owner text,
+            num_apples int
+        );
+    """)
+    session.execute("INSERT INTO apples VALUES ('vinesh', 5);")
+    session.connection.commit()
+
 
 templates = Jinja2Templates(directory="templates")
 
 app = FastAPI()
+
+connection = sqlite3.connect("zql.db")
+db_session = connection.cursor()
+setup_db(db_session)
+
 
 @app.get("/")
 async def home(request: Request):
@@ -19,18 +37,16 @@ async def home(request: Request):
 
 @app.post("/transpile")
 async def transpile_string(request: Request, inputString: str = Form(...)):
-    connection = sqlite3.connect("zql.db")
-    db_session = connection.cursor()
-    # transpilation logic here
-    transpilation_result = Zql().parse(inputString)
+    try:
+        transpilation_result = Zql().parse(inputString)
+    except ZqlParserError as zpe:
+        return { "error": str(zpe) }
 
     try:
         result = db_session.execute(transpilation_result).fetchall()
         connection.commit()
     except sqlite3.OperationalError as e:
         result = f"Error {e}"
-
-
 
     return templates.TemplateResponse(
         "main.html", {"request": request, "transpilation_result": transpilation_result, "client_response": f"> {result}"}

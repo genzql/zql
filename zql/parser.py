@@ -1,5 +1,5 @@
 import re
-from zql.type_hints import ZqlQuery, AstNode, Token
+from zql.types import ZqlQuery, AstNode, Token, NodeType
 
 
 SPACE = " "
@@ -39,7 +39,7 @@ FROM_CLAUSE = "from_clause"
 LIMIT_CLAUSE = "limit_clause"
 TERMINAL = "terminal"
 
-EXPR_RE = re.compile(r"[a-z]+")
+EXPR_RE = re.compile(r"[(a-z)|(0-9)]+")
 INT_RE = re.compile(r"[0-9]+")
 SELECT_CLAUSE_TOKENS = ["its", "giving"]
 FROM_CLAUSE_TOKEN = "yass"
@@ -110,7 +110,7 @@ def parse_to_ast(raw: ZqlQuery) -> AstNode:
             pop_tokens(tokens, len(SELECT_CLAUSE_TOKENS))
             expected_tokens.extend([EXPRESSION_LIST, FROM_CLAUSE])
 
-            select_node = {"type": "keyword", "value": "SELECT"}
+            select_node = {"type": NodeType.SELECT.value}
             parent = parent_stack[-1]
             add_child_to_parent(parent, select_node)
             parent_stack.append(select_node)
@@ -120,7 +120,7 @@ def parse_to_ast(raw: ZqlQuery) -> AstNode:
             if not EXPR_RE.match(token):
                 raise ZqlParserError(f"Expected expression, not `{token}`.")
 
-            expr_node = {"type": "expression", "value": token}
+            expr_node = {"type": NodeType.EXPRESSION.value, "value": token}
             parent = parent_stack[-1]
             add_child_to_parent(parent, expr_node)
             
@@ -141,8 +141,7 @@ def parse_to_ast(raw: ZqlQuery) -> AstNode:
                 raise ZqlParserError(f"Expected expression, not `{token}`.")
 
             from_node = {
-                "type": "keyword",
-                "value": "FROM",
+                "type": NodeType.FROM.value,
                 "children": [
                     {"type": "expression", "value": token}
                 ]
@@ -170,8 +169,7 @@ def parse_to_ast(raw: ZqlQuery) -> AstNode:
             expected_tokens.append(TERMINAL)
 
             limit_node = {
-                "type": "keyword",
-                "value": "LIMIT",
+                "type": NodeType.LIMIT.value,
                 "children": [
                     {"type": "integer", "value": token}
                 ]
@@ -188,7 +186,7 @@ def parse_to_ast(raw: ZqlQuery) -> AstNode:
             
             pop_tokens(tokens, len(TERMINAL_TOKENS))
 
-            terminal_node = {"type": "terminal", "value": ";"}
+            terminal_node = {"type": NodeType.TERMINAL.value}
             parent = parent_stack[-1]
             add_child_to_parent(parent, terminal_node)
 

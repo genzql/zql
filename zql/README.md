@@ -66,74 +66,7 @@ def test_select_query():
 
 ### Tests for (Internal) API
 
-```python
-from zql import Zql
-
-
-def test_parse_to_ast():
-    raw_query = """
-    its giving a, b
-    yass example
-    no cap
-    """
-    actual = Zql().parse_to_ast(raw_query)
-    expected = {
-        "type": "query",
-        "children": [
-            {
-                "type": "keyword",
-                "value": "SELECT",
-                "children": [
-                    { "type": "expression", "value": "a" },
-                    { "type": "expression", "value": "b" }
-                ]
-            },
-            {
-                "type": "keyword",
-                "value": "FROM",
-                "children": [
-                    { "type": "expression", "value": "example" }
-                ]
-            },
-            {
-                "type": "terminal",
-                "value": ";",
-            }
-        ]
-    }
-    assert actual == expected
-
-def test_render_from_ast():
-    ast = {
-        "type": "query",
-        "children": [
-            {
-                "type": "keyword",
-                "value": "SELECT",
-                "children": [
-                    { "type": "expression", "value": "a" },
-                    { "type": "expression", "value": "b" }
-                ]
-            },
-            {
-                "type": "keyword",
-                "value": "FROM",
-                "children": [
-                    { "type": "expression", "value": "example" }
-                ]
-            },
-            {
-                "type": "terminal",
-                "value": ";",
-            }
-        ]
-    }
-    actual = Zql().render_from_ast(ast)
-    expected = """
-    SELECT a, b FROM example;
-    """
-    assert is_same_query(actual, expected)
-```
+See actual tests 😊
 
 ## Grammar
 
@@ -144,7 +77,7 @@ def test_render_from_ast():
 
 ```
 TERMINAL = (no cap)
-EXPR = [a-Z]+
+EXPR = [(a-z)|(0-9)]+
 INT = [0-9]+
 
 COMMA = ,

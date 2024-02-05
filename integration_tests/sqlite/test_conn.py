@@ -1,7 +1,7 @@
 import pytest
 
 queries = [
-    ("SELECT num_apples FROM apples WHERE owner='Vinesh'", [(5,)])
+    ("SELECT num_apples FROM apples WHERE owner='vinesh'", [(5,)])
 ]
 
 

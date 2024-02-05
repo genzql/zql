@@ -36,13 +36,23 @@ EXPR = "expression"
 EXPRESSION_LIST = "expression_list"
 SELECT_CLAUSE = "select_clause"
 FROM_CLAUSE = "from_clause"
+WHERE_CLAUSE = "where_clause"
 LIMIT_CLAUSE = "limit_clause"
 TERMINAL = "terminal"
 
-EXPR_RE = re.compile(r"[(a-z)|(0-9)]+")
+EXPR_RE = re.compile(r"\'?[(a-z)|(0-9)]+\'?")
 INT_RE = re.compile(r"[0-9]+")
+COMPARISON_TOKEN_MAP = {
+    "be": "=",
+    "sike": "!="
+}
+FILTER_OP_TOKEN_MAP = {
+    "fax": "AND",
+    "uh": "OR"
+}
 SELECT_CLAUSE_TOKENS = ["its", "giving"]
 FROM_CLAUSE_TOKEN = "yass"
+WHERE_CLAUSE_TOKEN = "tfw"
 LIMIT_CLAUSE_TOKENS = ["say", "less"]
 TERMINAL_TOKENS = ["no", "cap"]
 
@@ -79,6 +89,10 @@ def safe_peek(tokens: list[Token]) -> Token:
 
 
 def parse_expression_list(tokens: list[Token]) -> list[AstNode]:
+    """
+    Parses a list of one or more expression nodes from the token list, while
+    modifying the token list.
+    """
     nodes: list[AstNode] = []
     while tokens:
         token = safe_pop(tokens)
@@ -94,6 +108,74 @@ def parse_expression_list(tokens: list[Token]) -> list[AstNode]:
         else:
             break
     return nodes
+
+
+def parse_filter(tokens: list[Token]) -> AstNode:
+    """
+    Parses a single filter node from the token list, while modifying the list.
+    """
+    token_a = safe_pop(tokens)
+    if not EXPR_RE.match(token_a):
+        raise ZqlParserError(f"Expected expression, not `{token_a}`.")
+
+    token = safe_pop(tokens)
+    comparison = COMPARISON_TOKEN_MAP.get(token)
+    if comparison is None:
+        raise ZqlParserError(
+            f"Expected filter comparison, not `{token}`."
+        )
+
+    token_b = safe_pop(tokens)
+    if not EXPR_RE.match(token_b):
+        raise ZqlParserError(f"Expected expression, not `{token_b}`.")
+
+    filter_node = {
+        "type": NodeType.FILTER.value,
+        "value": comparison,
+        "children": [
+            {"type": NodeType.EXPRESSION.value, "value": token_a},
+            {"type": NodeType.EXPRESSION.value, "value": token_b},
+        ]
+    }
+    return filter_node
+
+
+def parse_filter_ast(tokens: list[Token]) -> AstNode:
+    """
+    Parses an abstract syntax tree of one or more filter nodes from the token
+    list, while modifying the token list.
+    """
+    filter_node_a: AstNode | None = None
+    while tokens:
+        if filter_node_a is None:
+            filter_node_a: AstNode = parse_filter(tokens)
+
+        token = safe_peek(tokens)
+        operator = FILTER_OP_TOKEN_MAP.get(token)
+        if operator is None:
+            filter_ast = {
+                "type": NodeType.FILTER_BRANCH.value,
+                "value": None,
+                "children": [filter_node_a]
+            }
+            break
+        
+        token = tokens.pop(0)
+        filter_node_b = parse_filter(tokens)
+        filter_node = {
+            "type": NodeType.FILTER_BRANCH.value,
+            "value": operator,
+            "children": [filter_node_a, filter_node_b]
+        }
+        filter_node_a = filter_node
+
+        token = safe_peek(tokens)
+        operator = FILTER_OP_TOKEN_MAP.get(token)
+        if operator is None:
+            break
+
+    return filter_node_a
+
 
 def parse_to_ast(raw: ZqlQuery) -> AstNode:
     """Converts a raw ZQL query to an abstract syntax tree."""
@@ -142,11 +224,34 @@ def parse_to_ast(raw: ZqlQuery) -> AstNode:
             }
             ast_children.append(from_node)
             
+            next_token = safe_peek(tokens)
             if has_tokens_next(tokens, TERMINAL_TOKENS):
                 expected_tokens.append(TERMINAL)
+            elif next_token == WHERE_CLAUSE_TOKEN:
+                expected_tokens.append(WHERE_CLAUSE)
             else:
                 expected_tokens.append(LIMIT_CLAUSE)
         
+        if expecting == WHERE_CLAUSE:
+            token = safe_pop(tokens)
+            if token != WHERE_CLAUSE_TOKEN:
+                raise ZqlParserError(
+                    f"Expected `tfw`, not `{token}`."
+                )
+
+            filter_ast = parse_filter_ast(tokens)
+        
+            if has_tokens_next(tokens, LIMIT_CLAUSE_TOKENS):
+                expected_tokens.append(LIMIT_CLAUSE)
+            else:
+                expected_tokens.append(TERMINAL)
+
+            where_node = {
+                "type": NodeType.WHERE.value,
+                "children": [filter_ast]
+            }
+            ast_children.append(where_node)
+
         if expecting == LIMIT_CLAUSE:
             if not has_tokens_next(tokens, LIMIT_CLAUSE_TOKENS):
                 raise ZqlParserError(

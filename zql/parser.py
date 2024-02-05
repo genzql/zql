@@ -78,9 +78,24 @@ def safe_peek(tokens: list[Token]) -> Token:
     return tokens[0] if tokens else BLANK
 
 
+def add_child_to_parent(parent: AstNode, child: AstNode):
+    """Adds a node to its parent's children."""
+    if parent.get("children") is None:
+        parent["children"] = []
+    
+    parent["children"].append(child)
+
+
 def parse_to_ast(raw: ZqlQuery) -> AstNode:
     """Converts a raw ZQL query to an abstract syntax tree."""
     tokens = query_to_tokens(raw)
+
+    final_ast = {"type": "query"}
+    # Stack to track the current parent node that can accumulate children.
+    # - The last element is the current parent.
+    # - After the parser finds all possible children, pop the last element to
+    #   return to the previous parent so that it can find more children.
+    parent_stack: list[AstNode] = [final_ast]
 
     expected_tokens = [SELECT_CLAUSE]
     while tokens or expected_tokens:
@@ -95,15 +110,26 @@ def parse_to_ast(raw: ZqlQuery) -> AstNode:
             pop_tokens(tokens, len(SELECT_CLAUSE_TOKENS))
             expected_tokens.extend([EXPRESSION_LIST, FROM_CLAUSE])
 
+            select_node = {"type": "keyword", "value": "SELECT"}
+            parent = parent_stack[-1]
+            add_child_to_parent(parent, select_node)
+            parent_stack.append(select_node)
+
         if expecting == EXPRESSION_LIST:
             token = safe_pop(tokens)
             if not EXPR_RE.match(token):
                 raise ZqlParserError(f"Expected expression, not `{token}`.")
+
+            expr_node = {"type": "expression", "value": token}
+            parent = parent_stack[-1]
+            add_child_to_parent(parent, expr_node)
             
             next_token = safe_peek(tokens)
             if next_token == COMMA:
                 tokens.pop(0)
                 expected_tokens.insert(0, EXPRESSION_LIST)
+            else:
+                parent_stack.pop(-1)
         
         if expecting == FROM_CLAUSE:
             token = safe_pop(tokens)
@@ -113,6 +139,16 @@ def parse_to_ast(raw: ZqlQuery) -> AstNode:
             token = safe_pop(tokens)
             if not EXPR_RE.match(token):
                 raise ZqlParserError(f"Expected expression, not `{token}`.")
+
+            from_node = {
+                "type": "keyword",
+                "value": "FROM",
+                "children": [
+                    {"type": "expression", "value": token}
+                ]
+            }
+            parent = parent_stack[-1]
+            add_child_to_parent(parent, from_node)
             
             if has_tokens_next(tokens, TERMINAL_TOKENS):
                 expected_tokens.append(TERMINAL)
@@ -126,12 +162,22 @@ def parse_to_ast(raw: ZqlQuery) -> AstNode:
                 )
             
             pop_tokens(tokens, len(LIMIT_CLAUSE_TOKENS))
-            expected_tokens.extend([INT, TERMINAL])
 
-        if expecting == INT:
             token = safe_pop(tokens)
             if not INT_RE.match(token):
                 raise ZqlParserError(f"Expected integer, not `{token}`.")
+            
+            expected_tokens.append(TERMINAL)
+
+            limit_node = {
+                "type": "keyword",
+                "value": "LIMIT",
+                "children": [
+                    {"type": "integer", "value": token}
+                ]
+            }
+            parent = parent_stack[-1]
+            add_child_to_parent(parent, limit_node)
             
         if expecting == TERMINAL:
             if not has_tokens_next(tokens, TERMINAL_TOKENS):
@@ -142,4 +188,8 @@ def parse_to_ast(raw: ZqlQuery) -> AstNode:
             
             pop_tokens(tokens, len(TERMINAL_TOKENS))
 
-    return {}
+            terminal_node = {"type": "terminal", "value": ";"}
+            parent = parent_stack[-1]
+            add_child_to_parent(parent, terminal_node)
+
+    return final_ast

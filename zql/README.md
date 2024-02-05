@@ -152,7 +152,8 @@ LIMIT = (say less)
 KEYWORD = SELECT|FROM|LIMIT
 
 QUERY        : SELECT_CLAUSE
-EXPR_LIST    : (EXPR)+
+EXPR_LIST    : EXPR
+             : EXPR COMMA EXPR_LIST
              ;
 SELECT_CLAUSE: EXPR_LIST FROM_CLAUSE
              ;

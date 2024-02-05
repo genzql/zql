@@ -9,6 +9,14 @@ COMMA_REGEX = re.compile(r",")
 
 
 def query_to_tokens(raw: ZqlQuery) -> list[Token]:
+    """
+    Converts a raw quuery to a list of tokens.
+    - Strips whitespace from either side.
+    - Converts text to lowercase.
+    - Converts Unicode characters to ASCII.
+    - Adds spaces before commas so they become tokens.
+    - Ignores extra whitespace or line breaks in the query.
+    """
     normalized = raw.strip().casefold()
     cleaned = WHITESPACE_REGEX.sub(SPACE, normalized)
     cleaned_with_commas = COMMA_REGEX.sub(COMMA_WITH_SPACE, cleaned)
@@ -40,25 +48,38 @@ TERMINAL_TOKENS = ["no", "cap"]
 
 
 def has_tokens_next(tokens: list[Token], expecting: list[Token]) -> bool:
+    """
+    Checks if the expected tokens are found at the start of the token list.
+    """
     n = len(expecting)
     next_tokens = tokens[0:n]
     return next_tokens == expecting
 
 
 def pop_tokens(tokens: list[Token], n: int):
+    """Removes the given number of tokens from the front of the list."""
     for i in range(n):
         tokens.pop(0)
 
 
 def safe_pop(tokens: list[Token]) -> Token:
+    """
+    Removes and returns the first token.
+    Returns a blank space if the list is empty.
+    """
     return tokens.pop(0) if tokens else BLANK
 
 
 def safe_peek(tokens: list[Token]) -> Token:
+    """
+    Returns the first token but does not remove it from the list.
+    Returns a blank space if the list is empty.
+    """
     return tokens[0] if tokens else BLANK
 
 
 def parse_to_ast(raw: ZqlQuery) -> AstNode:
+    """Converts a raw ZQL query to an abstract syntax tree."""
     tokens = query_to_tokens(raw)
 
     expected_tokens = [SELECT_CLAUSE]

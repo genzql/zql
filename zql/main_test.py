@@ -31,3 +31,16 @@ LIMIT 10
 ;
     """.strip()
     assert actual == expected
+
+
+def test_select_without_from():
+    raw_query = """
+    its giving 6
+    no cap
+    """
+    actual = Zql().parse(raw_query)
+    expected = """
+SELECT 6
+;
+    """.strip()
+    assert actual == expected

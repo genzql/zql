@@ -1,5 +1,7 @@
 tasks:
-  - init: docker-compose pull
+  - init: |
+      poetry update
+      docker-compose pull
   - command: docker-compose up
 
 

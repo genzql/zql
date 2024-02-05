@@ -91,6 +91,7 @@ EXPR_LIST    : EXPR
              : EXPR COMMA EXPR_LIST
              ;
 SELECT_CLAUSE: EXPR_LIST FROM_CLAUSE
+             : EXPR_LIST TERMINAL
              ;
 FROM_CLAUSE  : EXPR TERMINAL
              | EXPR LIMIT_CLAUSE

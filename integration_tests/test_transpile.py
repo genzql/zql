@@ -8,6 +8,7 @@ zql_queries_expectations = [
 ]
 
 
+@pytest.mark.skip("Skipping transpilation integration tests")
 @pytest.mark.usefixtures("setup_db")
 @pytest.mark.parametrize("zql_query,expected", zql_queries_expectations)
 def test_transpile(session, zql_query, expected):

@@ -84,7 +84,6 @@ def add_child_to_parent(parent: AstNode, child: AstNode):
         parent["children"] = []
     
     parent["children"].append(child)
-    return parent
 
 
 def parse_to_ast(raw: ZqlQuery) -> AstNode:

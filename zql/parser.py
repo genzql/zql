@@ -1,5 +1,4 @@
 import re
-from typing import List, Optional
 from zql.type_hints import ZqlQuery, AstNode, Token
 
 
@@ -9,7 +8,7 @@ WHITESPACE_REGEX = re.compile(r"\s+")
 COMMA_REGEX = re.compile(r",")
 
 
-def query_to_tokens(raw: ZqlQuery) -> List[Token]:
+def query_to_tokens(raw: ZqlQuery) -> list[Token]:
     normalized = raw.strip().casefold()
     cleaned = WHITESPACE_REGEX.sub(SPACE, normalized)
     cleaned_with_commas = COMMA_REGEX.sub(COMMA_WITH_SPACE, cleaned)
@@ -40,22 +39,22 @@ LIMIT_CLAUSE_TOKENS = ["say", "less"]
 TERMINAL_TOKENS = ["no", "cap"]
 
 
-def has_tokens_next(tokens: List[Token], expecting: List[Token]) -> bool:
+def has_tokens_next(tokens: list[Token], expecting: list[Token]) -> bool:
     n = len(expecting)
     next_tokens = tokens[0:n]
     return next_tokens == expecting
 
 
-def pop_tokens(tokens: List[Token], n: int):
+def pop_tokens(tokens: list[Token], n: int):
     for i in range(n):
         tokens.pop(0)
 
 
-def safe_pop(tokens: List[Token]) -> Token:
+def safe_pop(tokens: list[Token]) -> Token:
     return tokens.pop(0) if tokens else BLANK
 
 
-def safe_peek(tokens: List[Token]) -> Token:
+def safe_peek(tokens: list[Token]) -> Token:
     return tokens[0] if tokens else BLANK
 
 

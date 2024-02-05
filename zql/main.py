@@ -8,6 +8,7 @@ class Zql:
         pass
 
     def parse(self, raw: ZqlQuery) -> SqlQuery:
+        # TODO(vinesh): connect to renderer
         sql = raw.replace("its giving", "select")
         sql = sql.replace(" no cap", ";")
         sql = sql.replace("yass", "from")

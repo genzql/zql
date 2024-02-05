@@ -7,5 +7,5 @@ class Zql:
     def __init__(self):
         pass
 
-    def parse(self, raw: ZqlQuery) -> SqlQuery
+    def parse(self, raw: ZqlQuery) -> SqlQuery:
         return ""

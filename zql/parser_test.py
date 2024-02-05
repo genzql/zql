@@ -14,21 +14,19 @@ def test_parse_to_ast():
                 "type": "keyword",
                 "value": "SELECT",
                 "children": [
-                    { "type": "expression", "value": "a" },
-                    { "type": "expression", "value": "b" }
-                ]
+                    {"type": "expression", "value": "a"},
+                    {"type": "expression", "value": "b"},
+                ],
             },
             {
                 "type": "keyword",
                 "value": "FROM",
-                "children": [
-                    { "type": "expression", "value": "example" }
-                ]
+                "children": [{"type": "expression", "value": "example"}],
             },
             {
                 "type": "terminal",
                 "value": ";",
-            }
+            },
         ]
     }
     # assert actual == expected

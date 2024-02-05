@@ -17,5 +17,5 @@ def setup_db(session):
         """CREATE TABLE apples
                           (owner text, num_apples int)"""
     )
-    session.execute('INSERT INTO apples VALUES ("Vinesh", 5)')
+    session.execute('INSERT INTO apples VALUES ("vinesh", 5)')
     session.connection.commit()

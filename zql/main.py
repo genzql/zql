@@ -8,4 +8,10 @@ class Zql:
         pass
 
     def parse(self, raw: ZqlQuery) -> SqlQuery:
-        return ""
+        raw = raw.lower()
+        sql = raw.replace("its giving", "select")
+        sql = sql.replace(" no cap", ";")
+        sql = sql.replace("yass", "from")
+        sql = sql.replace("facts", "where")
+        sql = sql.replace("yass", "from")
+        return sql

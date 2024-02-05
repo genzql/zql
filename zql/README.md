@@ -78,6 +78,7 @@ def test_parse_to_ast():
     """
     actual = Zql().parse_to_ast(raw_query)
     expected = {
+        "type": "query",
         "children": [
             {
                 "type": "keyword",
@@ -104,6 +105,7 @@ def test_parse_to_ast():
 
 def test_render_from_ast():
     ast = {
+        "type": "query",
         "children": [
             {
                 "type": "keyword",

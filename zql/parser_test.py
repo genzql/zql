@@ -108,7 +108,7 @@ def test_missing_select_expr_list():
         assert actual == expected
 
 
-def test_parse_to_ast():
+def test_parse_to_ast_simple_select():
     raw_query = """
     its giving a, b
     yass example
@@ -116,6 +116,7 @@ def test_parse_to_ast():
     """
     actual = parse_to_ast(raw_query)
     expected = {
+        "type": "query",
         "children": [
             {
                 "type": "keyword",
@@ -136,5 +137,41 @@ def test_parse_to_ast():
             },
         ]
     }
-    # assert actual == expected
-    assert actual == {}
+    assert actual == expected
+
+def test_parse_to_ast_simple_select_with_limit():
+    raw_query = """
+    its giving a, b
+    yass example
+    say less 10
+    no cap
+    """
+    actual = parse_to_ast(raw_query)
+    expected = {
+        "type": "query",
+        "children": [
+            {
+                "type": "keyword",
+                "value": "SELECT",
+                "children": [
+                    {"type": "expression", "value": "a"},
+                    {"type": "expression", "value": "b"},
+                ],
+            },
+            {
+                "type": "keyword",
+                "value": "FROM",
+                "children": [{"type": "expression", "value": "example"}],
+            },
+            {
+                "type": "keyword",
+                "value": "LIMIT",
+                "children": [{"type": "integer", "value": "10"}],
+            },
+            {
+                "type": "terminal",
+                "value": ";",
+            },
+        ]
+    }
+    assert actual == expected

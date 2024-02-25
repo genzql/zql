@@ -11,8 +11,9 @@ zql_queries_expectations = [
 
 
 @pytest.mark.usefixtures("setup_db")
+@pytest.mark.parametrize("use_grammar", [False, True])
 @pytest.mark.parametrize("zql_query,expected", zql_queries_expectations)
-def test_transpile(session, zql_query, expected):
-    transpiled_query = Zql().parse(zql_query)
+def test_transpile(session, zql_query, expected, use_grammar):
+    transpiled_query = Zql().parse(zql_query, use_grammar)
     result = session.execute(transpiled_query).fetchall()
     assert result == expected

@@ -58,6 +58,8 @@
             }
         })
 
+        const defaultQuery = `its giving\n\tname,\n\tfave_color,\n\tfollowers\nyass peeps\nsay less 3\nno cap`
+
         const zqlConfig = {
             ignoreCase: true,
             keywords: ["yass", "tfw", "say", "be", "sike", "fax", "uh"],
@@ -100,7 +102,7 @@
             // JavaScript without risk of cross-site scripting vulnerabilities.
             const originalQuery = queryEl.value
             const editor = monaco.editor.create(editorEl, {
-                value: originalQuery,
+                value: originalQuery || defaultQuery,
                 language: "zql",
                 theme: "vs-dark",
                 fontSize: 18,

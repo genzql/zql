@@ -8,14 +8,27 @@ from zql import Zql, ZqlParserError
 
 
 def setup_db(session):
-    session.execute("DROP TABLE IF EXISTS apples;")
+    session.execute("DROP TABLE IF EXISTS peeps;")
     session.execute("""
-        CREATE TABLE apples(
-            owner text,
-            num_apples int
+        CREATE TABLE peeps(
+            name text,
+            fave_color text,
+            followers int,
+            dank float
         );
     """)
-    session.execute("INSERT INTO apples VALUES ('vinesh', 5);")
+    session.execute("INSERT INTO peeps VALUES ('andrew', 'blue', 1700, 0.6);")
+    session.execute("INSERT INTO peeps VALUES ('bella', 'green', 1000, 0.4);")
+    session.execute("INSERT INTO peeps VALUES ('hugo', 'red', 1400, 0.5);")
+    session.execute("INSERT INTO peeps VALUES ('vinesh', 'green', 2700, 0.9);")
+    session.execute("INSERT INTO peeps VALUES ('tamjid', '?', 1100, 0.9);")
+    session.execute("INSERT INTO peeps VALUES ('laura', '?', 1500, 0.5);")
+    session.execute("INSERT INTO peeps VALUES ('nancy', '?', 23, 0.1);")
+    session.execute("INSERT INTO peeps VALUES ('lauren', '?', 15, 0.9);")
+    session.execute("INSERT INTO peeps VALUES ('david', 'black', 29, 0.7);")
+    session.execute("INSERT INTO peeps VALUES ('anshul', 'burgundy', 20, 0.9);")
+    session.execute("INSERT INTO peeps VALUES ('steph', 'purple', 41, 0.2);")
+    session.execute("INSERT INTO peeps VALUES ('stacy', 'yellow', 20, 0.3);")
     session.connection.commit()
 
 

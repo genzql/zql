@@ -33,7 +33,7 @@ LIMIT 10
     assert actual == expected
 
 
-def test_select_without_from():
+def test_select_integer_without_from():
     raw_query = """
     its giving 6
     no cap
@@ -41,6 +41,19 @@ def test_select_without_from():
     actual = Zql().parse(raw_query)
     expected = """
 SELECT 6
+;
+    """.strip()
+    assert actual == expected
+
+
+def test_select_float_without_from():
+    raw_query = """
+    its giving 6.04
+    no cap
+    """
+    actual = Zql().parse(raw_query)
+    expected = """
+SELECT 6.04
 ;
     """.strip()
     assert actual == expected

@@ -5,7 +5,6 @@ from zql.types import SqlQuery
 VALUE_NODES: set[str] = {
     "word",
     "integer",
-    "float",
     "quoted_expr",
 }
 SINGLE_CHILD_PASSTHROUGH_NODES: set[str] = {
@@ -15,6 +14,7 @@ SINGLE_CHILD_PASSTHROUGH_NODES: set[str] = {
 LITERAL_NODES: dict[str, str] = {
     "terminal": ";",
     "comma": ",",
+    "dot": ".",
     "alias": "AS",
     "select": "SELECT",
     "from": "FROM",
@@ -206,5 +206,11 @@ def render_node(ast: AstNode) -> SqlQuery:
 
     if node_type == "limit_amount":
         return render_node(children[0])
+
+    if node_type == "float":
+        whole = render_node(children[0])
+        dot = render_node(children[1])
+        decimal = render_node(children[2])
+        return f"{whole}{dot}{decimal}"
 
     raise NotImplementedError(f"Node type `{node_type}` not yet supported.")

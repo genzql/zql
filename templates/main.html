@@ -4,14 +4,24 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ZQL Transpiler</title>
+    <style>
+
+        .editor {
+            height: 400px;
+        }
+
+        [type="hidden"] {
+            display: none;
+        }
+
+    </style>
 </head>
 <body>
     <h1>ZQL Transpiler</h1>
+    <div id="editor" class="editor"></div>
 
-    <form method="POST" action="/transpile">
-        <label for="inputString">ZQL</label>
-        <br/>
-        <textarea id="inputString" name="inputString" rows="4" cols="50">{{ query }}</textarea>
+    <form id="form" method="POST" action="/transpile">
+        <textarea type="hidden" id="inputString" name="inputString">{{ query }}</textarea>
         <br/>
         <button type="submit">Transpile</button>
     </form>
@@ -27,5 +37,48 @@
         <pre>{{ error_message }}</pre>
     {% endif %}
 
+    <!-- Use Monaco Editor via CDN -->
+    <!-- https://stackoverflow.com/a/63179814 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.26.1/min/vs/loader.min.js"></script>
+    <script>
+        // The loader.min.js script provides these modules:
+        // global require
+        // global monaco
+
+        require.config({
+            paths: {
+                "vs": "https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.26.1/min/vs"
+            }
+        })
+
+        const editorEl = document.getElementById("editor")
+        const formEl = document.getElementById("form")
+        const inputStringEl = document.getElementById("inputString")
+
+        require(["vs/editor/editor.main"], () => {
+
+            // Jinja returns the original query escaped for rendering in HTML.
+            // The template populates the escaped string in the hidden textarea,
+            // which safely unescapes any HTML characters. Then, we read the
+            // sanitized value from the textarea value, which we can now use in
+            // JavaScript without risk of cross-site scripting vulnerabilities.
+            const originalQuery = inputStringEl.value
+            const editor = monaco.editor.create(editorEl, {
+                value: originalQuery,
+                language: "sql",
+                theme: "vs-dark",
+            })
+
+            // The Monaco editor only works on div elements, not textarea. So, 
+            // to submit the code to the backend, we copy the editor input to
+            // the hidden textarea before submitting the form.
+            formEl.addEventListener("submit", () => {
+                const content = editor.getValue()
+                inputStringEl.value = content
+            })
+
+        })
+
+    </script>
 </body>
 </html>

@@ -62,7 +62,7 @@ async def transpile_string(request: Request, query: str = Form(...)):
     error_message: str | None = None
     transpiled_query: str = ""
     try:
-        transpiled_query = Zql().parse(query)
+        transpiled_query = Zql().parse(query, use_grammar=False)
     except ZqlParserError as zpe:
         error_message = str(zpe)
 

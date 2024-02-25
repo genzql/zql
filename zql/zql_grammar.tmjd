@@ -63,8 +63,17 @@ expression        : expression operator expression
                   | dot_expression
                   | quoted_expr
                   | float
-                  | number
+                  | integer
                   | word
+                  ;
+quoted_expr       : r\".*?\"
+                  | r\'.*?\'
+                  ;
+float             : integer dot integer
+                  ;
+integer           : r[0-9]+
+                  ;
+word              : r[a-zA-Z][\w$]*
                   ;
 dot_expression    : word dot word
                   ;
@@ -90,7 +99,6 @@ table             : sub_query alias word
                   | table_name
                   ;
 table_name        : word alias word
-                  | word word
                   | word
                   ;
 join_list         : join_clause join_list
@@ -128,7 +136,7 @@ direction         : asc
                   ;
 limit_clause      : limit limit_amount
                   ;
-limit_amount      : number
+limit_amount      : integer
                   ;
 union_clause      : union all
                   | union

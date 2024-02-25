@@ -169,3 +169,71 @@ def test_parse_ast_formula_fail_no_source():
     actual = str(err.value)
     expected = "Expected match for `[0-9]+`, not end of input."
     assert actual == expected
+
+
+LIST_GRAMMAR_CONTENT = r"""
+root     : list
+         ;
+list     : num_list end
+         ;
+num_list : num comma num_list
+         | num
+         ;
+num      : r[0-9]+
+         ;
+comma    : ","
+         ;
+end      : r[0-9]+
+         ;
+"""
+LIST_GRAMMAR = parse_grammar(LIST_GRAMMAR_CONTENT)
+
+
+def test_parse_grammar_list():
+    actual = parse_grammar(LIST_GRAMMAR_CONTENT)
+    expected = {
+        "root": [
+            {"sequence": ["list"]},
+        ],
+        "list": [
+            {"sequence": ["num_list", "end"]},
+        ],
+        "num_list": [
+            {"sequence": ["num", "comma", "num_list"]},
+            {"sequence": ["num"]},
+        ],
+        "num": [
+            {"regex": r"[0-9]+"},
+        ],
+        "comma": [
+            {"literal": ","},
+        ],
+        "end": [
+            {"regex": r"[0-9]+"},
+        ],
+    }
+    assert actual == expected
+
+
+def test_parse_ast_list_simple():
+    actual = parse_ast(LIST_GRAMMAR, "1, 2 0")
+    expected = {
+        "type": "list",
+        "children": [
+            {
+                "type": "num_list",
+                "children": [
+                    {"type": "num", "value": "1"},
+                    {"type": "comma", "value": ","},
+                    {
+                        "type": "num_list",
+                        "children": [
+                            {"type": "num", "value": "2"},
+                        ],
+                    },
+                ],
+            },
+            {"type": "end", "value": "0"},
+        ],
+    }
+    assert actual == expected

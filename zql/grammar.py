@@ -153,10 +153,13 @@ def evaluate_sequence(
     tokens_manager: TokensManager,
     sequence: list[str]
 ) -> AstNode:
-    children = [
-        evaluate_node(grammar, tokens_manager, node)
-        for node in sequence
-    ]
+    mutable_tokens_manager = tokens_manager.copy()
+    children: list[AstNode] = []
+    for node in sequence:
+        ast_node = evaluate_node(grammar, mutable_tokens_manager, node)
+        children.append(ast_node)
+
+    tokens_manager.set_tokens(mutable_tokens_manager.tokens)
     return {"children": children}
 
 
@@ -195,14 +198,17 @@ def evaluate_node(
     rules = grammar.get(node, [])
     if not rules:
         raise AstParseError(
-            f"Reached node `{current_node}`, which has no defined rules."
+            f"Reached node `{node}`, which has no defined rules."
         )
 
     error = None
     ast_node = None
     for rule in rules:
         try:
-            ast_node = evaluate_rule(grammar, tokens_manager, rule)
+            mutable_tokens_manager = tokens_manager.copy()
+            ast_node = evaluate_rule(grammar, mutable_tokens_manager, rule)
+            tokens_manager.set_tokens(mutable_tokens_manager.tokens)
+            break
         except Exception as e:
             error = e
             continue
@@ -217,7 +223,8 @@ def evaluate_node(
             f"`{remaining_source_sample}`."
         )
 
-    return {"type": node, **ast_node}
+    ast_node = {"type": node, **ast_node}
+    return ast_node
 
 
 def parse_ast(grammar: Grammar, source: str) -> AstNode:

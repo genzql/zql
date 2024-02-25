@@ -1,5 +1,5 @@
 #
-FROM python:3.12-slim
+FROM --platform=linux/amd64 python:3.12-slim
 
 # install deps
 RUN pip install poetry==1.7.1

@@ -25,7 +25,7 @@
 
         <form id="form" method="POST" action="/transpile">
             <textarea type="hidden" id="query" name="query">{{ query }}</textarea>
-            <button type="submit" class="block mx-auto my-4 text-2xl rounded-md bg-pink-600 p-4 font-semibold text-white shadow-sm hover:bg-pink-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-pink-600">send it</button>
+            <button type="submit" class="block mx-auto my-4 text-2xl rounded-md bg-pink-500 p-4 font-semibold text-white shadow-sm hover:bg-pink-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-pink-500">send it</button>
         </form>
 
         {% if rows %}
@@ -146,7 +146,7 @@
 
         function ResultRow({ columns, row }) {
             const cells = columns.map((name) => (
-                html`<td class="p-2 border border-pink-700">${row?.[name]}</td>`
+                html`<td class="p-2 border border-pink-600">${row?.[name]}</td>`
             ))
             return html`<tr class="hover:bg-pink-400 hover:text-white">${cells}</tr>`
         }
@@ -154,7 +154,7 @@
         function ResultTable({ columns, rows }) {
             const noResultsMessage = html`<p>Query returned no results.</p>`
             const headers = columns.map((name) => (
-                html`<th class="p-2 bg-pink-600 hover:bg-pink-400 text-white font-semibold border border-pink-700">${name}</th>`
+                html`<th class="p-2 bg-pink-500 hover:bg-pink-400 text-white font-semibold border border-pink-600">${name}</th>`
             ))
             const tableRows = rows.map((row) => (
                 html`<${ResultRow} columns=${columns} row=${row} />`

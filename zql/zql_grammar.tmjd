@@ -141,7 +141,7 @@ limit_clause      : limit limit_amount
                   ;
 limit_amount      : integer
                   ;
-union_clause      : union all
+union_clause      : union_all
                   | union
                   ;
 definition_stmt   : create_stmt

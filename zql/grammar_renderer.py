@@ -10,6 +10,7 @@ VALUE_NODES: set[str] = {
 SINGLE_CHILD_PASSTHROUGH_NODES: set[str] = {
     "operator",
     "cond_operator",
+    "union_clause",
 }
 LITERAL_NODES: dict[str, str] = {
     "terminal": ";",
@@ -20,6 +21,8 @@ LITERAL_NODES: dict[str, str] = {
     "from": "FROM",
     "where": "WHERE",
     "limit": "LIMIT",
+    "union_all": "UNION ALL",
+    "union": "UNION",
     "is": "IS",
     "is_not": "IS NOT",
     "equal": "=",
@@ -65,10 +68,13 @@ def render_node(ast: AstNode) -> SqlQuery:
         return render_node(children[0])
 
     if node_type == "simple_query":
-        if len(children) > 1:
-            raise NotImplementedError("UNION not yet supported.")
+        select_query_a = render_node(children[0])
+        if len(children) == 1:
+            return select_query_a
 
-        return render_node(children[0])
+        union = render_node(children[1])
+        select_query_b = render_node(children[2])
+        return f"{select_query_a}\n{union}\n{select_query_b}"
 
     if node_type == "select_query":
         select_clause = render_node(children[0])

@@ -1,3 +1,4 @@
+import pytest
 from zql.main import Zql
 
 
@@ -173,6 +174,84 @@ def test_single_where_string_expression():
 SELECT a
 FROM example
 WHERE a = 'ahh'
+;
+    """.strip()
+    assert actual == expected
+
+
+def test_simple_select_union():
+    raw_query = """
+    its giving a, b, c
+    with the bois
+    its giving a, b, c
+    no cap
+    """
+    actual = Zql().parse(raw_query, use_grammar=True)
+    expected = """
+SELECT a, b, c
+UNION
+SELECT a, b, c
+;
+    """.strip()
+    assert actual == expected
+
+
+def test_simple_select_union_all():
+    raw_query = """
+    its giving a, b, c
+    with all the bois
+    its giving a, b, c
+    no cap
+    """
+    actual = Zql().parse(raw_query, use_grammar=True)
+    expected = """
+SELECT a, b, c
+UNION ALL
+SELECT a, b, c
+;
+    """.strip()
+    assert actual == expected
+
+
+@pytest.mark.skip()
+def test_select_where_union():
+    raw_query = """
+    its giving a, b, c
+    twf x = 100
+    with the bois
+    its giving a, b, c
+    twf y = 100
+    no cap
+    """
+    actual = Zql().parse(raw_query, use_grammar=True)
+    expected = """
+SELECT a, b, c
+WHERE x = 100
+UNION
+SELECT a, b, c
+WHERE y = 100
+;
+    """.strip()
+    assert actual == expected
+
+
+@pytest.mark.skip()
+def test_select_where_union_all():
+    raw_query = """
+    its giving a, b, c
+    twf x = 100
+    with all the bois
+    its giving a, b, c
+    twf y = 100
+    no cap
+    """
+    actual = Zql().parse(raw_query, use_grammar=True)
+    expected = """
+SELECT a, b, c
+WHERE x = 100
+UNION ALL
+SELECT a, b, c
+WHERE y = 100
 ;
     """.strip()
     assert actual == expected

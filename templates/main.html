@@ -7,7 +7,7 @@
     <style>
 
         .editor {
-            height: 400px;
+            height: 300px;
         }
 
         [type="hidden"] {
@@ -25,22 +25,22 @@
 
         <form id="form" method="POST" action="/transpile">
             <textarea type="hidden" id="query" name="query">{{ query }}</textarea>
-            <button type="submit" class="block mx-auto my-4 text-2xl rounded-md bg-indigo-600 p-4 font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">send it</button>
+            <button type="submit" class="block mx-auto my-4 text-2xl rounded-md bg-pink-600 p-4 font-semibold text-white shadow-sm hover:bg-pink-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-pink-600">send it</button>
         </form>
 
-        {% if transpiled_query %}
-            <h2 class="text-2xl my-4 font-bold">boomer sql</h2>
-            <pre class="my-4">{{ transpiled_query }}</pre>
-        {% endif %}
-
         {% if rows %}
-            <h2 class="text-2xl my-4 font-bold">results bussin</h2>
+            <h2 class="text-2xl my-4 font-bold">sheeeesh that zql bussin</h2>
             <div id="results"></div>
         {% endif %}
 
         {% if error_message %}
-            <h2 class="text-2xl my-4 font-bold">Error Message</h2>
+            <h2 class="text-2xl my-4 font-bold">that zql is a bit sus iykyk</h2>
             <pre class="my-4">{{ error_message }}</pre>
+        {% endif %}
+
+        {% if transpiled_query %}
+            <h2 class="text-2xl my-4 font-bold">sql for boomers</h2>
+            <pre class="my-4">{{ transpiled_query }}</pre>
         {% endif %}
     </div>
 
@@ -145,22 +145,22 @@
 
         function ResultRow({ columns, row }) {
             const cells = columns.map((name) => (
-                html`<td class="p-2 border border-indigo-700">${row?.[name]}</td>`
+                html`<td class="p-2 border border-pink-700">${row?.[name]}</td>`
             ))
-            return html`<tr class="hover:bg-indigo-400 hover:text-white">${cells}</tr>`
+            return html`<tr class="hover:bg-pink-400 hover:text-white">${cells}</tr>`
         }
 
         function ResultTable({ columns, rows }) {
             const noResultsMessage = html`<p>Query returned no results.</p>`
             const headers = columns.map((name) => (
-                html`<th class="p-2 bg-indigo-600 hover:bg-indigo-400 text-white font-semibold border border-indigo-700">${name}</th>`
+                html`<th class="p-2 bg-pink-600 hover:bg-pink-400 text-white font-semibold border border-pink-700">${name}</th>`
             ))
             const tableRows = rows.map((row) => (
                 html`<${ResultRow} columns=${columns} row=${row} />`
             ))
 
             return html`
-                <table class="table-auto w-full text-left border border-collapse border-indigo-400">
+                <table class="table-auto w-full text-left border border-collapse border-pink-400">
                     <thead>
                         <tr>${headers}</tr>
                     </thead>

@@ -29,6 +29,7 @@ def setup_db(session):
     session.execute("INSERT INTO peeps VALUES ('anshul', 'burgundy', 20, 0.9);")
     session.execute("INSERT INTO peeps VALUES ('steph', 'purple', 41, 0.2);")
     session.execute("INSERT INTO peeps VALUES ('stacy', 'yellow', 20, 0.3);")
+    session.execute("INSERT INTO peeps VALUES ('nina', 'turquoise', 2, 0.8);")
     session.connection.commit()
 
 

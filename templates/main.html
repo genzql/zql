@@ -51,11 +51,39 @@
             }
         })
 
+        const zqlConfig = {
+            ignoreCase: true,
+            keywords: ["yass", "tfw", "say", "be", "sike", "fax", "uh"],
+            tokenizer: {
+                root: [
+                    // Keywords
+                    // Multi-Token Keywords
+                    [/its giving/, "keyword"],
+                    [/say less/, "keyword"],
+                    [/no cap/, "delimiter"],
+                    [/@?[a-zA-Z][\w$]*/, {
+                        cases: {
+                            "@keywords": "keyword",
+                            "@default": "source",
+                        },
+                    }],
+                    // Literal Values
+                    [/".*?"/, "string"],
+                    [/\d*\.\d+([eE][\-+]?\d+)?/, "number.float"],
+                    [/\d+/, "number"],
+                ],
+            },
+        }
+
         const editorEl = document.getElementById("editor")
         const formEl = document.getElementById("form")
         const inputStringEl = document.getElementById("inputString")
 
         require(["vs/editor/editor.main"], () => {
+
+            // Configure custom ZQL syntax highlighting for code editor.
+            monaco.languages.register({ id: "zql" })
+            monaco.languages.setMonarchTokensProvider("zql", zqlConfig)
 
             // Jinja returns the original query escaped for rendering in HTML.
             // The template populates the escaped string in the hidden textarea,
@@ -65,7 +93,7 @@
             const originalQuery = inputStringEl.value
             const editor = monaco.editor.create(editorEl, {
                 value: originalQuery,
-                language: "sql",
+                language: "zql",
                 theme: "vs-dark",
             })
 

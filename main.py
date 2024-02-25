@@ -49,5 +49,11 @@ async def transpile_string(request: Request, inputString: str = Form(...)):
         result = f"Error {e}"
 
     return templates.TemplateResponse(
-        "main.html", {"request": request, "transpilation_result": transpilation_result, "client_response": f"> {result}"}
+        "main.html",
+        {
+            "request": request,
+            "query": inputString,
+            "transpilation_result": transpilation_result,
+            "client_response": f"> {result}"
+        }
     )

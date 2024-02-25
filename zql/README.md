@@ -133,7 +133,7 @@ query             : cte_clause simple_query
 cte_clause        : "with" cte_list
                   ;
 cte_list          : aliased_sub_query comma cte_list
-cte_list          | aliased_sub_query
+                  | aliased_sub_query
                   ;
 aliased_sub_query : sub_query alias word
                   ;

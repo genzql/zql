@@ -7,7 +7,7 @@ def test_simple_select_query():
     yass example
     no cap
     """
-    actual = Zql().parse(raw_query, use_grammar=False)
+    actual = Zql().parse(raw_query, use_grammar=True)
     expected = """
 SELECT a, b
 FROM example
@@ -23,7 +23,7 @@ def test_simple_select_query_with_limit():
     say less 10
     no cap
     """
-    actual = Zql().parse(raw_query, use_grammar=False)
+    actual = Zql().parse(raw_query, use_grammar=True)
     expected = """
 SELECT a, b
 FROM example
@@ -38,7 +38,7 @@ def test_select_without_from():
     its giving 6
     no cap
     """
-    actual = Zql().parse(raw_query, use_grammar=False)
+    actual = Zql().parse(raw_query, use_grammar=True)
     expected = """
 SELECT 6
 ;
@@ -51,7 +51,7 @@ def test_select_without_from_string_expression_single_quotes():
     its giving 'hello'
     no cap
     """
-    actual = Zql().parse(raw_query, use_grammar=False)
+    actual = Zql().parse(raw_query, use_grammar=True)
     expected = """
 SELECT 'hello'
 ;
@@ -64,7 +64,7 @@ def test_select_without_from_string_expression_double_quotes():
     its giving "hello"
     no cap
     """
-    actual = Zql().parse(raw_query, use_grammar=False)
+    actual = Zql().parse(raw_query, use_grammar=True)
     expected = """
 SELECT "hello"
 ;

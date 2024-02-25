@@ -69,7 +69,7 @@ expression        : expression operator expression
 quoted_expr       : r\".*?\"
                   | r\'.*?\'
                   ;
-float             : integer dot integer
+float             : r[0-9].[0-9]
                   ;
 integer           : r[0-9]+
                   ;

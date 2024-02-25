@@ -79,7 +79,7 @@ def test_single_where():
     tfw a be b
     no cap
     """
-    actual = Zql().parse(raw_query, use_grammar=False)
+    actual = Zql().parse(raw_query, use_grammar=True)
     expected = """
 SELECT a
 FROM example
@@ -97,7 +97,7 @@ def test_multi_where_and():
     fax a sike c
     no cap
     """
-    actual = Zql().parse(raw_query, use_grammar=False)
+    actual = Zql().parse(raw_query, use_grammar=True)
     expected = """
 SELECT a
 FROM example
@@ -116,7 +116,7 @@ def test_multi_where_or():
     uh a sike c
     no cap
     """
-    actual = Zql().parse(raw_query, use_grammar=False)
+    actual = Zql().parse(raw_query, use_grammar=True)
     expected = """
 SELECT a
 FROM example
@@ -136,7 +136,7 @@ def test_multi_where_and_or():
     uh b be c
     no cap
     """
-    actual = Zql().parse(raw_query, use_grammar=False)
+    actual = Zql().parse(raw_query, use_grammar=True)
     expected = """
 SELECT a
 FROM example
@@ -155,7 +155,7 @@ def test_single_where_string_expression():
     tfw a be 'ahh'
     no cap
     """
-    actual = Zql().parse(raw_query, use_grammar=False)
+    actual = Zql().parse(raw_query, use_grammar=True)
     expected = """
 SELECT a
 FROM example

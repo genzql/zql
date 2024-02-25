@@ -58,8 +58,10 @@ select_expr       : expression alias word
 expr_list         : expression comma expr_list
                   | expression
                   ;
-expression        : expression operator expression
-                  | function_expr
+expression        : single_expr operator single_expr
+                  | single_expr
+                  ;
+single_expr       : function_expr
                   | dot_expression
                   | quoted_expr
                   | float
@@ -77,11 +79,15 @@ word              : r[a-zA-Z][\w$]*
                   ;
 dot_expression    : word dot word
                   ;
-operator          : is
-                  | is_not
-                  | equal
+operator          : equal
                   | not_equal
+                  | is
+                  | is_not
+                  | cond_operator
                   | math_operator
+                  ;
+cond_operator     : and
+                  | or
                   ;
 function_expr     : function_name open_paren argument_list close_paren
                   ;
@@ -112,11 +118,8 @@ join_with_type    : join join_type
                   ;
 where_clause      : where condition_list
                   ;
-condition_list    : expression cond_operator expression
+condition_list    : expression cond_operator condition_list
                   | expression
-                  ;
-cond_operator     : and
-                  | or
                   ;
 groupby_clause    : groupby_start expr_list groupby_end
                   ;
@@ -204,6 +207,14 @@ where             : "tfw"
 and               : "fax"
                   ;
 or                : "uh"
+                  ;
+is                : "be"
+                  ;
+is_not            : "sike"
+                  ;
+equal             : "be"
+                  ;
+not_equal         : "sike"
                   ;
 groupby_start     : "let"
                   ;

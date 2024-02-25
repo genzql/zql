@@ -8,13 +8,24 @@ VALUE_NODES: set[str] = {
     "float",
     "quoted_expr",
 }
+SINGLE_CHILD_PASSTHROUGH_NODES: set[str] = {
+    "operator",
+    "cond_operator",
+}
 LITERAL_NODES: dict[str, str] = {
     "terminal": ";",
     "comma": ",",
+    "alias": "AS",
     "select": "SELECT",
     "from": "FROM",
-    "alias": "AS",
+    "where": "WHERE",
     "limit": "LIMIT",
+    "is": "IS",
+    "is_not": "IS NOT",
+    "equal": "=",
+    "not_equal": "!=",
+    "and": "AND",
+    "or": "OR",
 }
 
 
@@ -34,6 +45,9 @@ def render_node(ast: AstNode) -> SqlQuery:
 
     if node_type in VALUE_NODES:
         return ast.get("value")
+
+    if node_type in SINGLE_CHILD_PASSTHROUGH_NODES:
+        return render_node(children[0])
 
     literal = LITERAL_NODES.get(node_type)
     if literal is not None:
@@ -88,6 +102,15 @@ def render_node(ast: AstNode) -> SqlQuery:
         return f"{expression} {alias} {expression_alias}"
 
     if node_type == "expression":
+        expr_a = render_node(children[0])
+        if len(children) == 1:
+            return expr_a
+
+        operator = render_node(children[1])
+        expr_b = render_node(children[2])
+        return f"{expr_a} {operator} {expr_b}"
+
+    if node_type == "single_expr":
         first_child = children[0]
         expr_type = first_child.get("type")
         supported_expression_types = {"word", "integer", "float", "quoted_expr"}
@@ -137,6 +160,20 @@ def render_node(ast: AstNode) -> SqlQuery:
         where_query = render_node(children[0])
         groupby_query = render_node(children[1])
         return f"{where_query}\n{groupby_query}"
+
+    if node_type == "where_clause":
+        where = render_node(children[0])
+        condition_list = render_node(children[1])
+        return f"{where} {condition_list}"
+
+    if node_type == "condition_list":
+        expr_a = render_node(children[0])
+        if len(children) == 1:
+            return expr_a
+
+        cond_operator = render_node(children[1])
+        expr_b = render_node(children[2])
+        return f"{expr_a}\n{cond_operator} {expr_b}"
 
     if node_type == "groupby_query":
         if len(children) == 1:

@@ -46,7 +46,7 @@ SELECT 6
     assert actual == expected
 
 
-def test_select_without_from_string_expression():
+def test_select_without_from_string_expression_single_quotes():
     raw_query = """
     its giving 'hello'
     no cap
@@ -54,6 +54,19 @@ def test_select_without_from_string_expression():
     actual = Zql().parse(raw_query)
     expected = """
 SELECT 'hello'
+;
+    """.strip()
+    assert actual == expected
+
+
+def test_select_without_from_string_expression_double_quotes():
+    raw_query = """
+    its giving "hello"
+    no cap
+    """
+    actual = Zql().parse(raw_query)
+    expected = """
+SELECT "hello"
 ;
     """.strip()
     assert actual == expected

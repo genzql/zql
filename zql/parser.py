@@ -40,7 +40,7 @@ WHERE_CLAUSE = "where_clause"
 LIMIT_CLAUSE = "limit_clause"
 TERMINAL = "terminal"
 
-EXPR_RE = re.compile(r"\'?[(a-z)|(0-9)]+\'?")
+EXPR_RE = re.compile(r"(\'|\")?[(a-z)|(0-9)]+(\'|\")?")
 INT_RE = re.compile(r"[0-9]+")
 COMPARISON_TOKEN_MAP = {
     "be": "=",

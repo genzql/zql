@@ -45,11 +45,11 @@ async def home(request: Request):
 
 
 @app.post("/transpile")
-async def transpile_string(request: Request, inputString: str = Form(...)):
+async def transpile_string(request: Request, query: str = Form(...)):
     error_message: str | None = None
-    transpilation_result: str = ""
+    transpiled_query: str = ""
     try:
-        transpilation_result = Zql().parse(inputString)
+        transpiled_query = Zql().parse(query)
     except ZqlParserError as zpe:
         error_message = str(zpe)
 
@@ -57,7 +57,7 @@ async def transpile_string(request: Request, inputString: str = Form(...)):
     results: list[dict] = []
     if not error_message:
         try:
-            cursor = db_session.execute(transpilation_result)
+            cursor = db_session.execute(transpiled_query)
             rows = cursor.fetchall()
             columns = [col[0] for col in cursor.description]
             connection.commit()
@@ -69,10 +69,10 @@ async def transpile_string(request: Request, inputString: str = Form(...)):
         "main.html",
         {
             "request": request,
-            "query": inputString,
-            "transpilation_result": transpilation_result,
-            "client_response": results,
-            "response_columns": columns,
+            "query": query,
+            "transpiled_query": transpiled_query,
+            "rows": results,
+            "columns": columns,
             "error_message": error_message,
         }
     )

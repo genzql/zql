@@ -21,13 +21,13 @@
     <div id="editor" class="editor"></div>
 
     <form id="form" method="POST" action="/transpile">
-        <textarea type="hidden" id="inputString" name="inputString">{{ query }}</textarea>
+        <textarea type="hidden" id="query" name="query">{{ query }}</textarea>
         <br/>
         <button type="submit">Transpile</button>
     </form>
 
     <h2>Transpilation Result</h2>
-    <pre>{{ transpilation_result }}</pre>
+    <pre>{{ transpiled_query }}</pre>
 
     <h2>Client Response</h2>
     <div id="results"></div>
@@ -77,7 +77,7 @@
 
         const editorEl = document.getElementById("editor")
         const formEl = document.getElementById("form")
-        const inputStringEl = document.getElementById("inputString")
+        const queryEl = document.getElementById("query")
         const resultsEl = document.getElementById("results")
 
         require(["vs/editor/editor.main"], () => {
@@ -91,7 +91,7 @@
             // which safely unescapes any HTML characters. Then, we read the
             // sanitized value from the textarea value, which we can now use in
             // JavaScript without risk of cross-site scripting vulnerabilities.
-            const originalQuery = inputStringEl.value
+            const originalQuery = queryEl.value
             const editor = monaco.editor.create(editorEl, {
                 value: originalQuery,
                 language: "zql",
@@ -104,7 +104,7 @@
             formEl.addEventListener("submit", (e) => {
                 const content = editor.getValue()
                 if (!content) e.preventDefault()
-                inputStringEl.value = content
+                queryEl.value = content
             })
 
         })
@@ -140,8 +140,8 @@
             `
         }
 
-        const queryColumns = {{ response_columns|tojson }}
-        const queryRows = {{ client_response|tojson }}
+        const queryColumns = {{ columns|tojson if columns else [] }}
+        const queryRows = {{ rows|tojson if rows else [] }}
         const resultTable = html`
             <${ResultTable} columns=${queryColumns} rows=${queryRows} />
         `

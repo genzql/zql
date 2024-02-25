@@ -54,7 +54,7 @@ async def transpile_string(request: Request, inputString: str = Form(...)):
     except ZqlParserError as zpe:
         error_message = str(zpe)
 
-    result: list[dict] = []
+    results: list[dict] = []
     if not error_message:
         try:
             cursor = db_session.execute(transpilation_result)

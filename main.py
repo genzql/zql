@@ -28,12 +28,11 @@ db_session = connection.cursor()
 setup_db(db_session)
 
 
-def get_result_dicts(rows: list[tuple], columns: list[tuple]) -> list[dict]:
+def get_result_dicts(rows: list[tuple], column_names: list[str]) -> list[dict]:
     """
     Transforms SQLite rows and columns into dicts with column names as keys and
     column values as values.
     """
-    column_names = [col[0] for col in columns]
     results = [dict(zip(column_names, row)) for row in rows]
     return results
 
@@ -54,12 +53,13 @@ async def transpile_string(request: Request, inputString: str = Form(...)):
     except ZqlParserError as zpe:
         error_message = str(zpe)
 
+    columns: list[str] = []
     results: list[dict] = []
     if not error_message:
         try:
             cursor = db_session.execute(transpilation_result)
             rows = cursor.fetchall()
-            columns = cursor.description
+            columns = [col[0] for col in cursor.description]
             connection.commit()
             results = get_result_dicts(rows, columns)
         except sqlite3.OperationalError as soe:
@@ -72,6 +72,7 @@ async def transpile_string(request: Request, inputString: str = Form(...)):
             "query": inputString,
             "transpilation_result": transpilation_result,
             "client_response": results,
+            "response_columns": columns,
             "error_message": error_message,
         }
     )

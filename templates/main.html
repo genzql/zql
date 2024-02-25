@@ -122,28 +122,30 @@
             return html`<tr>${cells}</tr>`
         }
 
-        function QueryResults({ rows }) {
-            if (rows.length === 0) {
-                return html`<p>Query returned no results.</p>`
-            }
-
-            const columns = Object.keys(rows[0])
+        function ResultTable({ columns, rows }) {
+            const noResultsMessage = html`<p>Query returned no results.</p>`
             const headers = columns.map((name) => (
                 html`<th>${name}</th>`
             ))
             const tableRows = rows.map((row) => (
                 html`<${ResultRow} columns=${columns} row=${row} />`
             ))
+
             return html`
-            <table>
-                <tr>${headers}</tr>
-                ${tableRows}
-            </table>
-            `;
+                <table>
+                    <tr>${headers}</tr>
+                    ${tableRows}
+                </table>
+                ${rows.length === 0 && noResultsMessage}
+            `
         }
 
+        const queryColumns = {{ response_columns|tojson }}
         const queryRows = {{ client_response|tojson }}
-        render(html`<${QueryResults} rows=${queryRows} />`, resultsEl);
+        const resultTable = html`
+            <${ResultTable} columns=${queryColumns} rows=${queryRows} />
+        `
+        render(resultTable, resultsEl)
 
     </script>
 </body>

@@ -101,10 +101,28 @@
             // The Monaco editor only works on div elements, not textarea. So, 
             // to submit the code to the backend, we copy the editor input to
             // the hidden textarea before submitting the form.
-            formEl.addEventListener("submit", (e) => {
+            function submitForm() {
                 const content = editor.getValue()
-                if (!content) e.preventDefault()
+                if (!content) return
                 queryEl.value = content
+                formEl.submit()
+            }
+
+            formEl.addEventListener("submit", (e) => {
+                e.preventDefault()
+                submitForm()
+            })
+
+            // Submit form when Control + Enter is pressed.
+            const controlKey = "Control"
+            const enterKey = "Enter"
+            let isHoldingControl = false
+            editorEl.addEventListener("keydown", (e) => {
+                if (e.key === controlKey) isHoldingControl = true
+                if (isHoldingControl && e.key === enterKey) submitForm()
+            })
+            editorEl.addEventListener("keyup", (e) => {
+                if (e.key === controlKey) isHoldingControl = false
             })
 
         })

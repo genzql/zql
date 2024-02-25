@@ -21,5 +21,11 @@
 
     <h2>Client Response</h2>
     <pre>{{ client_response }}</pre>
+
+    {% if error_message %}
+        <h2>Error Message</h2>
+        <pre>{{ error_message }}</pre>
+    {% endif %}
+
 </body>
 </html>

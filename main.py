@@ -37,16 +37,20 @@ async def home(request: Request):
 
 @app.post("/transpile")
 async def transpile_string(request: Request, inputString: str = Form(...)):
+    error_message: str | None = None
+    transpilation_result: str = ""
     try:
         transpilation_result = Zql().parse(inputString)
     except ZqlParserError as zpe:
-        return { "error": str(zpe) }
+        error_message = str(zpe)
 
-    try:
-        result = db_session.execute(transpilation_result).fetchall()
-        connection.commit()
-    except sqlite3.OperationalError as e:
-        result = f"Error {e}"
+    result: list[tuple] = []
+    if not error_message:
+        try:
+            result = db_session.execute(transpilation_result).fetchall()
+            connection.commit()
+        except sqlite3.OperationalError as soe:
+            error_message = str(soe)
 
     return templates.TemplateResponse(
         "main.html",
@@ -54,6 +58,7 @@ async def transpile_string(request: Request, inputString: str = Form(...)):
             "request": request,
             "query": inputString,
             "transpilation_result": transpilation_result,
-            "client_response": f"> {result}"
+            "client_response": f"> {result}",
+            "error_message": error_message,
         }
     )

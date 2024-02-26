@@ -256,6 +256,70 @@ WHERE a = "hELlO"
     assert actual == expected
 
 
+@pytest.mark.skip()
+def test_single_line_comments():
+    raw_query = """
+    -- yo wassup its zql
+    its giving a, b, c
+    yass example
+    -- you cappin if you forget this
+    no cap
+    """
+    actual = Zql().parse(raw_query, use_grammar=True)
+    expected = """
+-- yo wassup its zql
+SELECT a, b, c
+FROM example
+-- you cappin if you forget this
+;
+    """.strip()
+    assert actual == expected
+
+
+@pytest.mark.skip()
+def test_inline_comments():
+    raw_query = """
+    its giving a, b, c -- yo wassup its zql
+    yass example
+    no cap -- you cappin if you forget this
+    """
+    actual = Zql().parse(raw_query, use_grammar=True)
+    expected = """
+SELECT a, b, c -- yo wassup its zql
+FROM example
+; -- you cappin if you forget this
+    """.strip()
+    assert actual == expected
+
+
+@pytest.mark.skip()
+def test_multiline_comments():
+    raw_query = """
+    /*
+     * yo wassup its zql
+     */
+    its giving a, b, c
+    yass example
+    no cap
+    /*
+    you cappin if you forget this
+     */
+    """
+    actual = Zql().parse(raw_query, use_grammar=True)
+    expected = """
+/*
+* yo wassup its zql
+*/
+SELECT a, b, c
+FROM example
+;
+/*
+you cappin if you forget this
+*/
+    """.strip()
+    assert actual == expected
+
+
 def test_simple_select_union():
     raw_query = """
     its giving a, b, c

@@ -49,7 +49,7 @@ export function SqlForm() {
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
-          className="flex flex-col justify-center items-center space-y-2"
+          className="flex flex-col justify-center items-center space-y-2 p-5"
         >
           <FormField
             control={form.control}
@@ -59,21 +59,21 @@ export function SqlForm() {
                 <FormControl>
                   <Textarea
                     placeholder="its giving 1 no cap"
-                    className="resize-none text-lg w-96 h-72" // Adjust width and height here
+                    className="resize-none text-lg w-96 h-56" // Adjust width and height here
                     {...field}
                   />
                 </FormControl>
               </FormItem>
             )}
           />
-          <Button className="" type="submit">
+          <Button className="bg-slate-900 h-12 text-lg" type="submit">
             send it
           </Button>
         </form>
       </Form>
       {dataColumns.length ? (
-        <div className="flex flex-col justify-center items-center p-10">
-          <h1 className="text-3xl p-2"> sheeeesh that zql bussin</h1>
+        <div className="flex flex-col">
+          <h1 className="text-2xl font-bold py-2"> sheeeesh that zql bussin</h1>
           <DataTable columns={dataColumns} data={dataRows} />
         </div>
       ) : (
@@ -81,18 +81,22 @@ export function SqlForm() {
       )}
 
       {errorMessage && (
-        <div className="flex flex-col justify-center items-center p-10">
-          <h1 className="text-3xl p-2"> that zql is a bit sus iykyk </h1>
+        <div className="flex flex-col">
+          <h1 className="text-2xl font-bold py-2">
+            {" "}
+            that zql is a bit sus iykyk{" "}
+          </h1>
           <div>{errorMessage}</div>
         </div>
       )}
 
       {transpiledQuery && (
-        <div className="flex flex-col justify-center items-center p-10">
-          <h1 className="text-3xl p-2"> sql for boomers </h1>
+        <div className="flex flex-col mt-3">
+          <h1 className="text-2xl font-bold py-2"> sql for boomers </h1>
           <div>{transpiledQuery}</div>
         </div>
       )}
+      <div className="mt-10"></div>
     </div>
   );
 }

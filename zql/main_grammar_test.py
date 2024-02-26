@@ -665,3 +665,107 @@ ORDER BY b DESC, c NULLS LAST, d NULLS FIRST, e ASC
 ;
     """.strip()
     assert actual == expected
+
+
+def test_common_table_expressions():
+    raw_query = """
+    perchance my_cte_b be (
+        its giving a
+        yass example
+        tfw b be "BBB"
+    ),
+    my_cte_c be (
+        its giving a
+        yass example
+        tfw c be "CCC"
+    )
+    its giving a
+    yass my_cte_b
+    with the bois
+    its giving a
+    yass my_cte_c
+    no cap
+    """
+    actual = Zql().parse(raw_query, use_grammar=True)
+    expected = """
+WITH my_cte_b AS (
+SELECT a
+FROM example
+WHERE b = "BBB"
+),
+my_cte_c AS (
+SELECT a
+FROM example
+WHERE c = "CCC"
+)
+SELECT a
+FROM my_cte_b
+UNION
+SELECT a
+FROM my_cte_c
+;
+    """.strip()
+    assert actual == expected
+
+
+def test_select_from_sub_query_without_alias():
+    raw_query = """
+    its giving a
+    yass (
+        its giving a
+        yass example
+    )
+    no cap
+    """
+    actual = Zql().parse(raw_query, use_grammar=True)
+    expected = """
+SELECT a
+FROM (
+SELECT a
+FROM example
+)
+;
+    """.strip()
+    assert actual == expected
+
+
+def test_select_from_sub_query_with_alias():
+    raw_query = """
+    its giving a
+    yass (
+        its giving a
+        yass example
+    ) be sub
+    no cap
+    """
+    actual = Zql().parse(raw_query, use_grammar=True)
+    expected = """
+SELECT a
+FROM (
+SELECT a
+FROM example
+) AS sub
+;
+    """.strip()
+    assert actual == expected
+
+
+def test_select_from_sub_query_with_implict_alias():
+    raw_query = """
+    its giving a
+    yass (
+        its giving a
+        yass example
+    ) sub
+    no cap
+    """
+    actual = Zql().parse(raw_query, use_grammar=True)
+    expected = """
+SELECT a
+FROM (
+SELECT a
+FROM example
+) sub
+;
+    """.strip()
+    assert actual == expected

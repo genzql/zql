@@ -161,7 +161,7 @@ def test_parse_ast_formula_fail_unparsed_tokens_remain():
     with pytest.raises(AstParseError) as err:
         parse_ast(FORMULA_GRAMMAR, "7 * c + 3")
     actual = str(err.value)
-    expected = "Satisfied `root` rule, but unparsed tokens remain: ['+', '3']"
+    expected = "Could not apply `root` rule to remaining tokens: ['+', '3']"
     assert actual == expected
 
 

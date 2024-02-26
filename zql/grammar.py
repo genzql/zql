@@ -232,8 +232,17 @@ def evaluate_node(
     for rule in rules:
         try:
             mutable_tokens_manager = tokens_manager.copy()
-            ast_node = evaluate_rule(grammar, mutable_tokens_manager, rule)
-            tokens_manager.set_tokens(mutable_tokens_manager.tokens)
+            rule_node = evaluate_rule(grammar, mutable_tokens_manager, rule)
+
+            remaining_tokens = mutable_tokens_manager.tokens
+            if node == ROOT and remaining_tokens:
+                raise AstParseError(
+                    "Could not apply `root` rule to remaining tokens: "
+                    f"{remaining_tokens}"
+                )
+
+            tokens_manager.set_tokens(remaining_tokens)
+            ast_node = rule_node
             break
         except Exception as e:
             error = e

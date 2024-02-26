@@ -10,16 +10,19 @@ query_stmt        : explain query
                   | query
                   ;
 query             : cte_clause simple_query
+                  > "{cte_clause}\n{simple_query}"
                   | simple_query
                   ;
 cte_clause        : with cte_list
                   ;
-cte_list          : aliased_sub_query comma cte_list
-                  | aliased_sub_query
+cte_list          : aliased_cte comma cte_list
+                  > "{aliased_cte},\n{cte_list}"
+                  | aliased_cte
                   ;
-aliased_sub_query : sub_query alias word
+aliased_cte       : word alias sub_query
                   ;
 sub_query         : open_paren simple_query close_paren 
+                  > "{open_paren}\n{simple_query}\n{close_paren}"
                   ;
 simple_query      : select_query
                   ;
@@ -146,7 +149,7 @@ from_clause       : from table join_list
                   | from table
                   ;
 table             : sub_query alias word
-                  | sub_query word
+                  | sub_query non_keyword
                   | sub_query
                   | table_name
                   ;
@@ -237,6 +240,8 @@ db_table          : word dot word
 manipulation_stmt : insert_stmt
                   ;
 insert_stmt       : insert_into db_table open_paren expr_list close_paren
+                  ;
+non_keyword       : r\b(?!perchance\b|\bits\b|\byass\b|\bcome\b|\bbet\b|\btfw\b|\blet\b|\bcatch\b|\bngl\b|\bsay\b|\bwith\b|\bno\b)\w+\b
                   ;
 with              : "perchance"
                   > "WITH"

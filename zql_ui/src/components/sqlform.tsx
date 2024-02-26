@@ -59,7 +59,7 @@ export function SqlForm() {
                 <FormControl>
                   <Textarea
                     placeholder="its giving 1 no cap"
-                    className="resize-none text-lg"
+                    className="resize-none text-lg w-96 h-72" // Adjust width and height here
                     {...field}
                   />
                 </FormControl>
@@ -72,26 +72,24 @@ export function SqlForm() {
         </form>
       </Form>
       {dataColumns.length ? (
-        <div className="container">
-          <h1 className="flex text-3xl justify-center p-10">
-            {" "}
-            sheeeesh that zql bussin
-          </h1>
+        <div className="flex flex-col justify-center items-center p-10">
+          <h1 className="text-3xl p-2"> sheeeesh that zql bussin</h1>
           <DataTable columns={dataColumns} data={dataRows} />
         </div>
       ) : (
         <div />
       )}
+
       {errorMessage && (
-        <div className="flex flex-col justify-center items-center">
-          <h1 className="text-3xl p-10"> that zql is a bit sus iykyk </h1>
+        <div className="flex flex-col justify-center items-center p-10">
+          <h1 className="text-3xl p-2"> that zql is a bit sus iykyk </h1>
           <div>{errorMessage}</div>
         </div>
       )}
 
       {transpiledQuery && (
-        <div className="flex flex-col justify-center items-center">
-          <h1 className="text-3xl p-10"> sql for boomers </h1>
+        <div className="flex flex-col justify-center items-center p-10">
+          <h1 className="text-3xl p-2"> sql for boomers </h1>
           <div>{transpiledQuery}</div>
         </div>
       )}

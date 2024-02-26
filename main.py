@@ -57,8 +57,14 @@ async def home(request: Request):
         "main.html", {"request": request, "transpilation_result": "", "client_response": ">"}
     )
 
-
 @app.post("/transpile")
+async def transpile_query(query: str = Form(...)):
+    try:
+        transpiled_query = Zql().parse(query, use_grammar=False)
+    except ZqlParserError as zpe:
+        error_message = str(zpe)
+
+@app.post("/run")
 async def transpile_string(request: Request, query: str = Form(...)):
     error_message: str | None = None
     transpiled_query: str = ""

@@ -1,183 +1,181 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ZQL Transpiler</title>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ZQL Engine</title>
     <style>
+      .editor {
+        height: 300px;
+      }
 
-        .editor {
-            height: 300px;
-        }
-
-        [type="hidden"] {
-            display: none;
-        }
-
+      [type="hidden"] {
+        display: none;
+      }
     </style>
     <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body>
+  </head>
+  <body>
     <div class="mx-auto max-w-2xl p-4">
-        <h1 class="text-7xl my-4 font-bold text-center">zql</h1>
-        <p class="text-2xl my-4 text-center">its giving sql for gen z</p>
-        <div id="editor" class="editor"></div>
+      <h1 class="text-7xl my-4 font-bold text-center">zql</h1>
+      <p class="text-2xl my-4 text-center">its giving sql for gen z</p>
+      <div id="editor" class="editor"></div>
 
-        <form id="form" method="POST" action="/transpile">
-            <textarea type="hidden" id="query" name="query">{{ query }}</textarea>
-            <button type="submit" class="block mx-auto my-4 text-2xl rounded-md bg-pink-500 p-4 font-semibold text-white shadow-sm hover:bg-pink-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-pink-500">send it</button>
-        </form>
+      <form id="form" method="POST" action="/run">
+        <textarea type="hidden" id="query" name="query">{{ query }}</textarea>
+        <button
+          type="submit"
+          class="block mx-auto my-4 text-2xl rounded-md bg-pink-500 p-4 font-semibold text-white shadow-sm hover:bg-pink-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-pink-500"
+        >
+          send it
+        </button>
+      </form>
 
-        {% if rows %}
-            <h2 class="text-2xl my-4 font-bold">sheeeesh that zql bussin</h2>
-            <div id="results"></div>
-        {% endif %}
-
-        {% if error_message %}
-            <h2 class="text-2xl my-4 font-bold">that zql is a bit sus iykyk</h2>
-            <pre class="my-4">{{ error_message }}</pre>
-        {% endif %}
-
-        {% if transpiled_query %}
-            <h2 class="text-2xl my-4 font-bold">sql for boomers</h2>
-            <pre class="my-4">{{ transpiled_query }}</pre>
-        {% endif %}
+      {% if rows %}
+      <h2 class="text-2xl my-4 font-bold">sheeeesh that zql bussin</h2>
+      <div id="results"></div>
+      {% endif %} {% if error_message %}
+      <h2 class="text-2xl my-4 font-bold">that zql is a bit sus iykyk</h2>
+      <pre class="my-4">{{ error_message }}</pre>
+      {% endif %} {% if transpiled_query %}
+      <h2 class="text-2xl my-4 font-bold">sql for boomers</h2>
+      <pre class="my-4">{{ transpiled_query }}</pre>
+      {% endif %}
     </div>
 
     <!-- Use Monaco Editor via CDN -->
     <!-- https://stackoverflow.com/a/63179814 -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.26.1/min/vs/loader.min.js"></script>
     <script type="module">
-        // The loader.min.js script provides these modules:
-        // global require
-        // global monaco
+      // The loader.min.js script provides these modules:
+      // global require
+      // global monaco
 
-        require.config({
-            paths: {
-                "vs": "https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.26.1/min/vs"
-            }
-        })
+      require.config({
+          paths: {
+              "vs": "https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.26.1/min/vs"
+          }
+      })
 
-        const defaultQuery = `its giving\n\tname,\n\tfave_color,\n\tfollowers\nyass peeps\nsay less 3\nno cap`
+      const defaultQuery = `its giving\n\tname,\n\tfave_color,\n\tfollowers\nyass peeps\nsay less 3\nno cap`
 
-        const zqlConfig = {
-            ignoreCase: true,
-            keywords: ["yass", "tfw", "say", "be", "sike", "fax", "uh"],
-            tokenizer: {
-                root: [
-                    // Keywords
-                    // Multi-Token Keywords
-                    [/its giving/, "keyword"],
-                    [/say less/, "keyword"],
-                    [/no cap/, "keyword"],
-                    [/@?[a-zA-Z][\w$]*/, {
-                        cases: {
-                            "@keywords": "keyword",
-                            "@default": "source",
-                        },
-                    }],
-                    // Literal Values
-                    [/".*?"/, "string"],
-                    [/'.*?'/, "string"],
-                    [/\d*\.\d+([eE][\-+]?\d+)?/, "number.float"],
-                    [/\d+/, "number"],
-                ],
-            },
-        }
+      const zqlConfig = {
+          ignoreCase: true,
+          keywords: ["yass", "tfw", "say", "be", "sike", "fax", "uh"],
+          tokenizer: {
+              root: [
+                  // Keywords
+                  // Multi-Token Keywords
+                  [/its giving/, "keyword"],
+                  [/say less/, "keyword"],
+                  [/no cap/, "keyword"],
+                  [/@?[a-zA-Z][\w$]*/, {
+                      cases: {
+                          "@keywords": "keyword",
+                          "@default": "source",
+                      },
+                  }],
+                  // Literal Values
+                  [/".*?"/, "string"],
+                  [/'.*?'/, "string"],
+                  [/\d*\.\d+([eE][\-+]?\d+)?/, "number.float"],
+                  [/\d+/, "number"],
+              ],
+          },
+      }
 
-        const editorEl = document.getElementById("editor")
-        const formEl = document.getElementById("form")
-        const queryEl = document.getElementById("query")
-        const resultsEl = document.getElementById("results")
+      const editorEl = document.getElementById("editor")
+      const formEl = document.getElementById("form")
+      const queryEl = document.getElementById("query")
+      const resultsEl = document.getElementById("results")
 
-        require(["vs/editor/editor.main"], () => {
+      require(["vs/editor/editor.main"], () => {
 
-            // Configure custom ZQL syntax highlighting for code editor.
-            monaco.languages.register({ id: "zql" })
-            monaco.languages.setMonarchTokensProvider("zql", zqlConfig)
+          // Configure custom ZQL syntax highlighting for code editor.
+          monaco.languages.register({ id: "zql" })
+          monaco.languages.setMonarchTokensProvider("zql", zqlConfig)
 
-            // Jinja returns the original query escaped for rendering in HTML.
-            // The template populates the escaped string in the hidden textarea,
-            // which safely unescapes any HTML characters. Then, we read the
-            // sanitized value from the textarea value, which we can now use in
-            // JavaScript without risk of cross-site scripting vulnerabilities.
-            const originalQuery = queryEl.value
-            const editor = monaco.editor.create(editorEl, {
-                value: originalQuery || defaultQuery,
-                language: "zql",
-                theme: "vs-dark",
-                fontSize: 18,
-            })
+          // Jinja returns the original query escaped for rendering in HTML.
+          // The template populates the escaped string in the hidden textarea,
+          // which safely unescapes any HTML characters. Then, we read the
+          // sanitized value from the textarea value, which we can now use in
+          // JavaScript without risk of cross-site scripting vulnerabilities.
+          const originalQuery = queryEl.value
+          const editor = monaco.editor.create(editorEl, {
+              value: originalQuery || defaultQuery,
+              language: "zql",
+              theme: "vs-dark",
+              fontSize: 18,
+          })
 
-            // The Monaco editor only works on div elements, not textarea. So, 
-            // to submit the code to the backend, we copy the editor input to
-            // the hidden textarea before submitting the form.
-            function submitForm() {
-                const content = editor.getValue()
-                if (!content) return
-                queryEl.value = content
-                formEl.submit()
-            }
+          // The Monaco editor only works on div elements, not textarea. So,
+          // to submit the code to the backend, we copy the editor input to
+          // the hidden textarea before submitting the form.
+          function submitForm() {
+              const content = editor.getValue()
+              if (!content) return
+              queryEl.value = content
+              formEl.submit()
+          }
 
-            formEl.addEventListener("submit", (e) => {
-                e.preventDefault()
-                submitForm()
-            })
+          formEl.addEventListener("submit", (e) => {
+              e.preventDefault()
+              submitForm()
+          })
 
-            // Submit form when Control + Enter is pressed.
-            const controlKey = "Control"
-            const enterKey = "Enter"
-            let isHoldingControl = false
-            editorEl.addEventListener("keydown", (e) => {
-                if (e.key === controlKey) isHoldingControl = true
-                if (isHoldingControl && e.key === enterKey) submitForm()
-            })
-            editorEl.addEventListener("keyup", (e) => {
-                if (e.key === controlKey) isHoldingControl = false
-            })
+          // Submit form when Control + Enter is pressed.
+          const controlKey = "Control"
+          const enterKey = "Enter"
+          let isHoldingControl = false
+          editorEl.addEventListener("keydown", (e) => {
+              if (e.key === controlKey) isHoldingControl = true
+              if (isHoldingControl && e.key === enterKey) submitForm()
+          })
+          editorEl.addEventListener("keyup", (e) => {
+              if (e.key === controlKey) isHoldingControl = false
+          })
 
-        })
+      })
 
-        // Import and initialize Preact and htm
-        import { h, render } from 'https://esm.sh/preact'
-        import htm from 'https://esm.sh/htm'
+      // Import and initialize Preact and htm
+      import { h, render } from 'https://esm.sh/preact'
+      import htm from 'https://esm.sh/htm'
 
-        const html = htm.bind(h)
+      const html = htm.bind(h)
 
-        function ResultRow({ columns, row }) {
-            const cells = columns.map((name) => (
-                html`<td class="p-2 border border-pink-600">${row?.[name]}</td>`
-            ))
-            return html`<tr class="hover:bg-pink-400 hover:text-white">${cells}</tr>`
-        }
+      function ResultRow({ columns, row }) {
+          const cells = columns.map((name) => (
+              html`<td class="p-2 border border-pink-600">${row?.[name]}</td>`
+          ))
+          return html`<tr class="hover:bg-pink-400 hover:text-white">${cells}</tr>`
+      }
 
-        function ResultTable({ columns, rows }) {
-            const noResultsMessage = html`<p>Query returned no results.</p>`
-            const headers = columns.map((name) => (
-                html`<th class="p-2 bg-pink-500 hover:bg-pink-400 text-white font-semibold border border-pink-600">${name}</th>`
-            ))
-            const tableRows = rows.map((row) => (
-                html`<${ResultRow} columns=${columns} row=${row} />`
-            ))
+      function ResultTable({ columns, rows }) {
+          const noResultsMessage = html`<p>Query returned no results.</p>`
+          const headers = columns.map((name) => (
+              html`<th class="p-2 bg-pink-500 hover:bg-pink-400 text-white font-semibold border border-pink-600">${name}</th>`
+          ))
+          const tableRows = rows.map((row) => (
+              html`<${ResultRow} columns=${columns} row=${row} />`
+          ))
 
-            return html`
-                <table class="table-auto w-full text-left border border-collapse border-pink-400">
-                    <thead>
-                        <tr>${headers}</tr>
-                    </thead>
-                    <tbody>${tableRows}</tbody>
-                </table>
-                ${rows.length === 0 && noResultsMessage}
-            `
-        }
+          return html`
+              <table class="table-auto w-full text-left border border-collapse border-pink-400">
+                  <thead>
+                      <tr>${headers}</tr>
+                  </thead>
+                  <tbody>${tableRows}</tbody>
+              </table>
+              ${rows.length === 0 && noResultsMessage}
+          `
+      }
 
-        const queryColumns = {{ columns|tojson if columns else [] }}
-        const queryRows = {{ rows|tojson if rows else [] }}
-        const resultTable = html`
-            <${ResultTable} columns=${queryColumns} rows=${queryRows} />
-        `
-        if (resultsEl) render(resultTable, resultsEl)
-
+      const queryColumns = {{ columns|tojson if columns else [] }}
+      const queryRows = {{ rows|tojson if rows else [] }}
+      const resultTable = html`
+          <${ResultTable} columns=${queryColumns} rows=${queryRows} />
+      `
+      if (resultsEl) render(resultTable, resultsEl)
     </script>
-</body>
+  </body>
 </html>

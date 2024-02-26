@@ -288,6 +288,21 @@ FROM example
     assert actual == expected
 
 
+def test_select_postfix_alias():
+    raw_query = """
+    its giving a, b af be total_b
+    yass example
+    no cap
+    """
+    actual = Zql().parse(raw_query, use_grammar=True)
+    expected = """
+SELECT a, SUM(b) AS total_b
+FROM example
+;
+    """.strip()
+    assert actual == expected
+
+
 def test_respect_case():
     raw_query = """
     ITS GIVING a

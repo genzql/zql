@@ -117,6 +117,7 @@ argument_list     : expression comma argument_list
                   | expression
                   ;
 from_clause       : from table join_list
+                  > "{from} {table}\n{join_list}"
                   | from table
                   ;
 table             : sub_query alias word
@@ -132,8 +133,10 @@ join_list         : join_clause join_list
                   ;
 join_clause       : comma table 
                   | join_with_type table join_on condition_list
+                  > "{join_with_type} {table}\n{join_on} {condition_list}"
                   ;
 join_with_type    : join join_type
+                  > "{join_type} {join}"
                   | join
                   ;
 where_clause      : where condition_list
@@ -223,13 +226,34 @@ join              : "come through"
 join_on           : "bet"
                   > "ON"
                   ;
-join_type         : "inner"
-                  | "left"
-                  | "left outer"
-                  | "right"
-                  | "right outer"
-                  | "full outer"
-                  | "cross"
+join_type         : join_inner
+                  | join_left
+                  | join_left_outer
+                  | join_right
+                  | join_right_outer
+                  | join_full_outer
+                  | join_cross
+                  ;
+join_inner        : "inner"
+                  > "INNER"
+                  ;
+join_left         : "left"
+                  > "LEFT"
+                  ;
+join_left_outer   : "left_outer"
+                  > "LEFT OUTER"
+                  ;
+join_right        : "right"
+                  > "RIGHT"
+                  ;
+join_right_outer  : "right_outer"
+                  > "RIGHT OUTER"
+                  ;
+join_full_outer   : "full_outer"
+                  > "FULL OUTER"
+                  ;
+join_cross        : "cross"
+                  > "CROSS"
                   ;
 where             : "tfw"
                   > "WHERE"

@@ -253,3 +253,47 @@ WHERE y = 100
 ;
     """.strip()
     assert actual == expected
+
+
+@pytest.mark.skip()
+def test_join_single():
+    raw_query = """
+    its giving a, b
+    yass table_a
+    come through left table_b
+    bet a be b
+    no cap
+    """
+    actual = Zql().parse(raw_query, use_grammar=True)
+    expected = """
+SELECT a, b
+FROM table_a
+LEFT JOIN table_b
+ON a = b
+;
+    """.strip()
+    assert actual == expected
+
+
+@pytest.mark.skip()
+def test_join_many():
+    raw_query = """
+    its giving a, b, c
+    yass table_a
+    come through left table_b
+        bet a be b
+    come through full outer table_c
+        bet a sike c
+    no cap
+    """
+    actual = Zql().parse(raw_query, use_grammar=True)
+    expected = """
+SELECT a, b, c
+FROM table_a
+LEFT JOIN table_b
+ON a = b
+FULL OUTER JOIN table_c
+ON a != c
+;
+    """.strip()
+    assert actual == expected

@@ -61,7 +61,8 @@ union_query       : union_clause simple_query
                   > "{union_clause}\n{simple_query}"
                   | terminal
                   ;
-select_clause     : select select_expr_list
+select_clause     : select distinct select_expr_list
+                  | select select_expr_list
                   ;
 select_expr_list  : select_expr comma select_expr_list
                   > "{select_expr}, {select_expr_list}"
@@ -75,10 +76,15 @@ star              : r(shee)(e)*(sh)
                   > "*"
                   ;
 expr_list         : expression comma expr_list
+                  > "{expression}, {expr_list}"
                   | expression
                   ;
 expression        : single_expr operator single_expr
+                  | single_expr postfix_expr
+                  > "{postfix_expr}({single_expr})"
                   | single_expr
+                  ;
+postfix_expr      : sum
                   ;
 single_expr       : function_expr
                   | dot_expression
@@ -108,16 +114,31 @@ operator          : equal
                   | is
                   | is_not
                   | cond_operator
+                  | comp_operator
                   | math_operator
                   ;
 cond_operator     : and
                   | or
                   ;
-function_expr     : function_name open_paren argument_list close_paren
+comp_operator     : lte
+                  | gte
+                  | lt
+                  | gt
+                  ;
+math_operator     : plus
+                  | minus
+                  | multiply
+                  | divide
+                  ;
+function_expr     : function_name open_paren function_args close_paren
+                  > "{function_name}({function_args})"
+                  ;
+function_args     : distinct arg_list
+                  | arg_list
                   ;
 function_name     : word
                   ;
-argument_list     : expression comma argument_list
+arg_list          : expression comma arg_list
                   | expression
                   ;
 from_clause       : from table join_list
@@ -222,6 +243,12 @@ with              : "perchance"
 select            : "its giving"
                   > "SELECT"
                   ;
+distinct          : "real ones"
+                  > "DISTINCT"
+                  ;
+sum               : "af"
+                  > "SUM"
+                  ;
 from              : "yass"
                   > "FROM"
                   ;
@@ -280,6 +307,26 @@ equal             : "be"
                   ;
 not_equal         : "sike"
                   > "!="
+                  ;
+lte               : "kinda flops"
+                  > "<="
+                  ;
+gte               : "kinda bops"
+                  > ">="
+                  ;
+lt                : "flops"
+                  > "<"
+                  ;
+gt                : "bops"
+                  > ">"
+                  ;
+plus              : "+"
+                  ;
+minus             : "-"
+                  ;
+multiply          : "*"
+                  ;
+divide            : "/"
                   ;
 groupby_start     : "let"
                   ;

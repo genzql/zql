@@ -209,6 +209,36 @@ FROM example
     assert actual == expected
 
 
+def test_select_distinct():
+    raw_query = """
+    its giving real ones a, b, c
+    yass example
+    no cap
+    """
+    actual = Zql().parse(raw_query, use_grammar=True)
+    expected = """
+SELECT DISTINCT a, b, c
+FROM example
+;
+    """.strip()
+    assert actual == expected
+
+
+def test_select_math_expressions():
+    raw_query = """
+    its giving a, b + c, d * e, f/g, h-i
+    yass example
+    no cap
+    """
+    actual = Zql().parse(raw_query, use_grammar=True)
+    expected = """
+SELECT a, b + c, d * e, f / g, h - i
+FROM example
+;
+    """.strip()
+    assert actual == expected
+
+
 def test_respect_case():
     raw_query = """
     ITS GIVING a
@@ -370,6 +400,116 @@ FULL OUTER JOIN table_c
 ON a != c
 AND 1 = 1
 OR c != "quack"
+;
+    """.strip()
+    assert actual == expected
+
+
+def test_groupby_one_field_simple_aggregation():
+    raw_query = """
+    its giving a, count(b)
+    yass example
+    let a cook
+    no cap
+    """
+    actual = Zql().parse(raw_query, use_grammar=True)
+    expected = """
+SELECT a, count(b)
+FROM example
+GROUP BY a
+;
+    """.strip()
+    assert actual == expected
+
+
+def test_groupby_one_field_sum_aggregation():
+    raw_query = """
+    its giving a, b af
+    yass example
+    let a cook
+    no cap
+    """
+    actual = Zql().parse(raw_query, use_grammar=True)
+    expected = """
+SELECT a, SUM(b)
+FROM example
+GROUP BY a
+;
+    """.strip()
+    assert actual == expected
+
+
+def test_groupby_one_field_distinct_aggregation():
+    raw_query = """
+    its giving a, COUNT(real ones b)
+    yass example
+    let a cook
+    no cap
+    """
+    actual = Zql().parse(raw_query, use_grammar=True)
+    expected = """
+SELECT a, COUNT(DISTINCT b)
+FROM example
+GROUP BY a
+;
+    """.strip()
+    assert actual == expected
+
+
+def test_groupby_multiple_fields():
+    raw_query = """
+    its giving a, b, c, d, count(e)
+    yass example
+    let a, b, c, d cook
+    no cap
+    """
+    actual = Zql().parse(raw_query, use_grammar=True)
+    expected = """
+SELECT a, b, c, d, count(e)
+FROM example
+GROUP BY a, b, c, d
+;
+    """.strip()
+    assert actual == expected
+
+
+def test_groupby_having_with_one_field():
+    raw_query = """
+    its giving a, count(b)
+    yass example
+    let a cook
+    catch these count(b) bops 10 hands
+    no cap
+    """
+    actual = Zql().parse(raw_query, use_grammar=True)
+    expected = """
+SELECT a, count(b)
+FROM example
+GROUP BY a
+HAVING count(b) > 10
+;
+    """.strip()
+    assert actual == expected
+
+
+def test_groupby_having_with_multiple_fields():
+    raw_query = """
+    its giving a, count(b)
+    yass example
+    let a cook
+    catch these
+        count(b) bops 10
+        fax count(b) kinda flops 100
+    hands
+    no cap
+    """
+    actual = Zql().parse(raw_query, use_grammar=True)
+    expected = """
+SELECT a, count(b)
+FROM example
+GROUP BY a
+HAVING count(b) > 10
+AND count(b) <= 100
 ;
     """.strip()
     assert actual == expected

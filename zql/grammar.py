@@ -113,7 +113,7 @@ def parse_grammar(content: str) -> Grammar:
 
 
 WHITESPACE_REGEX = re.compile(r"\s+")
-NEED_SPACE_AROUND_CHARS = [",", ".", "(", ")"]
+NEED_SPACE_AROUND_CHARS = [",", ".", "(", ")", "+", "-", "*", "/"]
 
 
 AstNode = dict

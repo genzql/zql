@@ -6,7 +6,6 @@ import axios from "axios";
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem } from "@/components/ui/form";
 import { Textarea } from "@/components/ui/textarea";
-import { toast } from "@/components/ui/use-toast";
 import { useState } from "react";
 import { DataTable } from "./data-table";
 
@@ -39,28 +38,18 @@ export function SqlForm() {
       setDataRows(response.data["rows"]);
       setDataColumns(response.data["columns"]);
       setErrorMessage(response.data["error_message"]);
-
-      toast({
-        title: "Transpilation successful",
-        description: "Check the console for the transpiled data.",
-      });
     } catch (error) {
       // Handle errors
       console.error("Transpilation failed:", error);
-
-      toast({
-        title: "Transpilation failed",
-        description: "An error occurred while transpiling the query.",
-      });
     }
   }
 
   return (
-    <div className="p-5">
+    <div>
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
-          className="flex flex-col justify-center items-center space-y-6"
+          className="flex flex-col justify-center items-center space-y-2"
         >
           <FormField
             control={form.control}
@@ -70,21 +59,21 @@ export function SqlForm() {
                 <FormControl>
                   <Textarea
                     placeholder="its giving 1 no cap"
-                    className="resize-none"
+                    className="resize-none text-lg"
                     {...field}
                   />
                 </FormControl>
               </FormItem>
             )}
           />
-          <Button className="w-1/8" type="submit">
-            send It
+          <Button className="" type="submit">
+            send it
           </Button>
         </form>
       </Form>
       {dataColumns.length ? (
-        <div className="container justify-center items-center">
-          <h1 className="flex text-3xl justify-center p-5">
+        <div className="container">
+          <h1 className="flex text-3xl justify-center p-10">
             {" "}
             sheeeesh that zql bussin
           </h1>
@@ -95,14 +84,14 @@ export function SqlForm() {
       )}
       {errorMessage && (
         <div className="flex flex-col justify-center items-center">
-          <h1 className="text-3xl p-5"> that zql is a bit sus iykyk </h1>
+          <h1 className="text-3xl p-10"> that zql is a bit sus iykyk </h1>
           <div>{errorMessage}</div>
         </div>
       )}
 
       {transpiledQuery && (
         <div className="flex flex-col justify-center items-center">
-          <h1 className="text-3xl p-5"> sql for boomers </h1>
+          <h1 className="text-3xl p-10"> sql for boomers </h1>
           <div>{transpiledQuery}</div>
         </div>
       )}

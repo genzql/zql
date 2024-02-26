@@ -8,6 +8,7 @@ VALUE_NODES: set[str] = {
     "quoted_expr",
 }
 SINGLE_CHILD_PASSTHROUGH_NODES: set[str] = {
+    "zql",
     "operator",
     "cond_operator",
     "union_clause",
@@ -56,10 +57,19 @@ def render_node(ast: AstNode) -> SqlQuery:
     if literal is not None:
         return literal
 
-    if node_type == "zql":
-        query = render_node(children[0])
-        terminal = render_node(children[1])
-        return f"{query}\n{terminal}"
+    if node_type == "statement":
+        if len(children) > 1:
+            raise NotImplementedError("DDL and DML queries not yet supported.")
+
+        return render_node(children[0])
+
+    if node_type == "query_stmt":
+        if len(children) == 1:
+            return render_node(children[0])
+
+        explain = render_node(children[0])
+        query = render_node(children[1])
+        return f"{explain} {query}"
 
     if node_type == "query":
         if len(children) > 1:
@@ -204,6 +214,22 @@ def render_node(ast: AstNode) -> SqlQuery:
         orderby_query = render_node(children[0])
         limit_clause = render_node(children[1])
         return f"{orderby_query}\n{limit_clause}"
+
+    if node_type == "limit_query":
+        if len(children) == 1:
+            return render_node(children[0])
+
+        limit_clause = render_node(children[0])
+        union_query = render_node(children[1])
+        return f"{limit_clause}\n{union_query}"
+
+    if node_type == "union_query":
+        if len(children) == 1:
+            return render_node(children[0])
+
+        union_clause = render_node(children[0])
+        simple_query = render_node(children[1])
+        return f"{union_clause}\n{simple_query}"
 
     if node_type == "limit_clause":
         limit = render_node(children[0])

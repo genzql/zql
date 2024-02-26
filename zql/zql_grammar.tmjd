@@ -253,7 +253,7 @@ db_table          : word dot word
 manipulation_stmt : insert_stmt
                   ;
 insert_stmt       : insert_into db_table open_paren expr_list close_paren
-                  > "{insert_into} {db_table} ({expr_list})"
+                  > "{insert_into} {db_table} VALUES ({expr_list})"
                   ;
 non_keyword       : r\b(?!perchance\b|\bits\b|\byass\b|\bcome\b|\bbet\b|\btfw\b|\blet\b|\bcatch\b|\bngl\b|\bsay\b|\bwith\b|\bno\b)\w+\b
                   ;

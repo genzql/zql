@@ -899,4 +899,4 @@ def test_drop_table_if_not_exists():
 def test_insert():
     raw_query = "pushin p into example (1, \"A\") no cap"
     actual = Zql().parse(raw_query, use_grammar=True)
-    assert actual == "INSERT INTO example (1, \"A\");"
+    assert actual == "INSERT INTO example VALUES (1, \"A\");"

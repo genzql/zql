@@ -13,8 +13,10 @@ FORMULA_GRAMMAR_CONTENT = r"""
              | number
              ;
     open     : "("
+             > "(\n"
              ;
     close    : ")"
+             > "\n)"
              ;
     word     : r[a-zA-Z][\w$]*
              ;
@@ -54,10 +56,10 @@ def test_parse_grammar_formula():
             {"sequence": ["number"]},
         ],
         "open": [
-            {"literal": "("},
+            {"literal": "(", "template": "(\n"},
         ],
         "close": [
-            {"literal": ")"},
+            {"literal": ")", "template": "\n)"},
         ],
         "word": [
             {"regex": r"[a-zA-Z][\w$]*"},

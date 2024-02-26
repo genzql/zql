@@ -1,248 +1,99 @@
-from zql.grammar import AstNode
+from zql.grammar import AstNode, Grammar
 from zql.types import SqlQuery
 
 
-VALUE_NODES: set[str] = {
-    "word",
-    "integer",
-    "quoted_expr",
-}
-SINGLE_CHILD_PASSTHROUGH_NODES: set[str] = {
-    "zql",
-    "operator",
-    "cond_operator",
-    "union_clause",
-}
-LITERAL_NODES: dict[str, str] = {
-    "terminal": ";",
-    "comma": ",",
-    "dot": ".",
-    "alias": "AS",
-    "select": "SELECT",
-    "from": "FROM",
-    "where": "WHERE",
-    "limit": "LIMIT",
-    "union_all": "UNION ALL",
-    "union": "UNION",
-    "is": "IS",
-    "is_not": "IS NOT",
-    "equal": "=",
-    "not_equal": "!=",
-    "and": "AND",
-    "or": "OR",
-}
+RuleKey = tuple[str, list[str]]
+Template = str
+TemplateLookup = dict[RuleKey, Template]
+
+
+SPACE = " "
+SEQUENCE_RULE_TYPE = "sequence"
+NON_CHILDREN_RULE_TYPES = {"literal", "regex"}
 
 
 class QueryRenderError(Exception):
     pass
 
 
-def render_query(ast: AstNode) -> SqlQuery:
-    return render_node(ast)
+def render_query(grammar: Grammar, ast: AstNode) -> SqlQuery:
+    template_lookup = get_template_lookup(grammar)
+    return render_with_grammar(grammar, template_lookup, ast)
 
 
-def render_node(ast: AstNode) -> SqlQuery:
+def render_with_grammar(
+    grammar: Grammar,
+    lookup: TemplateLookup,
+    ast: AstNode
+) -> SqlQuery:
     node_type = ast.get("type")
     children = ast.get("children", [])
     if not node_type:
         raise QueryRenderError(f"Node should have a `type`: {ast}")
 
-    if node_type in VALUE_NODES:
-        return ast.get("value")
+    template = maybe_get_template(lookup, ast)
+    if template:
+        kwargs = {
+            c.get("type"): render_with_grammar(grammar, lookup, c)
+            for c in children
+        }
+        rendered = template.format(**kwargs)
+        return rendered
 
-    if node_type in SINGLE_CHILD_PASSTHROUGH_NODES:
-        return render_node(children[0])
+    if children:
+        args = [render_with_grammar(grammar, lookup, c) for c in children]
+        rendered = SPACE.join(args)
+        return rendered
 
-    literal = LITERAL_NODES.get(node_type)
-    if literal is not None:
-        return literal
+    value = ast.get("value")
+    if value is not None:
+        return value
 
-    if node_type == "statement":
-        if len(children) > 1:
-            raise NotImplementedError("DDL and DML queries not yet supported.")
+    raise QueryRenderError(f"Unable to render node: `{node_type}`.")
 
-        return render_node(children[0])
 
-    if node_type == "query_stmt":
-        if len(children) == 1:
-            return render_node(children[0])
+def get_template_lookup(grammar: Grammar) -> TemplateLookup:
+    template_lookup: TemplateLookup = {}
+    for node, rules in grammar.items():
+        for rule in rules:
+            template = rule.get("template")
+            if template is None:
+                continue
 
-        explain = render_node(children[0])
-        query = render_node(children[1])
-        return f"{explain} {query}"
+            key = get_rule_key(node, rule)
+            template_lookup[key] = template
 
-    if node_type == "query":
-        if len(children) > 1:
-            raise NotImplementedError("CTEs not yet supported.")
+    return template_lookup
 
-        return render_node(children[0])
 
-    if node_type == "simple_query":
-        select_query_a = render_node(children[0])
-        if len(children) == 1:
-            return select_query_a
+def get_rule_key(node: str, rule: dict) -> RuleKey:
+    if SEQUENCE_RULE_TYPE in rule:
+        sequence = rule.get(SEQUENCE_RULE_TYPE)
+        key = SPACE.join([node, *sequence])
+        return key
 
-        union = render_node(children[1])
-        select_query_b = render_node(children[2])
-        return f"{select_query_a}\n{union}\n{select_query_b}"
+    for rule_type in NON_CHILDREN_RULE_TYPES:
+        if rule_type in rule:
+            key = SPACE.join([node, rule_type])
+            return key
 
-    if node_type == "select_query":
-        select_clause = render_node(children[0])
-        if len(children) == 1:
-            return select_clause
+    raise QueryRenderError(f"Unable to determine pattern of node: `{node}`.")
 
-        from_query = render_node(children[1])
-        return f"{select_clause}\n{from_query}"
 
-    if node_type == "select_clause":
-        select = render_node(children[0])
-        select_expr_list = render_node(children[1])
-        return f"{select} {select_expr_list}"
+def maybe_get_template(lookup: TemplateLookup, ast: AstNode) -> Template | None:
+    node = ast.get("type")
+    children = ast.get("children", [])
 
-    if node_type == "select_expr_list":
-        select_expr = render_node(children[0])
-        if len(children) == 1:
-            return select_expr
+    if children:
+        rule_pattern = [child.get("type") for child in children]
+        key = SPACE.join([node, *rule_pattern])
+        template = lookup.get(key)
+        return template
 
-        comma = render_node(children[1])
-        select_expr_list = render_node(children[2])
-        return f"{select_expr}{comma} {select_expr_list}"
+    for rule_type in NON_CHILDREN_RULE_TYPES:
+        key = SPACE.join([node, rule_type])
+        template = lookup.get(key)
+        if template is not None:
+            return template
 
-    if node_type == "select_expr":
-        expression = render_node(children[0])
-        if len(children) == 1:
-            return expression
-
-        alias = render_node(children[1])
-        expression_alias = render_node(children[2])
-        return f"{expression} {alias} {expression_alias}"
-
-    if node_type == "expression":
-        expr_a = render_node(children[0])
-        if len(children) == 1:
-            return expr_a
-
-        operator = render_node(children[1])
-        expr_b = render_node(children[2])
-        return f"{expr_a} {operator} {expr_b}"
-
-    if node_type == "single_expr":
-        first_child = children[0]
-        expr_type = first_child.get("type")
-        supported_expression_types = {"word", "integer", "float", "quoted_expr"}
-        if expr_type not in supported_expression_types:
-            raise NotImplementedError(
-                f"Expression type `{expr_type}` not yet supported"
-            )
-
-        return render_node(first_child)
-
-    if node_type == "from_query":
-        if len(children) == 1:
-            return render_node(children[0])
-
-        from_clause = render_node(children[0])
-        where_query = render_node(children[1])
-        return f"{from_clause}\n{where_query}"
-
-    if node_type == "from_clause":
-        if len(children) > 2:
-            raise NotImplementedError("JOIN not yet supported.")
-
-        from_literal = render_node(children[0])
-        table = render_node(children[1])
-        return f"{from_literal} {table}"
-
-    if node_type == "table":
-        first_child = children[0]
-        if first_child.get("type") != "table_name":
-            raise NotImplementedError("Subquery not yet supported.")
-
-        return render_node(first_child)
-
-    if node_type == "table_name":
-        table_name_word = render_node(children[0])
-        if len(children) == 1:
-            return table_name_word
-
-        alias = render_node(children[1])
-        table_name_alias = render_node(children[2])
-        return f"{table_name_word} {alias} {table_name_alias}"
-
-    if node_type == "where_query":
-        if len(children) == 1:
-            return render_node(children[0])
-
-        where_query = render_node(children[0])
-        groupby_query = render_node(children[1])
-        return f"{where_query}\n{groupby_query}"
-
-    if node_type == "where_clause":
-        where = render_node(children[0])
-        condition_list = render_node(children[1])
-        return f"{where} {condition_list}"
-
-    if node_type == "condition_list":
-        expr_a = render_node(children[0])
-        if len(children) == 1:
-            return expr_a
-
-        cond_operator = render_node(children[1])
-        expr_b = render_node(children[2])
-        return f"{expr_a}\n{cond_operator} {expr_b}"
-
-    if node_type == "groupby_query":
-        if len(children) == 1:
-            return render_node(children[0])
-
-        groupby_query = render_node(children[0])
-        having_query = render_node(children[1])
-        return f"{groupby_query}\n{having_query}"
-
-    if node_type == "having_query":
-        if len(children) == 1:
-            return render_node(children[0])
-
-        having_query = render_node(children[0])
-        orderby_query = render_node(children[1])
-        return f"{having_query}\n{orderby_query}"
-
-    if node_type == "orderby_query":
-        if len(children) == 1:
-            return render_node(children[0])
-
-        orderby_query = render_node(children[0])
-        limit_clause = render_node(children[1])
-        return f"{orderby_query}\n{limit_clause}"
-
-    if node_type == "limit_query":
-        if len(children) == 1:
-            return render_node(children[0])
-
-        limit_clause = render_node(children[0])
-        union_query = render_node(children[1])
-        return f"{limit_clause}\n{union_query}"
-
-    if node_type == "union_query":
-        if len(children) == 1:
-            return render_node(children[0])
-
-        union_clause = render_node(children[0])
-        simple_query = render_node(children[1])
-        return f"{union_clause}\n{simple_query}"
-
-    if node_type == "limit_clause":
-        limit = render_node(children[0])
-        limit_amount = render_node(children[1])
-        return f"{limit} {limit_amount}"
-
-    if node_type == "limit_amount":
-        return render_node(children[0])
-
-    if node_type == "float":
-        whole = render_node(children[0])
-        dot = render_node(children[1])
-        decimal = render_node(children[2])
-        return f"{whole}{dot}{decimal}"
-
-    raise NotImplementedError(f"Node type `{node_type}` not yet supported.")
+    return None

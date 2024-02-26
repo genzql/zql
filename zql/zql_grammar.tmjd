@@ -24,38 +24,47 @@ sub_query         : open_paren simple_query close_paren
 simple_query      : select_query
                   ;
 select_query      : select_clause from_query
+                  > "{select_clause}\n{from_query}"
                   | select_clause
                   ;
 from_query        : from_clause where_query
+                  > "{from_clause}\n{where_query}"
                   | from_clause
                   | where_query
                   ;
 where_query       : where_clause groupby_query
+                  > "{where_clause}\n{groupby_query}"
                   | where_clause
                   | groupby_query
                   ;
 groupby_query     : groupby_clause having_query
+                  > "{groupby_clause}\n{having_query}"
                   | groupby_clause
                   | having_query
                   ;
 having_query      : having_clause orderby_query
+                  > "{having_clause}\n{orderby_query}"
                   | having_clause
                   | orderby_query
                   ;
 orderby_query     : orderby_clause limit_query
+                  > "{orderby_clause}\n{limit_query}"
                   | orderby_clause
                   | limit_query
                   ;
 limit_query       : limit_clause union_query
+                  > "{limit_clause}\n{union_query}"
                   | limit_clause
                   | union_query
                   ;
 union_query       : union_clause simple_query
+                  > "{union_clause}\n{simple_query}"
                   | terminal
                   ;
 select_clause     : select select_expr_list
                   ;
 select_expr_list  : select_expr comma select_expr_list
+                  > "{select_expr}, {select_expr_list}"
                   | select_expr
                   ;
 select_expr       : expression alias word
@@ -77,7 +86,12 @@ single_expr       : function_expr
 quoted_expr       : r\".*?\"
                   | r\'.*?\'
                   ;
-float             : integer dot integer
+float             : whole dot fractional
+                  > "{whole}.{fractional}"
+                  ;
+whole             : integer
+                  ;
+fractional        : integer
                   ;
 integer           : r[0-9]+
                   ;
@@ -125,13 +139,17 @@ join_with_type    : join join_type
 where_clause      : where condition_list
                   ;
 condition_list    : expression cond_operator condition_list
+                  > "{expression}\n{cond_operator} {condition_list}"
                   | expression
                   ;
 groupby_clause    : groupby_start expr_list groupby_end
+                  > "GROUP BY {expr_list}"
                   ;
 having_clause     : having_start condition_list having_end
+                  > "HAVING {condition_list}"
                   ;
 orderby_clause    : orderby orderby_list
+                  > "ORDER BY {orderby_list}"
                   ;
 orderby_list      : orderby_expr comma orderby_expr
                   | orderby_expr
@@ -191,14 +209,19 @@ manipulation_stmt : insert_stmt
 insert_stmt       : insert_into db_table open_paren expr_list close_paren
                   ;
 with              : "perchance"
+                  > "WITH"
                   ;
 select            : "its giving"
+                  > "SELECT"
                   ;
 from              : "yass"
+                  > "FROM"
                   ;
 join              : "come through"
+                  > "JOIN"
                   ;
 join_on           : "bet"
+                  > "ON"
                   ;
 join_type         : "inner"
                   | "left"
@@ -209,18 +232,25 @@ join_type         : "inner"
                   | "cross"
                   ;
 where             : "tfw"
+                  > "WHERE"
                   ;
 and               : "fax"
+                  > "AND"
                   ;
 or                : "uh"
+                  > "OR"
                   ;
 is                : "be"
+                  > "IS"
                   ;
 is_not            : "sike"
+                  > "IS NOT"
                   ;
 equal             : "be"
+                  > "="
                   ;
 not_equal         : "sike"
+                  > "!="
                   ;
 groupby_start     : "let"
                   ;
@@ -233,12 +263,16 @@ having_end        : "hands"
 orderby           : "ngl"
                   ;
 limit             : "say less"
+                  > "LIMIT"
                   ;
 union_all         : "with all the bois"
+                  > "UNION ALL"
                   ;
 union             : "with the bois"
+                  > "UNION"
                   ;
 explain           : "whats good with"
+                  > "EXPLAIN"
                   ;
 dot               : "."
                   ;
@@ -249,20 +283,29 @@ open_paren        : "("
 close_paren       : ")"
                   ;
 alias             : "be"
+                  > "AS"
                   ;
 create_db         : "built different queen"
+                  > "CREATE DATABASE"
                   ;
 create_table      : "built different girlie"
+                  > "CREATE TABLE"
                   ;
 drop_db           : "yeet queen"
+                  > "DROP DATABASE"
                   ;
 drop_table        : "yeet girlie"
+                  > "DROP TABLE"
                   ;
 if_not_exists     : "or nah"
+                  > "IF NOT EXISTS"
                   ;
 if_exists         : "or nah"
+                  > "IF EXISTS"
                   ;
 insert_into       : "pushin p into"
+                  > "INSERT INTO"
                   ;
 terminal          : "no cap"
+                  > ";"
                   ;

@@ -19,7 +19,7 @@ class Zql:
         if use_grammar:
             try:
                 ast = parse_ast(ZQL_GRAMMAR, raw)
-                sql = render_query(ast)
+                sql = render_query(ZQL_GRAMMAR, ast)
                 return sql
             except AstParseError as ape:
                 raise ZqlParserError(ape)

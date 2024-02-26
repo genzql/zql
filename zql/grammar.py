@@ -3,10 +3,13 @@ import re
 
 DEF = ":"
 CASE = "|"
+TEMPLATE = ">"
 END = ";"
 REGEX_START = "r"
 QUOTE = "\""
 SPACE = " "
+NEWLINE = "\n"
+ESCAPED_NEWLINE = "\\n"
 ROOT = "root"
 
 
@@ -63,8 +66,33 @@ def parse_grammar(content: str) -> Grammar:
             grammar[current_node].append(rule)
             continue
 
-
+        template_index = line.find(TEMPLATE)
         case_index = line.find(CASE)
+
+        has_template = template_index > -1
+        has_case = case_index > -1
+        has_template_first = template_index < case_index
+        is_template = has_template and (not has_case or has_template_first)
+        if is_template:
+            raw_template = line[template_index+1:].strip()
+            if not raw_template:
+                raise GrammarParseError(f"L{n}: Missing template after `>`.")
+
+            template_no_quotes = raw_template[1:-1]
+            template = template_no_quotes.replace(ESCAPED_NEWLINE, NEWLINE)
+            current_rules = grammar[current_node]
+            if not current_rules:
+                raise GrammarParseError(
+                    f"L{n}: Missing rule for template on lines above `>`."
+                )
+
+            last_rule = current_rules[-1]
+            if "template" in last_rule:
+                raise GrammarParseError(f"L{n}: Repeat template for rule.")
+
+            last_rule["template"] = template
+            continue
+
         if case_index < 0:
             raise GrammarParseError(f"L{n}: Missing case `|`.")
 

@@ -255,8 +255,7 @@ WHERE y = 100
     assert actual == expected
 
 
-@pytest.mark.skip()
-def test_join_single():
+def test_join_two_tables():
     raw_query = """
     its giving a, b
     yass table_a
@@ -275,8 +274,7 @@ ON a = b
     assert actual == expected
 
 
-@pytest.mark.skip()
-def test_join_many():
+def test_join_three_tables():
     raw_query = """
     its giving a, b, c
     yass table_a
@@ -294,6 +292,37 @@ LEFT JOIN table_b
 ON a = b
 FULL OUTER JOIN table_c
 ON a != c
+;
+    """.strip()
+    assert actual == expected
+
+
+def test_join_three_tables_multiple_conditions():
+    raw_query = """
+    its giving a, b, c
+    yass table_a
+    come through left table_b
+        bet a be b
+        fax 1 be 1
+        uh b sike "quack"
+    come through full outer table_c
+        bet a sike c
+        fax 1 be 1
+        uh c sike "quack"
+    no cap
+    """
+    actual = Zql().parse(raw_query, use_grammar=True)
+    expected = """
+SELECT a, b, c
+FROM table_a
+LEFT JOIN table_b
+ON a = b
+AND 1 = 1
+OR b != "quack"
+FULL OUTER JOIN table_c
+ON a != c
+AND 1 = 1
+OR c != "quack"
 ;
     """.strip()
     assert actual == expected

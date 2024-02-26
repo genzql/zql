@@ -129,6 +129,7 @@ table_name        : word alias word
                   | word
                   ;
 join_list         : join_clause join_list
+                  > "{join_clause}\n{join_list}"
                   | join_clause
                   ;
 join_clause       : comma table 
@@ -240,16 +241,16 @@ join_inner        : "inner"
 join_left         : "left"
                   > "LEFT"
                   ;
-join_left_outer   : "left_outer"
+join_left_outer   : "left outer"
                   > "LEFT OUTER"
                   ;
 join_right        : "right"
                   > "RIGHT"
                   ;
-join_right_outer  : "right_outer"
+join_right_outer  : "right outer"
                   > "RIGHT OUTER"
                   ;
-join_full_outer   : "full_outer"
+join_full_outer   : "full outer"
                   > "FULL OUTER"
                   ;
 join_cross        : "cross"

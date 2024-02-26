@@ -179,6 +179,36 @@ WHERE a = 'ahh'
     assert actual == expected
 
 
+def test_select_star_short_sheesh():
+    raw_query = """
+    its giving sheesh
+    yass example
+    no cap
+    """
+    actual = Zql().parse(raw_query, use_grammar=True)
+    expected = """
+SELECT *
+FROM example
+;
+    """.strip()
+    assert actual == expected
+
+
+def test_select_star_long_sheesh():
+    raw_query = """
+    its giving sheeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeesh
+    yass example
+    no cap
+    """
+    actual = Zql().parse(raw_query, use_grammar=True)
+    expected = """
+SELECT *
+FROM example
+;
+    """.strip()
+    assert actual == expected
+
+
 def test_simple_select_union():
     raw_query = """
     its giving a, b, c

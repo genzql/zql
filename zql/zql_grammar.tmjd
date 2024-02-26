@@ -67,8 +67,12 @@ select_expr_list  : select_expr comma select_expr_list
                   > "{select_expr}, {select_expr_list}"
                   | select_expr
                   ;
-select_expr       : expression alias word
+select_expr       : star
+                  | expression alias word
                   | expression
+                  ;
+star              : r(shee)(e)*(sh)
+                  > "*"
                   ;
 expr_list         : expression comma expr_list
                   | expression

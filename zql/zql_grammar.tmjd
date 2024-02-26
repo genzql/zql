@@ -118,7 +118,12 @@ integer           : r[0-9]+
                   ;
 word              : r[a-zA-Z][\w$]*
                   ;
-dot_expression    : word dot word
+word1             : word
+                  ;
+word2             : word
+                  ;
+dot_expression    : word1 dot word2
+                  > "{word1}.{word2}"
                   ;
 operator          : equal
                   | not_equal
@@ -162,6 +167,7 @@ table             : sub_query alias word
                   | table_name
                   ;
 table_name        : word alias word
+                  | word non_keyword
                   | word
                   ;
 join_list         : join_clause join_list

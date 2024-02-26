@@ -479,6 +479,63 @@ ON a = b
     assert actual == expected
 
 
+def test_join_two_tables_explicit_columns():
+    raw_query = """
+    its giving table_a.a, table_b.b
+    yass table_a
+    come through left table_b
+    bet table_a.a be table_b.b
+    no cap
+    """
+    actual = Zql().parse(raw_query, use_grammar=True)
+    expected = """
+SELECT table_a.a, table_b.b
+FROM table_a
+LEFT JOIN table_b
+ON table_a.a = table_b.b
+;
+    """.strip()
+    assert actual == expected
+
+
+def test_join_two_tables_explicit_columns_explicit_table_aliases():
+    raw_query = """
+    its giving ta.a, tb.b
+    yass table_a be ta
+    come through left table_b be tb
+    bet ta.a be tb.b
+    no cap
+    """
+    actual = Zql().parse(raw_query, use_grammar=True)
+    expected = """
+SELECT ta.a, tb.b
+FROM table_a AS ta
+LEFT JOIN table_b AS tb
+ON ta.a = tb.b
+;
+    """.strip()
+    assert actual == expected
+
+
+def test_join_two_tables_explicit_columns_implicit_table_aliaes():
+    raw_query = """
+    its giving ta.a, tb.b
+    yass table_a ta
+    come through left table_b tb
+    bet ta.a be tb.b
+    no cap
+    """
+    actual = Zql().parse(raw_query, use_grammar=True)
+    expected = """
+SELECT ta.a, tb.b
+FROM table_a ta
+LEFT JOIN table_b tb
+ON ta.a = tb.b
+;
+    """.strip()
+    assert actual == expected
+
+
 def test_join_three_tables():
     raw_query = """
     its giving a, b, c
@@ -814,7 +871,7 @@ FROM example
     assert actual == expected
 
 
-def test_select_from_sub_query_with_implict_alias():
+def test_select_from_sub_query_with_implicit_alias():
     raw_query = """
     its giving a
     yass (

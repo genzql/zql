@@ -4,7 +4,9 @@ zql               : statement
                   ;
 statement         : query_stmt
                   | definition_stmt terminal
+                  > "{definition_stmt}{terminal}"
                   | manipulation_stmt terminal
+                  > "{manipulation_stmt}{terminal}"
                   ;
 query_stmt        : explain query
                   | query
@@ -209,15 +211,22 @@ definition_stmt   : create_stmt
 create_stmt       : create_db_stmt
                   | create_table_stmt
                   ;
-create_db_stmt    : create_db if_not_exists word
+create_db_stmt    : create_db word if_not_exists
+                  > "{create_db} {if_not_exists} {word}"
                   | create_db word
                   ;
-create_table_stmt : create_table if_not_exists db_table alias table_definition
+create_table_stmt : create_table db_table if_not_exists alias table_def
+                  > "{create_table} {if_not_exists} {db_table}{table_def}"
+                  | create_table db_table alias table_def
+                  > "{create_table} {db_table}{table_def}"
                   ;
-table_definition  : open_paren column_def_list close_paren
+table_def         : open_paren column_def_list close_paren
+                  > "(\n{column_def_list}\n)"
                   ;
 column_def_list   : column_def comma column_def_list
+                  > "    {column_def},\n{column_def_list}"
                   | column_def
+                  > "    {column_def}"
                   ;
 column_def        : word column_type_expr
                   ;
@@ -231,9 +240,11 @@ drop_stmt         : drop_db_stmt
                   | drop_table_stmt
                   ;
 drop_db_stmt      : drop_db word if_exists
+                  > "{drop_db} {if_exists} {word}"
                   | drop_db word
                   ;
 drop_table_stmt   : drop_table db_table if_exists
+                  > "{drop_table} {if_exists} {db_table}"
                   | drop_table db_table
                   ;
 db_table          : word dot word
@@ -242,6 +253,7 @@ db_table          : word dot word
 manipulation_stmt : insert_stmt
                   ;
 insert_stmt       : insert_into db_table open_paren expr_list close_paren
+                  > "{insert_into} {db_table} ({expr_list})"
                   ;
 non_keyword       : r\b(?!perchance\b|\bits\b|\byass\b|\bcome\b|\bbet\b|\btfw\b|\blet\b|\bcatch\b|\bngl\b|\bsay\b|\bwith\b|\bno\b)\w+\b
                   ;

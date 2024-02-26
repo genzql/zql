@@ -818,3 +818,85 @@ FROM example
 ;
     """.strip()
     assert actual == expected
+
+
+def test_create_table():
+    raw_query = """
+    built different girlie example be (
+        a int,
+        b float,
+        c text
+    )
+    no cap
+    """
+    actual = Zql().parse(raw_query, use_grammar=True)
+    expected = """
+CREATE TABLE example(
+    a int,
+    b float,
+    c text
+);
+    """.strip()
+    assert actual == expected
+
+
+def test_create_table_if_not_exists():
+    raw_query = """
+    built different girlie example or nah be (
+        a int,
+        b float,
+        c text
+    )
+    no cap
+    """
+    actual = Zql().parse(raw_query, use_grammar=True)
+    expected = """
+CREATE TABLE IF NOT EXISTS example(
+    a int,
+    b float,
+    c text
+);
+    """.strip()
+    assert actual == expected
+
+
+def test_create_database():
+    raw_query = "built different queen db no cap"
+    actual = Zql().parse(raw_query, use_grammar=True)
+    assert actual == "CREATE DATABASE db;"
+
+
+def test_create_database_if_not_exists():
+    raw_query = "built different queen db or nah no cap"
+    actual = Zql().parse(raw_query, use_grammar=True)
+    assert actual == "CREATE DATABASE IF NOT EXISTS db;"
+
+
+def test_drop_database():
+    raw_query = "yeet queen db no cap"
+    actual = Zql().parse(raw_query, use_grammar=True)
+    assert actual == "DROP DATABASE db;"
+
+
+def test_drop_database_if_not_exists():
+    raw_query = "yeet queen db or nah no cap"
+    actual = Zql().parse(raw_query, use_grammar=True)
+    assert actual == "DROP DATABASE IF EXISTS db;"
+
+
+def test_drop_table():
+    raw_query = "yeet girlie example no cap"
+    actual = Zql().parse(raw_query, use_grammar=True)
+    assert actual == "DROP TABLE example;"
+
+
+def test_drop_table_if_not_exists():
+    raw_query = "yeet girlie example or nah no cap"
+    actual = Zql().parse(raw_query, use_grammar=True)
+    assert actual == "DROP TABLE IF EXISTS example;"
+
+
+def test_insert():
+    raw_query = "pushin p into example (1, \"A\") no cap"
+    actual = Zql().parse(raw_query, use_grammar=True)
+    assert actual == "INSERT INTO example (1, \"A\");"

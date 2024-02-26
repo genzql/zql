@@ -180,15 +180,16 @@ having_clause     : having_start condition_list having_end
 orderby_clause    : orderby orderby_list
                   > "ORDER BY {orderby_list}"
                   ;
-orderby_list      : orderby_expr comma orderby_expr
+orderby_list      : orderby_expr comma orderby_list
+                  > "{orderby_expr}, {orderby_list}"
                   | orderby_expr
                   ;
 orderby_expr      : expression direction
                   ;
-direction         : asc
+direction         : nulls_first
+                  | nulls_last
+                  | asc
                   | desc
-                  | nulls first
-                  | nulls last
                   ;
 limit_clause      : limit limit_amount
                   ;
@@ -337,6 +338,18 @@ having_start      : "catch these"
 having_end        : "hands"
                   ;
 orderby           : "ngl"
+                  ;
+nulls_first       : "high key yikes"
+                  > "NULLS FIRST"
+                  ;
+nulls_last        : "low key yikes"
+                  > "NULLS LAST"
+                  ;
+asc               : "low key"
+                  > "ASC"
+                  ;
+desc              : "high key"
+                  > "DESC"
                   ;
 limit             : "say less"
                   > "LIMIT"

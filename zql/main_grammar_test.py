@@ -577,3 +577,91 @@ AND count(b) <= 100
 ;
     """.strip()
     assert actual == expected
+
+
+def test_orderby_one_field_desc():
+    raw_query = """
+    its giving a, b
+    yass example
+    ngl b high key
+    no cap
+    """
+    actual = Zql().parse(raw_query, use_grammar=True)
+    expected = """
+SELECT a, b
+FROM example
+ORDER BY b DESC
+;
+    """.strip()
+    assert actual == expected
+
+
+def test_orderby_one_field_asc():
+    raw_query = """
+    its giving a, b
+    yass example
+    ngl b low key
+    no cap
+    """
+    actual = Zql().parse(raw_query, use_grammar=True)
+    expected = """
+SELECT a, b
+FROM example
+ORDER BY b ASC
+;
+    """.strip()
+    assert actual == expected
+
+
+def test_orderby_one_field_nulls_first():
+    raw_query = """
+    its giving a, b
+    yass example
+    ngl b high key yikes
+    no cap
+    """
+    actual = Zql().parse(raw_query, use_grammar=True)
+    expected = """
+SELECT a, b
+FROM example
+ORDER BY b NULLS FIRST
+;
+    """.strip()
+    assert actual == expected
+
+
+def test_orderby_one_field_nulls_last():
+    raw_query = """
+    its giving a, b
+    yass example
+    ngl b low key yikes
+    no cap
+    """
+    actual = Zql().parse(raw_query, use_grammar=True)
+    expected = """
+SELECT a, b
+FROM example
+ORDER BY b NULLS LAST
+;
+    """.strip()
+    assert actual == expected
+
+
+def test_orderby_multiple_fields():
+    raw_query = """
+    its giving a, b, c, d, e
+    yass example
+    ngl b high key,
+        c low key yikes,
+        d high key yikes,
+        e low key
+    no cap
+    """
+    actual = Zql().parse(raw_query, use_grammar=True)
+    expected = """
+SELECT a, b, c, d, e
+FROM example
+ORDER BY b DESC, c NULLS LAST, d NULLS FIRST, e ASC
+;
+    """.strip()
+    assert actual == expected

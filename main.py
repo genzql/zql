@@ -58,14 +58,18 @@ async def home(request: Request):
     )
 
 @app.post("/transpile")
-async def transpile_query(query: str = Form(...)):
+async def transpile_query(query: str = Form(...)) -> str:
+    """Transpile ZQL to SQL"""
     try:
         transpiled_query = Zql().parse(query, use_grammar=False)
     except ZqlParserError as zpe:
         error_message = str(zpe)
+        return error_message
+    return transpiled_query
 
 @app.post("/run")
-async def transpile_string(request: Request, query: str = Form(...)):
+async def run_query(request: Request, query: str = Form(...)):
+    """Run ZQL query"""
     error_message: str | None = None
     transpiled_query: str = ""
     try:

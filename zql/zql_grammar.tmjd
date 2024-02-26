@@ -1,10 +1,10 @@
 root              : zql
                   ;
-zql               : query terminal
+zql               : statement
                   ;
 statement         : query_stmt
-                  | definition_stmt
-                  | manipulation_stmt
+                  | definition_stmt terminal
+                  | manipulation_stmt terminal
                   ;
 query_stmt        : explain query
                   | query

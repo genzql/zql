@@ -151,13 +151,12 @@ def evaluate_regex(tokens: list[str], regex: str) -> AstNode:
 def evaluate_sequence(
     grammar: Grammar,
     tokens_manager: TokensManager,
-    sequence: list[str],
-    level: int
+    sequence: list[str]
 ) -> AstNode:
     mutable_tokens_manager = tokens_manager.copy()
     children: list[AstNode] = []
     for node in sequence:
-        ast_node = evaluate_node(grammar, mutable_tokens_manager, node, level + 1)
+        ast_node = evaluate_node(grammar, mutable_tokens_manager, node)
         children.append(ast_node)
 
     tokens_manager.set_tokens(mutable_tokens_manager.tokens)
@@ -167,8 +166,7 @@ def evaluate_sequence(
 def evaluate_rule(
     grammar: Grammar,
     tokens_manager: TokensManager,
-    rule: dict,
-    level: int
+    rule: dict
 ) -> AstNode:
     tokens = tokens_manager.tokens
     literal = rule.get("literal")
@@ -184,7 +182,7 @@ def evaluate_rule(
     sequence = rule.get("sequence")
     if sequence is not None:
         mutable_tokens_manager = tokens_manager.copy()
-        ast_node = evaluate_sequence(grammar, mutable_tokens_manager, sequence, level + 1)
+        ast_node = evaluate_sequence(grammar, mutable_tokens_manager, sequence)
         mutated_tokens = mutable_tokens_manager.tokens
         tokens_manager.set_tokens(mutated_tokens)
         return ast_node
@@ -195,8 +193,7 @@ def evaluate_rule(
 def evaluate_node(
     grammar: Grammar,
     tokens_manager: TokensManager,
-    node: str,
-    level: int
+    node: str
 ) -> AstNode:
     rules = grammar.get(node, [])
     if not rules:
@@ -206,43 +203,18 @@ def evaluate_node(
 
     error = None
     ast_node = None
-    R = "\u001b[31m"
-    G = "\u001b[32m"
-    Y = "\u001b[33m"
-    B = "\u001b[34m"
-    W = "\u001b[37m"
-    target_nodes = {"where_query"}
-    max_depth = 20
-    if node in target_nodes:
-        print(f"Evaluating Node: {node}")
-        print(f"Before: {tokens_manager.tokens}")
     for rule in rules:
         try:
-            if level < max_depth:
-                print(f"{' ' * level}- Traced to Rule: {Y}{node} -> {rule}{W}")
             mutable_tokens_manager = tokens_manager.copy()
-            ast_node = evaluate_rule(grammar, mutable_tokens_manager, rule, level + 1)
-            
-            
-            # print(f"    Before: {tokens_manager.tokens}")
-            # if node in target_nodes:
-            if level < max_depth:
-                print(f"    {G}Success: {B}{node} -> {rule}{W}")
+            ast_node = evaluate_rule(grammar, mutable_tokens_manager, rule)
             tokens_manager.set_tokens(mutable_tokens_manager.tokens)
-            # print(f"    After: {tokens_manager.tokens}")
             break
         except Exception as e:
             error = e
-            if level < max_depth:
-                print(f"    {R}Fail:{W} {node} -> {rule} ({e})")
-            # print(f"- Trying Rule: {Y}{node} -> {rule}{W}")
-            # print(f"    After: {tokens_manager.tokens}")
             continue
 
     if not ast_node:
         if error:
-            if node in target_nodes:
-                print(f"    {R}Failed all rules:{W} {error}")
             raise error
 
         remaining_source_sample = SPACE.join(tokens[:3])[:20]
@@ -258,7 +230,7 @@ def evaluate_node(
 def parse_ast(grammar: Grammar, source: str) -> AstNode:
     tokens = get_tokens(source)
     tokens_manager = TokensManager(tokens)
-    root = evaluate_node(grammar, tokens_manager, ROOT, level=0)
+    root = evaluate_node(grammar, tokens_manager, ROOT)
 
     remaining_tokens = tokens_manager.tokens
     if remaining_tokens:

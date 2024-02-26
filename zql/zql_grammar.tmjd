@@ -21,8 +21,7 @@ aliased_sub_query : sub_query alias word
                   ;
 sub_query         : open_paren simple_query close_paren 
                   ;
-simple_query      : select_query union_clause select_query
-                  | select_query
+simple_query      : select_query
                   ;
 select_query      : select_clause from_query
                   | select_clause
@@ -43,9 +42,16 @@ having_query      : having_clause orderby_query
                   | having_clause
                   | orderby_query
                   ;
-orderby_query     : orderby_clause limit_clause
+orderby_query     : orderby_clause limit_query
                   | orderby_clause
+                  | limit_query
+                  ;
+limit_query       : limit_clause union_query
                   | limit_clause
+                  | union_query
+                  ;
+union_query       : union_clause simple_query
+                  | terminal
                   ;
 select_clause     : select select_expr_list
                   ;
@@ -63,10 +69,10 @@ expression        : single_expr operator single_expr
                   ;
 single_expr       : function_expr
                   | dot_expression
+                  | word
                   | quoted_expr
                   | float
                   | integer
-                  | word
                   ;
 quoted_expr       : r\".*?\"
                   | r\'.*?\'

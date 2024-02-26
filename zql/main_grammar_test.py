@@ -213,14 +213,14 @@ SELECT a, b, c
     assert actual == expected
 
 
-@pytest.mark.skip()
+# @pytest.mark.skip()
 def test_select_where_union():
     raw_query = """
     its giving a, b, c
-    twf x = 100
+    twf x be 100
     with the bois
     its giving a, b, c
-    twf y = 100
+    twf y be 100
     no cap
     """
     actual = Zql().parse(raw_query, use_grammar=True)
@@ -235,14 +235,14 @@ WHERE y = 100
     assert actual == expected
 
 
-@pytest.mark.skip()
+# @pytest.mark.skip()
 def test_select_where_union_all():
     raw_query = """
     its giving a, b, c
-    twf x = 100
+    twf x be 100
     with all the bois
     its giving a, b, c
-    twf y = 100
+    twf y be 100
     no cap
     """
     actual = Zql().parse(raw_query, use_grammar=True)

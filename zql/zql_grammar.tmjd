@@ -72,7 +72,9 @@ select_expr_list  : select_expr comma select_expr_list
                   | select_expr
                   ;
 select_expr       : star
-                  | expression alias word
+                  | single_expr alias word
+                  | open_paren expression close_paren alias word
+                  > "{expression} {alias} {word}"
                   | expression
                   ;
 star              : r(shee)(e)*(sh)

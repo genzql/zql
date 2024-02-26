@@ -239,6 +239,55 @@ FROM example
     assert actual == expected
 
 
+def test_select_column_alias():
+    raw_query = """
+    its giving a, b be flower
+    yass example
+    no cap
+    """
+    actual = Zql().parse(raw_query, use_grammar=True)
+    expected = """
+SELECT a, b AS flower
+FROM example
+;
+    """.strip()
+    assert actual == expected
+
+
+def test_select_expression_alias():
+    raw_query = """
+    its giving a, (b be c) be is_equal
+    yass example
+    no cap
+    """
+    actual = Zql().parse(raw_query, use_grammar=True)
+    expected = """
+SELECT a, b = c AS is_equal
+FROM example
+;
+    """.strip()
+    assert actual == expected
+
+
+def test_select_multiple_aliases():
+    raw_query = """
+    its giving
+        a be x,
+        b,
+        (c + d) be yo,
+        e
+    yass example
+    no cap
+    """
+    actual = Zql().parse(raw_query, use_grammar=True)
+    expected = """
+SELECT a AS x, b, c + d AS yo, e
+FROM example
+;
+    """.strip()
+    assert actual == expected
+
+
 def test_respect_case():
     raw_query = """
     ITS GIVING a

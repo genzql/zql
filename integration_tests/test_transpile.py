@@ -6,7 +6,7 @@ from zql.main import Zql
 zql_queries_expectations = [
     ("its giving num_apples yass apples no cap", [(5,)]),
     ("its giving 1 no cap", [(1,)]),
-    ("its giving num_apples yass apples tfw owner be 'Vinesh' no cap", [(5,)]),
+    ("its giving num_apples yass apples tfw owner be 'vinesh' no cap", [(5,)]),
 ]
 
 

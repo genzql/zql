@@ -127,12 +127,10 @@ def get_tokens(source: str) -> list[str]:
     """
     Converts a raw source string to a list of tokens.
     - Strips whitespace from either side.
-    - Converts text to lowercase.
-    - Converts Unicode characters to ASCII.
     - Adds spaces around characters like commas so they become tokens.
     - Ignores extra whitespace or line breaks in the query.
     """
-    normalized = source.strip().casefold()
+    normalized = source.strip()
     cleaned = WHITESPACE_REGEX.sub(SPACE, normalized)
     for char in NEED_SPACE_AROUND_CHARS:
         cleaned = cleaned.replace(char, SPACE + char + SPACE)
@@ -155,7 +153,7 @@ class TokensManager:
 
 def evaluate_literal(tokens: list[str], literal: str) -> AstNode:
     tokens_in_literal = len(literal.split(SPACE))
-    peeked_tokens = SPACE.join(tokens[:tokens_in_literal])
+    peeked_tokens = SPACE.join(tokens[:tokens_in_literal]).casefold()
     if peeked_tokens != literal:
         raise AstParseError(f"Expected `{literal}`. Got `{peeked_tokens}`.")
     

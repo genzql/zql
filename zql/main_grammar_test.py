@@ -209,6 +209,23 @@ FROM example
     assert actual == expected
 
 
+def test_respect_case():
+    raw_query = """
+    ITS GIVING a
+    yASs example
+    tfw a be "hELlO"
+    no cap
+    """
+    actual = Zql().parse(raw_query, use_grammar=True)
+    expected = """
+SELECT a
+FROM example
+WHERE a = "hELlO"
+;
+    """.strip()
+    assert actual == expected
+
+
 def test_simple_select_union():
     raw_query = """
     its giving a, b, c

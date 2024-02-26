@@ -36,7 +36,7 @@ def test_get_tokens():
     (A + 12) - 0
     """
     actual = get_tokens(source)
-    expected = ["(", "a", "+", "12", ")", "-", "0"]
+    expected = ["(", "A", "+", "12", ")", "-", "0"]
     assert actual == expected
 
 
@@ -119,7 +119,7 @@ def test_parse_ast_formula_nested():
                             {
                                 "type": "expr",
                                 "children": [
-                                    {"type": "word", "value": "a"}
+                                    {"type": "word", "value": "A"}
                                 ],
                             },
                             {

@@ -59,7 +59,7 @@ def test_render_simple():
 def test_render_nested():
     ast = parse_ast(FUNCTION_GRAMMAR, "(2 + 3) - (1000 * K)")
     actual = render_query(FUNCTION_GRAMMAR, ast)
-    assert actual == "subtract(add(2, 3), multiply(1000, k))"
+    assert actual == "subtract(add(2, 3), multiply(1000, K))"
 
 
 def test_render_fancy_case():
@@ -68,7 +68,7 @@ def test_render_fancy_case():
     assert actual == """
 add(2, 3)
 ---------------------
-multiply(1000, k)
+multiply(1000, K)
     """.strip()
 
 

@@ -1,8 +1,16 @@
 services:
-  app:
+  api:
     build: .
-    container_name: zql_web
+    container_name: zql_api
     ports:
       - 80:80
     volumes:
       - .:/code
+
+  ui:
+    build: zql_ui/.
+    container_name: zql_ui
+    ports:
+      - 3000:3000
+    volumes:
+      - ./zql_ui/src:/app/src

@@ -11,5 +11,5 @@ RUN poetry install --no-dev
 
 
 COPY . /code
-ENTRYPOINT ["uvicorn",  "main:app"]
+ENTRYPOINT ["uvicorn",  "zql_api.main:app"]
 CMD ["--host", "0.0.0.0", "--port", "80", "--reload"]

@@ -1,44 +1,72 @@
 {
-    "family": "zql-app",
-    "containerDefinitions": [
+  "family": "zql-app",
+  "containerDefinitions": [
+    {
+      "name": "zql-app",
+      "image": "217089594100.dkr.ecr.us-east-2.amazonaws.com/zql-app:856d881079945ea959a56f6d3564ae27e08011fd",
+      "cpu": 0,
+      "portMappings": [
         {
-            "name": "zql-app",
-            "image": "217089594100.dkr.ecr.us-east-2.amazonaws.com/zql-app:63a1fa8c42e7233f74ced103c3f690aab3cc8857",
-            "cpu": 0,
-            "portMappings": [
-                {
-                    "name": "zql-app-80-tcp",
-                    "containerPort": 80,
-                    "hostPort": 80,
-                    "protocol": "tcp",
-                    "appProtocol": "http"
-                }
-            ],
-            "essential": true,
-            "environment": [],
-            "mountPoints": [],
-            "volumesFrom": [],
-            "logConfiguration": {
-                "logDriver": "awslogs",
-                "options": {
-                    "awslogs-create-group": "true",
-                    "awslogs-group": "/ecs/zql-app",
-                    "awslogs-region": "us-east-2",
-                    "awslogs-stream-prefix": "ecs"
-                }
-            }
+          "name": "zql-app-80-tcp",
+          "containerPort": 80,
+          "hostPort": 80,
+          "protocol": "tcp",
+          "appProtocol": "http"
         }
-    ],
-    "taskRoleArn": "arn:aws:iam::217089594100:role/ecsTaskExecutionRole",
-    "executionRoleArn": "arn:aws:iam::217089594100:role/ecsTaskExecutionRole",
-    "networkMode": "awsvpc",
-    "requiresCompatibilities": [
-        "FARGATE"
-    ],
-    "cpu": "1024",
-    "memory": "3072",
-    "runtimePlatform": {
-        "cpuArchitecture": "X86_64",
-        "operatingSystemFamily": "LINUX"
+      ],
+      "essential": true,
+      "environment": [],
+      "mountPoints": [],
+      "volumesFrom": [],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-create-group": "true",
+          "awslogs-group": "/ecs/zql-app",
+          "awslogs-region": "us-east-2",
+          "awslogs-stream-prefix": "ecs"
+        },
+        "secretOptions": []
+      }
+    },
+    {
+      "name": "zql-ui",
+      "image": "217089594100.dkr.ecr.us-east-2.amazonaws.com/zql-ui:latest",
+      "cpu": 0,
+      "portMappings": [
+        {
+          "name": "zql-ui-3000-tcp",
+          "containerPort": 3000,
+          "hostPort": 3000,
+          "protocol": "tcp",
+          "appProtocol": "http"
+        }
+      ],
+      "essential": false,
+      "environment": [],
+      "environmentFiles": [],
+      "mountPoints": [],
+      "volumesFrom": [],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-create-group": "true",
+          "awslogs-group": "/ecs/zql-app",
+          "awslogs-region": "us-east-2",
+          "awslogs-stream-prefix": "ecs"
+        },
+        "secretOptions": []
+      }
     }
+  ],
+  "taskRoleArn": "arn:aws:iam::217089594100:role/ecsTaskExecutionRole",
+  "executionRoleArn": "arn:aws:iam::217089594100:role/ecsTaskExecutionRole",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": ["FARGATE"],
+  "cpu": "1024",
+  "memory": "3072",
+  "runtimePlatform": {
+    "cpuArchitecture": "X86_64",
+    "operatingSystemFamily": "LINUX"
+  }
 }

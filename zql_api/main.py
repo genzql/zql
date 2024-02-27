@@ -43,6 +43,14 @@ templates = Jinja2Templates(directory=TEMPLATE_DIR)
 
 app = FastAPI()
 
+origins = [
+    "http://localhost",
+    "https://localhost",
+    "http://genzql.com:3000",
+    "https://genzql.com",
+    "*",
+]
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],

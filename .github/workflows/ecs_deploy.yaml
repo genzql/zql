@@ -65,6 +65,7 @@ jobs:
   build-api:
     needs: test
     runs-on: ubuntu-latest
+    environment: production
 
     outputs:
       image: ${{ steps.build-api-image.outputs.image }}
@@ -102,6 +103,7 @@ jobs:
   # build-ui:
   #   needs: test
   #   runs-on: ubuntu-latest
+  #   environment: production
 
   #   outputs:
   #     image: ${{ steps.build-ui-image.outputs.image }}

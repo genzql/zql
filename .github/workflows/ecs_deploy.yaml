@@ -1,66 +1,179 @@
-name: Deploy to Amazon ECS
+name: PyTest and Deploy
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
 
 env:
   AWS_REGION: us-east-2
-  ECR_REPOSITORY: tamjid-app
+  API_ECR_REPOSITORY: tamjid-app
   ECS_SERVICE: zql-app
   ECS_CLUSTER: zql
   ECS_TASK_DEFINITION: task_definition.json
-  CONTAINER_NAME: zql-app	
+  API_CONTAINER_NAME: zql-app
 
 permissions:
   contents: read
 
 jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      #----------------------------------------------
+      #       check-out repo and set-up python
+      #----------------------------------------------
+      - name: Check out repository
+        uses: actions/checkout@v3
+      - name: Set up python
+        id: setup-python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.12"
+      #----------------------------------------------
+      #  -----  install & configure poetry  -----
+      #----------------------------------------------
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
+        with:
+          virtualenvs-create: true
+          virtualenvs-in-project: true
+          installer-parallel: true
+
+      #----------------------------------------------
+      #       load cached venv if cache exists
+      #----------------------------------------------
+      - name: Load cached venv
+        id: cached-poetry-dependencies
+        uses: actions/cache@v3
+        with:
+          path: .venv
+          key: venv-${{ runner.os }}-${{ steps.setup-python.outputs.python-version }}-${{ hashFiles('**/poetry.lock') }}
+      #----------------------------------------------
+      # install dependencies if cache does not exist
+      #----------------------------------------------
+      - name: Install dependencies
+        if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
+        run: poetry install --no-interaction --no-root
+      #----------------------------------------------
+      #              run test suite
+      #----------------------------------------------
+      - name: Run tests
+        run: |
+          source .venv/bin/activate
+          pytest
+
+  build-api:
+    needs: test
+    runs-on: ubuntu-latest
+
+    outputs:
+      image: ${{ steps.build-api-image.outputs.image }}
+
+    steps:
+      - name: Check out
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@0e613a0980cbf65ed5b322eb7a1e075d28913a83
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-2
+          mask-aws-account-id: "no"
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
+      - name: Build, tag, and push API image to Amazon ECR
+        id: build-api-image
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          # Build a docker container and push it to ECR so that it can
+          docker build -t $ECR_REGISTRY/$API_ECR_REPOSITORY:$IMAGE_TAG .
+
+          # Also tag with latest
+          docker image tag $ECR_REGISTRY/$API_ECR_REPOSITORY:$IMAGE_TAG $ECR_REGISTRY/$API_ECR_REPOSITORY:latest
+
+          docker push --all-tags $ECR_REGISTRY/$API_ECR_REPOSITORY
+          echo "image=$ECR_REGISTRY/$API_ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
+
+  # build-ui:
+  #   needs: test
+  #   runs-on: ubuntu-latest
+
+  #   outputs:
+  #     image: ${{ steps.build-ui-image.outputs.image }}
+
+  #   steps:
+  #     - name: Check out
+  #       uses: actions/checkout@v4
+
+  #     - name: Configure AWS credentials
+  # uses: aws-actions/configure-aws-credentials@0e613a0980cbf65ed5b322eb7a1e075d28913a83
+  # with:
+  #   aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  #   aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  #   aws-region: us-east-2
+  #   mask-aws-account-id: "no"
+
+  #     - name: Login to Amazon ECR
+  #       id: login-ecr
+  #       uses: aws-actions/amazon-ecr-login@v1
+
+  #     - name: Build, tag, and push UI image to Amazon ECR
+  #       id: build-ui-image
+  #       env:
+  #         ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+  #         IMAGE_TAG: ${{ github.sha }}
+  #       run: |
+  #         # Build a docker container and push it to ECR so that it can
+  #         docker build -t $ECR_REGISTRY/$UI_ECR_REPOSITORY:$IMAGE_TAG -f Dockerfile.ui .
+
+  #         # Also tag with latest
+  #         docker image tag $ECR_REGISTRY/$UI_ECR_REPOSITORY:$IMAGE_TAG $ECR_REGISTRY/$UI_ECR_REPOSITORY:latest
+
+  #         docker push --all-tags $ECR_REGISTRY/$UI_ECR_REPOSITORY
+  #         echo "image=$ECR_REGISTRY/$UI_ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
+
   deploy:
     name: Deploy
     runs-on: ubuntu-latest
     environment: production
 
     steps:
-    - name: Checkout
-      uses: actions/checkout@v3
+      - name: Checkout
+        uses: actions/checkout@v3
 
-    - name: Configure AWS credentials
-      uses: aws-actions/configure-aws-credentials@v1
-      with:
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: ${{ env.AWS_REGION }}
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
 
-    - name: Login to Amazon ECR
-      id: login-ecr
-      uses: aws-actions/amazon-ecr-login@v1
+      - name: Fill in the new API image ID in the Amazon ECS task definition
+        id: api-task-def
+        uses: aws-actions/amazon-ecs-render-task-definition@c804dfbdd57f713b6c079302a4c01db7017a36fc
+        with:
+          task-definition: ${{ env.ECS_TASK_DEFINITION }}
+          container-name: ${{ env.API_CONTAINER_NAME }}
+          image: ${{ needs.build-api.outputs.image}}
 
-    - name: Build, tag, and push image to Amazon ECR
-      id: build-image
-      env:
-        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-        IMAGE_TAG: ${{ github.sha }}
-      run: |
-        # Build a docker container and
-        # push it to ECR so that it can
-        # be deployed to ECS.
-        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
-        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-        echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
+      # - name: Fill in the new UI image ID in the Amazon ECS task definition
+      #   id: ui-task-def
+      #   uses: aws-actions/amazon-ecs-render-task-definition@c804dfbdd57f713b6c079302a4c01db7017a36fc
+      #   with:
+      #     task-definition: ${{ steps.api-task-def.outputs.task-definition }}
+      #     container-name: ${{ env.UI_CONTAINER_NAME }}
+      #     image: ${{ needs.build-ui.outputs.image}}
 
-    - name: Fill in the new image ID in the Amazon ECS task definition
-      id: task-def
-      uses: aws-actions/amazon-ecs-render-task-definition@v1
-      with:
-        task-definition: ${{ env.ECS_TASK_DEFINITION }}
-        container-name: ${{ env.CONTAINER_NAME }}
-        image: ${{ steps.build-image.outputs.image }}
-
-    - name: Deploy Amazon ECS task definition
-      uses: aws-actions/amazon-ecs-deploy-task-definition@v1
-      with:
-        task-definition: ${{ steps.task-def.outputs.task-definition }}
-        service: ${{ env.ECS_SERVICE }}
-        cluster: ${{ env.ECS_CLUSTER }}
-        wait-for-service-stability: true
+      - name: Deploy Amazon ECS task definition
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+        with:
+          task-definition: ${{ steps.task-def.outputs.task-definition }}
+          service: ${{ env.ECS_SERVICE }}
+          cluster: ${{ env.ECS_CLUSTER }}
+          wait-for-service-stability: true

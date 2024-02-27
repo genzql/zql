@@ -1,12 +1,6 @@
 name: PyTest
 
-on:
-  push:
-    branches:
-    - main
-  pull_request:
-    branches:
-    - main
+on: pull_request
 
 jobs:
   test:
@@ -21,7 +15,7 @@ jobs:
         id: setup-python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.12'
+          python-version: "3.12"
       #----------------------------------------------
       #  -----  install & configure poetry  -----
       #----------------------------------------------

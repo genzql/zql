@@ -6,7 +6,7 @@ on:
 
 env:
   AWS_REGION: us-east-2
-  API_ECR_REPOSITORY: tamjid-app
+  API_ECR_REPOSITORY: zql-app
   ECS_SERVICE: zql-app
   ECS_CLUSTER: zql
   ECS_TASK_DEFINITION: task_definition.json
@@ -80,6 +80,7 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
+          mask-aws-account-id: "no"
 
       - name: Login to Amazon ECR
         id: login-ecr
@@ -118,6 +119,7 @@ jobs:
   #   aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
   #   aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
   #   aws-region: us-east-2
+  #   mask-aws-account-id: 'no'
 
   #     - name: Login to Amazon ECR
   #       id: login-ecr
@@ -154,6 +156,7 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
+          mask-aws-account-id: "no"
 
       - name: Fill in the new API image ID in the Amazon ECS task definition
         id: api-task-def

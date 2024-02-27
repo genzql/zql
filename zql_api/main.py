@@ -10,7 +10,7 @@ from zql import Zql, ZqlParserError
 from fastapi.middleware.cors import CORSMiddleware
 
 TEMPLATE_DIR = Path(__file__).resolve().parent / "templates"
-USE_GRAMMAR = False
+USE_GRAMMAR = True
 
 def setup_db(session):
     session.execute("DROP TABLE IF EXISTS peeps;")

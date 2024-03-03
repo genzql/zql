@@ -15,6 +15,82 @@ const FormSchema = z.object({
 
 const BASE_API_URL = import.meta.env.VITE_BASE_API_URL;
 
+// Register the custom language
+monaco.languages.register({ id: "zql" });
+
+// Set the custom language configuration
+monaco.languages.setMonarchTokensProvider("zql", {
+  ignoreCase: true,
+  keywords: [
+    "yass",
+    "tfw",
+    "say",
+    "be",
+    "sike",
+    "fax",
+    "uh",
+    "let",
+    "cook",
+    "hands",
+    "ngl",
+    "perchance",
+    "rizz",
+    "af",
+    "bops",
+    "flops",
+    "inner",
+    "cross",
+    "left",
+    "right",
+  ],
+  tokenizer: {
+    root: [
+      // Select Star
+      [/(shee)(e)*(sh)/, "type"],
+      // Keywords
+      // Multi-Token Keywords
+      [/its giving/, "keyword"],
+      [/real ones/, "keyword"],
+      [/say less/, "keyword"],
+      [/no cap/, "keyword"],
+      [/come through/, "keyword"],
+      [/left outer/, "keyword"],
+      [/right outer/, "keyword"],
+      [/full outer/, "keyword"],
+      [/catch these/, "keyword"],
+      [/kinda bops/, "keyword"],
+      [/kinda flops/, "keyword"],
+      [/high key/, "keyword"],
+      [/low key/, "keyword"],
+      [/high key yikes/, "keyword"],
+      [/low key yikes/, "keyword"],
+      [/with the bois/, "keyword"],
+      [/with all the bois/, "keyword"],
+      [/whats good with/, "keyword"],
+      [/yeet queen/, "keyword"],
+      [/yeet girlie/, "keyword"],
+      [/or nah/, "keyword"],
+      [/built different queen/, "keyword"],
+      [/built different girlie/, "keyword"],
+      [/pushin p into/, "keyword"],
+      [
+        /@?[a-zA-Z][\w$]*/,
+        {
+          cases: {
+            "@keywords": "keyword",
+            "@default": "source",
+          },
+        },
+      ],
+      // Literal Values
+      [/".*?"/, "string"],
+      [/'.*?'/, "string"],
+      [/\d*\.\d+([eE][\-+]?\d+)?/, "number.float"],
+      [/\d+/, "number"],
+    ],
+  },
+});
+
 export function SqlForm() {
   const [transpiledQuery, setTranspiledQuery] = useState("");
   const [dataRows, setDataRows] = useState([]);
@@ -29,15 +105,22 @@ export function SqlForm() {
 
   useEffect(() => {
     // Setup Monaco editor
+
+    const defaultQuery =
+      "its giving\n\tname,\n\tfave_color,\n\tfollowers\nyass peeps\nsay less 3\nno cap";
+
     const editor = monaco.editor.create(
       document.getElementById("monaco-editor")!,
       {
-        value: "// Type your query here...",
-        language: "sql",
+        value: defaultQuery,
         theme: "vs-dark",
-        // minimap: { enabled: false }, // Hide minimap
+        language: "zql",
+        fontSize: 16,
+        minimap: { enabled: false },
       }
     );
+
+    setValue("query", editor.getValue());
 
     editor.onDidChangeModelContent(() => {
       const value = editor.getValue();

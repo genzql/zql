@@ -14,3 +14,4 @@ services:
       - 3000:3000
     volumes:
       - ./zql_ui/src:/app/src
+    command: npm run dev

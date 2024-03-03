@@ -1,0 +1,52 @@
+{
+    "serviceName": "zql-app",
+    "cluster": "zql",
+    "loadBalancers": [
+        {
+            "targetGroupArn": "arn:aws:elasticloadbalancing:us-east-2:217089594100:targetgroup/zql-tg/95d598c060115aaf",
+            "containerName": "zql-app",
+            "containerPort": 80
+        },
+        {
+            "targetGroupArn": "arn:aws:elasticloadbalancing:us-east-2:217089594100:targetgroup/zql-ui-tg/68514221fc27bec3",
+            "containerName": "zql-ui",
+            "containerPort": 3000
+        }
+    ],
+    "serviceRegistries": [],
+            "desiredCount": 1,
+            "launchType": "FARGATE",
+            "platformVersion": "1.4.0",
+            "taskDefinition": "arn:aws:ecs:us-east-2:217089594100:task-definition/zql-app:11",
+            "deploymentConfiguration": {
+                "deploymentCircuitBreaker": {
+                    "enable": true,
+                    "rollback": true
+                },
+                "maximumPercent": 200,
+                "minimumHealthyPercent": 0
+            },
+            "placementConstraints": [],
+            "placementStrategy": [],
+            "networkConfiguration": {
+                "awsvpcConfiguration": {
+                    "subnets": [
+                        "subnet-0fc1d0125f37616be",
+                        "subnet-00c16a648fe41c642",
+                        "subnet-06b8699b0edf3a8b4"
+                    ],
+                    "securityGroups": [
+                        "sg-0a691cbb2d1fa2e2b"
+                    ],
+                    "assignPublicIp": "ENABLED"
+                }
+            },
+            "healthCheckGracePeriodSeconds": 0,
+            "schedulingStrategy": "REPLICA",
+            "deploymentController": {
+                "type": "ECS"
+            },
+            "enableECSManagedTags": true,
+            "propagateTags": "NONE",
+            "enableExecuteCommand": false
+        }

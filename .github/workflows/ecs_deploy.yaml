@@ -8,11 +8,13 @@ on:
 
 env:
   AWS_REGION: us-east-2
-  API_ECR_REPOSITORY: zql-app
   ECS_SERVICE: zql-app
   ECS_CLUSTER: zql
   ECS_TASK_DEFINITION: task_definition.json
+  API_ECR_REPOSITORY: zql-app
   API_CONTAINER_NAME: zql-app
+  UI_ECR_REPOSITORY: zql-ui
+  UI_CONTAINER_NAME: zql-ui
 
 permissions:
   contents: read

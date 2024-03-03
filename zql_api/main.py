@@ -10,7 +10,6 @@ from zql import Zql, ZqlParserError
 from fastapi.middleware.cors import CORSMiddleware
 
 TEMPLATE_DIR = Path(__file__).resolve().parent / "templates"
-USE_GRAMMAR = True
 
 def setup_db(session):
     session.execute("DROP TABLE IF EXISTS peeps;")
@@ -77,7 +76,7 @@ def get_result_dicts(rows: list[tuple], column_names: list[str]) -> list[dict]:
 async def transpile_query(query: str = Form(...)):
     """Transpile ZQL to SQL"""
     try:
-        return Zql().parse(query, use_grammar=USE_GRAMMAR)
+        return Zql().parse(query)
     except ZqlParserError as zpe:
         return str(zpe)
     return transpiled_query, error_message
@@ -88,7 +87,7 @@ async def run_query(query: str = Form(...)) -> dict:
     error_message: str | None = None
     transpiled_query: str = ""
     try:
-        transpiled_query = Zql().parse(query, use_grammar=USE_GRAMMAR)
+        transpiled_query = Zql().parse(query)
     except ZqlParserError as zpe:
         error_message = str(zpe)
 
@@ -128,7 +127,7 @@ async def run_query(request: Request, query: str = Form(...)):
     error_message: str | None = None
     transpiled_query: str = ""
     try:
-        transpiled_query = Zql().parse(query, use_grammar=USE_GRAMMAR)
+        transpiled_query = Zql().parse(query)
     except ZqlParserError as zpe:
         error_message = str(zpe)
 

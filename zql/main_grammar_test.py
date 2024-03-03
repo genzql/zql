@@ -8,7 +8,7 @@ def test_simple_select_query():
     yass example
     no cap
     """
-    actual = Zql().parse(raw_query, use_grammar=True)
+    actual = Zql().parse(raw_query)
     expected = """
 SELECT a, b
 FROM example
@@ -24,7 +24,7 @@ def test_simple_select_query_with_limit():
     say less 10
     no cap
     """
-    actual = Zql().parse(raw_query, use_grammar=True)
+    actual = Zql().parse(raw_query)
     expected = """
 SELECT a, b
 FROM example
@@ -39,7 +39,7 @@ def test_select_integer_without_from():
     its giving 6
     no cap
     """
-    actual = Zql().parse(raw_query, use_grammar=True)
+    actual = Zql().parse(raw_query)
     expected = """
 SELECT 6
 ;
@@ -52,7 +52,7 @@ def test_select_float_without_from():
     its giving 6.04
     no cap
     """
-    actual = Zql().parse(raw_query, use_grammar=True)
+    actual = Zql().parse(raw_query)
     expected = """
 SELECT 6.04
 ;
@@ -65,7 +65,7 @@ def test_select_without_from_string_expression_single_quotes():
     its giving 'hello'
     no cap
     """
-    actual = Zql().parse(raw_query, use_grammar=True)
+    actual = Zql().parse(raw_query)
     expected = """
 SELECT 'hello'
 ;
@@ -78,7 +78,7 @@ def test_select_without_from_string_expression_double_quotes():
     its giving "hello"
     no cap
     """
-    actual = Zql().parse(raw_query, use_grammar=True)
+    actual = Zql().parse(raw_query)
     expected = """
 SELECT "hello"
 ;
@@ -93,7 +93,7 @@ def test_single_where():
     tfw a be b
     no cap
     """
-    actual = Zql().parse(raw_query, use_grammar=True)
+    actual = Zql().parse(raw_query)
     expected = """
 SELECT a
 FROM example
@@ -111,7 +111,7 @@ def test_multi_where_and():
     fax a sike c
     no cap
     """
-    actual = Zql().parse(raw_query, use_grammar=True)
+    actual = Zql().parse(raw_query)
     expected = """
 SELECT a
 FROM example
@@ -130,7 +130,7 @@ def test_multi_where_or():
     uh a sike c
     no cap
     """
-    actual = Zql().parse(raw_query, use_grammar=True)
+    actual = Zql().parse(raw_query)
     expected = """
 SELECT a
 FROM example
@@ -150,7 +150,7 @@ def test_multi_where_and_or():
     uh b be c
     no cap
     """
-    actual = Zql().parse(raw_query, use_grammar=True)
+    actual = Zql().parse(raw_query)
     expected = """
 SELECT a
 FROM example
@@ -169,7 +169,7 @@ def test_single_where_string_expression():
     tfw a be 'ahh'
     no cap
     """
-    actual = Zql().parse(raw_query, use_grammar=True)
+    actual = Zql().parse(raw_query)
     expected = """
 SELECT a
 FROM example
@@ -185,7 +185,7 @@ def test_select_star_short_sheesh():
     yass example
     no cap
     """
-    actual = Zql().parse(raw_query, use_grammar=True)
+    actual = Zql().parse(raw_query)
     expected = """
 SELECT *
 FROM example
@@ -200,7 +200,7 @@ def test_select_star_long_sheesh():
     yass example
     no cap
     """
-    actual = Zql().parse(raw_query, use_grammar=True)
+    actual = Zql().parse(raw_query)
     expected = """
 SELECT *
 FROM example
@@ -215,7 +215,7 @@ def test_select_distinct():
     yass example
     no cap
     """
-    actual = Zql().parse(raw_query, use_grammar=True)
+    actual = Zql().parse(raw_query)
     expected = """
 SELECT DISTINCT a, b, c
 FROM example
@@ -230,7 +230,7 @@ def test_select_math_expressions():
     yass example
     no cap
     """
-    actual = Zql().parse(raw_query, use_grammar=True)
+    actual = Zql().parse(raw_query)
     expected = """
 SELECT a, b + c, d * e, f / g, h - i
 FROM example
@@ -245,7 +245,7 @@ def test_select_column_alias():
     yass example
     no cap
     """
-    actual = Zql().parse(raw_query, use_grammar=True)
+    actual = Zql().parse(raw_query)
     expected = """
 SELECT a, b AS flower
 FROM example
@@ -260,7 +260,7 @@ def test_select_expression_alias():
     yass example
     no cap
     """
-    actual = Zql().parse(raw_query, use_grammar=True)
+    actual = Zql().parse(raw_query)
     expected = """
 SELECT a, b = c AS is_equal
 FROM example
@@ -279,7 +279,7 @@ def test_select_multiple_aliases():
     yass example
     no cap
     """
-    actual = Zql().parse(raw_query, use_grammar=True)
+    actual = Zql().parse(raw_query)
     expected = """
 SELECT a AS x, b, c + d AS yo, e
 FROM example
@@ -294,7 +294,7 @@ def test_select_postfix_alias():
     yass example
     no cap
     """
-    actual = Zql().parse(raw_query, use_grammar=True)
+    actual = Zql().parse(raw_query)
     expected = """
 SELECT a, SUM(b) AS total_b
 FROM example
@@ -310,7 +310,7 @@ def test_respect_case():
     tfw a be "hELlO"
     no cap
     """
-    actual = Zql().parse(raw_query, use_grammar=True)
+    actual = Zql().parse(raw_query)
     expected = """
 SELECT a
 FROM example
@@ -328,7 +328,7 @@ def test_single_line_comments():
     -- you cappin if you forget this
     no cap
     """
-    actual = Zql().parse(raw_query, use_grammar=True)
+    actual = Zql().parse(raw_query)
 #     expected = """
 # -- yo wassup its zql
 # SELECT a, b, c
@@ -350,7 +350,7 @@ def test_inline_comments():
     yass example
     no cap -- you cappin if you forget this
     """
-    actual = Zql().parse(raw_query, use_grammar=True)
+    actual = Zql().parse(raw_query)
 #     expected = """
 # SELECT a, b, c -- yo wassup its zql
 # FROM example
@@ -376,7 +376,7 @@ def test_multiline_comments():
     you cappin if you forget this
      */
     """
-    actual = Zql().parse(raw_query, use_grammar=True)
+    actual = Zql().parse(raw_query)
 #     expected = """
 # /*
 # * yo wassup its zql
@@ -403,7 +403,7 @@ def test_simple_select_union():
     its giving a, b, c
     no cap
     """
-    actual = Zql().parse(raw_query, use_grammar=True)
+    actual = Zql().parse(raw_query)
     expected = """
 SELECT a, b, c
 UNION
@@ -420,7 +420,7 @@ def test_simple_select_union_all():
     its giving a, b, c
     no cap
     """
-    actual = Zql().parse(raw_query, use_grammar=True)
+    actual = Zql().parse(raw_query)
     expected = """
 SELECT a, b, c
 UNION ALL
@@ -439,7 +439,7 @@ def test_select_where_union():
     tfw y be 100
     no cap
     """
-    actual = Zql().parse(raw_query, use_grammar=True)
+    actual = Zql().parse(raw_query)
     expected = """
 SELECT a, b, c
 WHERE x = 100
@@ -460,7 +460,7 @@ def test_select_where_union_all():
     tfw y be 100
     no cap
     """
-    actual = Zql().parse(raw_query, use_grammar=True)
+    actual = Zql().parse(raw_query)
     expected = """
 SELECT a, b, c
 WHERE x = 100
@@ -480,7 +480,7 @@ def test_join_two_tables():
     bet a be b
     no cap
     """
-    actual = Zql().parse(raw_query, use_grammar=True)
+    actual = Zql().parse(raw_query)
     expected = """
 SELECT a, b
 FROM table_a
@@ -499,7 +499,7 @@ def test_join_two_tables_explicit_columns():
     bet table_a.a be table_b.b
     no cap
     """
-    actual = Zql().parse(raw_query, use_grammar=True)
+    actual = Zql().parse(raw_query)
     expected = """
 SELECT table_a.a, table_b.b
 FROM table_a
@@ -518,7 +518,7 @@ def test_join_two_tables_explicit_columns_explicit_table_aliases():
     bet ta.a be tb.b
     no cap
     """
-    actual = Zql().parse(raw_query, use_grammar=True)
+    actual = Zql().parse(raw_query)
     expected = """
 SELECT ta.a, tb.b
 FROM table_a AS ta
@@ -537,7 +537,7 @@ def test_join_two_tables_explicit_columns_implicit_table_aliaes():
     bet ta.a be tb.b
     no cap
     """
-    actual = Zql().parse(raw_query, use_grammar=True)
+    actual = Zql().parse(raw_query)
     expected = """
 SELECT ta.a, tb.b
 FROM table_a ta
@@ -558,7 +558,7 @@ def test_join_three_tables():
         bet a sike c
     no cap
     """
-    actual = Zql().parse(raw_query, use_grammar=True)
+    actual = Zql().parse(raw_query)
     expected = """
 SELECT a, b, c
 FROM table_a
@@ -585,7 +585,7 @@ def test_join_three_tables_multiple_conditions():
         uh c sike "quack"
     no cap
     """
-    actual = Zql().parse(raw_query, use_grammar=True)
+    actual = Zql().parse(raw_query)
     expected = """
 SELECT a, b, c
 FROM table_a
@@ -609,7 +609,7 @@ def test_groupby_one_field_simple_aggregation():
     let a cook
     no cap
     """
-    actual = Zql().parse(raw_query, use_grammar=True)
+    actual = Zql().parse(raw_query)
     expected = """
 SELECT a, count(b)
 FROM example
@@ -626,7 +626,7 @@ def test_groupby_one_field_sum_aggregation():
     let a cook
     no cap
     """
-    actual = Zql().parse(raw_query, use_grammar=True)
+    actual = Zql().parse(raw_query)
     expected = """
 SELECT a, SUM(b)
 FROM example
@@ -643,7 +643,7 @@ def test_groupby_one_field_distinct_aggregation():
     let a cook
     no cap
     """
-    actual = Zql().parse(raw_query, use_grammar=True)
+    actual = Zql().parse(raw_query)
     expected = """
 SELECT a, COUNT(DISTINCT b)
 FROM example
@@ -660,7 +660,7 @@ def test_groupby_multiple_fields():
     let a, b, c, d cook
     no cap
     """
-    actual = Zql().parse(raw_query, use_grammar=True)
+    actual = Zql().parse(raw_query)
     expected = """
 SELECT a, b, c, d, count(e)
 FROM example
@@ -678,7 +678,7 @@ def test_groupby_having_with_one_field():
     catch these count(b) bops 10 hands
     no cap
     """
-    actual = Zql().parse(raw_query, use_grammar=True)
+    actual = Zql().parse(raw_query)
     expected = """
 SELECT a, count(b)
 FROM example
@@ -700,7 +700,7 @@ def test_groupby_having_with_multiple_fields():
     hands
     no cap
     """
-    actual = Zql().parse(raw_query, use_grammar=True)
+    actual = Zql().parse(raw_query)
     expected = """
 SELECT a, count(b)
 FROM example
@@ -719,7 +719,7 @@ def test_orderby_one_field_desc():
     ngl b high key
     no cap
     """
-    actual = Zql().parse(raw_query, use_grammar=True)
+    actual = Zql().parse(raw_query)
     expected = """
 SELECT a, b
 FROM example
@@ -736,7 +736,7 @@ def test_orderby_one_field_asc():
     ngl b low key
     no cap
     """
-    actual = Zql().parse(raw_query, use_grammar=True)
+    actual = Zql().parse(raw_query)
     expected = """
 SELECT a, b
 FROM example
@@ -753,7 +753,7 @@ def test_orderby_one_field_nulls_first():
     ngl b high key yikes
     no cap
     """
-    actual = Zql().parse(raw_query, use_grammar=True)
+    actual = Zql().parse(raw_query)
     expected = """
 SELECT a, b
 FROM example
@@ -770,7 +770,7 @@ def test_orderby_one_field_nulls_last():
     ngl b low key yikes
     no cap
     """
-    actual = Zql().parse(raw_query, use_grammar=True)
+    actual = Zql().parse(raw_query)
     expected = """
 SELECT a, b
 FROM example
@@ -790,7 +790,7 @@ def test_orderby_multiple_fields():
         e low key
     no cap
     """
-    actual = Zql().parse(raw_query, use_grammar=True)
+    actual = Zql().parse(raw_query)
     expected = """
 SELECT a, b, c, d, e
 FROM example
@@ -819,7 +819,7 @@ def test_common_table_expressions():
     yass my_cte_c
     no cap
     """
-    actual = Zql().parse(raw_query, use_grammar=True)
+    actual = Zql().parse(raw_query)
     expected = """
 WITH my_cte_b AS (
 SELECT a
@@ -850,7 +850,7 @@ def test_select_from_sub_query_without_alias():
     )
     no cap
     """
-    actual = Zql().parse(raw_query, use_grammar=True)
+    actual = Zql().parse(raw_query)
     expected = """
 SELECT a
 FROM (
@@ -871,7 +871,7 @@ def test_select_from_sub_query_with_alias():
     ) be sub
     no cap
     """
-    actual = Zql().parse(raw_query, use_grammar=True)
+    actual = Zql().parse(raw_query)
     expected = """
 SELECT a
 FROM (
@@ -892,7 +892,7 @@ def test_select_from_sub_query_with_implicit_alias():
     ) sub
     no cap
     """
-    actual = Zql().parse(raw_query, use_grammar=True)
+    actual = Zql().parse(raw_query)
     expected = """
 SELECT a
 FROM (
@@ -913,7 +913,7 @@ def test_create_table():
     )
     no cap
     """
-    actual = Zql().parse(raw_query, use_grammar=True)
+    actual = Zql().parse(raw_query)
     expected = """
 CREATE TABLE example(
     a int,
@@ -933,7 +933,7 @@ def test_create_table_if_not_exists():
     )
     no cap
     """
-    actual = Zql().parse(raw_query, use_grammar=True)
+    actual = Zql().parse(raw_query)
     expected = """
 CREATE TABLE IF NOT EXISTS example(
     a int,
@@ -946,41 +946,41 @@ CREATE TABLE IF NOT EXISTS example(
 
 def test_create_database():
     raw_query = "built different queen db no cap"
-    actual = Zql().parse(raw_query, use_grammar=True)
+    actual = Zql().parse(raw_query)
     assert actual == "CREATE DATABASE db;"
 
 
 def test_create_database_if_not_exists():
     raw_query = "built different queen db or nah no cap"
-    actual = Zql().parse(raw_query, use_grammar=True)
+    actual = Zql().parse(raw_query)
     assert actual == "CREATE DATABASE IF NOT EXISTS db;"
 
 
 def test_drop_database():
     raw_query = "yeet queen db no cap"
-    actual = Zql().parse(raw_query, use_grammar=True)
+    actual = Zql().parse(raw_query)
     assert actual == "DROP DATABASE db;"
 
 
 def test_drop_database_if_not_exists():
     raw_query = "yeet queen db or nah no cap"
-    actual = Zql().parse(raw_query, use_grammar=True)
+    actual = Zql().parse(raw_query)
     assert actual == "DROP DATABASE IF EXISTS db;"
 
 
 def test_drop_table():
     raw_query = "yeet girlie example no cap"
-    actual = Zql().parse(raw_query, use_grammar=True)
+    actual = Zql().parse(raw_query)
     assert actual == "DROP TABLE example;"
 
 
 def test_drop_table_if_not_exists():
     raw_query = "yeet girlie example or nah no cap"
-    actual = Zql().parse(raw_query, use_grammar=True)
+    actual = Zql().parse(raw_query)
     assert actual == "DROP TABLE IF EXISTS example;"
 
 
 def test_insert():
     raw_query = "pushin p into example (1, \"A\") no cap"
-    actual = Zql().parse(raw_query, use_grammar=True)
+    actual = Zql().parse(raw_query)
     assert actual == "INSERT INTO example VALUES (1, \"A\");"

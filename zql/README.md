@@ -70,45 +70,4 @@ See actual tests 😊
 
 ## Grammar
 
-- [x] Simple select queries
-- [ ] Simple create queries
-- [ ] Simple insert queries
-- [ ] Inline comments
-
-```
-TERMINAL = (no cap)
-EXPR = [(a-z)|(0-9)]+
-INT = [0-9]+
-
-COMMA = ,
-SELECT = (its giving)
-FROM = (yass)
-WHERE = (tfw)
-LIMIT = (say less)
-KEYWORD = SELECT|FROM|WHERE|LIMIT
-COMPARISON = be|(sike)
-FILTER_OP = fax|uh
-
-QUERY        : SELECT_CLAUSE
-             ;
-EXPR_LIST    : EXPR
-             | EXPR COMMA EXPR_LIST
-             ;
-SELECT_CLAUSE: EXPR_LIST FROM_CLAUSE
-             | EXPR_LIST TERMINAL
-             ;
-FROM_CLAUSE  : EXPR TERMINAL
-             | EXPR WHERE_CLAUSE
-             | EXPR LIMIT_CLAUSE
-             ;
-FILTER       : EXPR COMPARISON EXPR
-             ;
-FILTER_LIST  : FILTER
-             | FILTER FILTER_OP FILTER_LIST
-             ;
-WHERE_CLAUSE : FILTER_LIST TERMINAL
-             | FILTER_LIST LIMIT_CLAUSE
-             ;
-LIMIT_CLAUSE : INT TERMINAL
-             ;
-```
+See `zql/zql_grammar.tmjd`.

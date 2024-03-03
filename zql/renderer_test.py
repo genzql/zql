@@ -1,53 +1,7 @@
 import pytest
-from zql.grammar import parse_grammar, parse_ast
-from zql.grammar_renderer import QueryRenderError, render_query
-
-
-FUNCTION_GRAMMAR_CONTENT = r"""
-    root     : function
-             ;
-    function : arg1 divide arg2
-             > "{arg1}\n---------------------\n{arg2}"
-             | arg1 operator arg2
-             > "{operator}({arg1}, {arg2})"
-             | expr
-             ;
-    arg1     : expr
-             ;
-    arg2     : expr
-             ;
-    expr     : open function close
-             > "{function}"
-             | word
-             | number
-             ;
-    open     : "("
-             ;
-    close    : ")"
-             ;
-    word     : r[a-zA-Z][\w$]*
-             ;
-    number   : r[0-9]+
-             ;
-    operator : add
-             | subtract
-             | multiply
-             | divide
-             ;
-    add      : "+"
-             > "add"
-             ;
-    subtract : "-"
-             > "subtract"
-             ;
-    multiply : "*"
-             > "multiply"
-             ;
-    divide   : "/"
-             > "divide"
-             ;
-"""
-FUNCTION_GRAMMAR = parse_grammar(FUNCTION_GRAMMAR_CONTENT)
+from zql.parser import parse_ast
+from zql.renderer import QueryRenderError, render_query
+from zql.sample_grammars import FUNCTION_GRAMMAR
 
 
 def test_render_simple():

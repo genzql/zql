@@ -1,7 +1,7 @@
 from zql.types import ZqlQuery, SqlQuery
-from zql.grammar import AstParseError, parse_ast
-from zql.grammar_loader import get_zql_grammar
-from zql.grammar_renderer import QueryRenderError, render_query
+from zql.parser import AstParseError, parse_ast
+from zql.loader import get_zql_grammar
+from zql.renderer import QueryRenderError, render_query
 
 
 ZQL_GRAMMAR = get_zql_grammar()

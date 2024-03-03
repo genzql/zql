@@ -1,5 +1,6 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react-swc";
+import monacoEditorPlugin from "vite-plugin-monaco-editor";
 
 import path from "path";
 
@@ -13,7 +14,10 @@ export default defineConfig({
     port: 3000,
   },
 
-  plugins: [react()],
+  plugins: [
+    react(),
+    ((monacoEditorPlugin as any).default as typeof monacoEditorPlugin)({}), // https://github.com/vdesjs/vite-plugin-monaco-editor/issues/21
+  ],
 
   resolve: {
     alias: {

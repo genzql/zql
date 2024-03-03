@@ -1,4 +1,5 @@
 import re
+from zql.cleaner import get_tokens_string_safe
 
 
 DEF = ":"
@@ -112,31 +113,11 @@ def parse_grammar(content: str) -> Grammar:
     return grammar
 
 
-WHITESPACE_REGEX = re.compile(r"\s+")
-NEED_SPACE_AROUND_CHARS = [",", ".", "(", ")", "+", "-", "*", "/"]
-
-
 AstNode = dict
 
 
 class AstParseError(Exception):
     pass
-
-
-def get_tokens(source: str) -> list[str]:
-    """
-    Converts a raw source string to a list of tokens.
-    - Strips whitespace from either side.
-    - Adds spaces around characters like commas so they become tokens.
-    - Ignores extra whitespace or line breaks in the query.
-    """
-    normalized = source.strip()
-    cleaned = WHITESPACE_REGEX.sub(SPACE, normalized)
-    for char in NEED_SPACE_AROUND_CHARS:
-        cleaned = cleaned.replace(char, SPACE + char + SPACE)
-    separated = cleaned.split(SPACE)
-    tokens = [t for t in separated if t]
-    return tokens
 
 
 class TokensManager:
@@ -263,7 +244,7 @@ def evaluate_node(
 
 
 def parse_ast(grammar: Grammar, source: str) -> AstNode:
-    tokens = get_tokens(source)
+    tokens = get_tokens_string_safe(source)
     tokens_manager = TokensManager(tokens)
     root = evaluate_node(grammar, tokens_manager, ROOT)
 

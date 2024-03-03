@@ -13,7 +13,7 @@ const FormSchema = z.object({
   query: z.string(),
 });
 
-const BASE_API_URL = "http://localhost:80";
+const BASE_API_URL = import.meta.env.VITE_BASE_API_URL;
 
 export function SqlForm() {
   const [transpiledQuery, setTranspiledQuery] = useState("");

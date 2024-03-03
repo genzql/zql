@@ -45,3 +45,51 @@ def test_get_tokens_string_safe_separating_characters():
     actual = get_tokens_string_safe(source)
     expected = ["get", "secure", ".", "latest", "when", "1", "+", "1", "=", "2"]
     assert actual == expected
+
+
+def test_get_tokens_string_safe_single_line_comment():
+    source = """
+    hey
+    -- line comment
+    lets go -- inline comment
+    -- comment with "string" haha
+    """
+    actual = get_tokens_string_safe(source)
+    expected = ["hey", "lets", "go"]
+    assert actual == expected
+
+
+def test_get_tokens_string_safe_multi_line_comment():
+    source = """
+    hey
+    /* block comment
+     * hey
+     * its over
+     */
+    lets go -- inline comment
+    -- comment with "string" haha
+    """
+    actual = get_tokens_string_safe(source)
+    expected = ["hey", "lets", "go"]
+    assert actual == expected
+
+
+def test_get_tokens_string_safe_end_in_dash():
+    source = "yo-"
+    actual = get_tokens_string_safe(source)
+    expected = ["yo", "-"]
+    assert actual == expected
+
+
+def test_get_tokens_string_safe_multiple_spaces():
+    source = "yo    hey"
+    actual = get_tokens_string_safe(source)
+    expected = ["yo", "hey"]
+    assert actual == expected
+
+
+def test_get_tokens_string_safe_quote_in_word():
+    source = "it's me"
+    actual = get_tokens_string_safe(source)
+    expected = ["it", "'s me"]
+    assert actual == expected

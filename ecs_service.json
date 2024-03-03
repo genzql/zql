@@ -5,12 +5,12 @@
     {
       "targetGroupArn": "arn:aws:elasticloadbalancing:us-east-2:217089594100:targetgroup/zql-tg/95d598c060115aaf",
       "containerName": "zql-app",
-      "containerPort": 81
+      "containerPort": 80
     },
     {
       "targetGroupArn": "arn:aws:elasticloadbalancing:us-east-2:217089594100:targetgroup/zql-ui-tg/68514221fc27bec3",
       "containerName": "zql-ui",
-      "containerPort": 80
+      "containerPort": 3000
     }
   ],
   "serviceRegistries": [],

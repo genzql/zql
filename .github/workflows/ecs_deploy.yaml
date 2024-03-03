@@ -101,50 +101,50 @@ jobs:
           docker push --all-tags $ECR_REGISTRY/$API_ECR_REPOSITORY
           echo "image=$ECR_REGISTRY/$API_ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
 
-  # build-ui:
-  #   needs: test
-  #   runs-on: ubuntu-latest
-  #   environment: production
+  build-ui:
+    needs: test
+    runs-on: ubuntu-latest
+    environment: production
 
-  #   outputs:
-  #     image: ${{ steps.build-ui-image.outputs.image }}
+    outputs:
+      image: ${{ steps.build-ui-image.outputs.image }}
 
-  #   steps:
-  #     - name: Check out
-  #       uses: actions/checkout@v4
+    steps:
+      - name: Check out
+        uses: actions/checkout@v4
 
-  #     - name: Configure AWS credentials
-  # uses: configure-aws-credentials@v1
-  # with:
-  #   aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-  #   aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-  #   aws-region: us-east-2
-  #   mask-aws-account-id: 'no'
+      - name: Configure AWS credentials
+        uses: configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-2
+          mask-aws-account-id: "no"
 
-  #     - name: Login to Amazon ECR
-  #       id: login-ecr
-  #       uses: aws-actions/amazon-ecr-login@v1
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
 
-  #     - name: Build, tag, and push UI image to Amazon ECR
-  #       id: build-ui-image
-  #       env:
-  #         ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-  #         IMAGE_TAG: ${{ github.sha }}
-  #       run: |
-  #         # Build a docker container and push it to ECR so that it can
-  #         docker build -t $ECR_REGISTRY/$UI_ECR_REPOSITORY:$IMAGE_TAG -f Dockerfile.ui .
+      - name: Build, tag, and push UI image to Amazon ECR
+        id: build-ui-image
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          # Build a docker container and push it to ECR so that it can
+          docker build -t $ECR_REGISTRY/$UI_ECR_REPOSITORY:$IMAGE_TAG -f zql_ui/.
 
-  #         # Also tag with latest
-  #         docker image tag $ECR_REGISTRY/$UI_ECR_REPOSITORY:$IMAGE_TAG $ECR_REGISTRY/$UI_ECR_REPOSITORY:latest
+          # Also tag with latest
+          docker image tag $ECR_REGISTRY/$UI_ECR_REPOSITORY:$IMAGE_TAG $ECR_REGISTRY/$UI_ECR_REPOSITORY:latest
 
-  #         docker push --all-tags $ECR_REGISTRY/$UI_ECR_REPOSITORY
-  #         echo "image=$ECR_REGISTRY/$UI_ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
+          docker push --all-tags $ECR_REGISTRY/$UI_ECR_REPOSITORY
+          echo "image=$ECR_REGISTRY/$UI_ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
 
   deploy:
     name: Deploy
     runs-on: ubuntu-latest
     environment: production
-    needs: ["build-api"]
+    needs: ["build-api", "build-ui"]
 
     steps:
       - name: Checkout
@@ -166,18 +166,18 @@ jobs:
           container-name: ${{ env.API_CONTAINER_NAME }}
           image: ${{ needs.build-api.outputs.image}}
 
-      # - name: Fill in the new UI image ID in the Amazon ECS task definition
-      #   id: ui-task-def
-      #   uses: aws-actions/amazon-ecs-render-task-definition@c804dfbdd57f713b6c079302a4c01db7017a36fc
-      #   with:
-      #     task-definition: ${{ steps.api-task-def.outputs.task-definition }}
-      #     container-name: ${{ env.UI_CONTAINER_NAME }}
-      #     image: ${{ needs.build-ui.outputs.image}}
+      - name: Fill in the new UI image ID in the Amazon ECS task definition
+        id: ui-task-def
+        uses: aws-actions/amazon-ecs-render-task-definition@c804dfbdd57f713b6c079302a4c01db7017a36fc
+        with:
+          task-definition: ${{ steps.api-task-def.outputs.task-definition }}
+          container-name: ${{ env.UI_CONTAINER_NAME }}
+          image: ${{ needs.build-ui.outputs.image}}
 
       - name: Deploy Amazon ECS task definition
         uses: aws-actions/amazon-ecs-deploy-task-definition@v1
         with:
-          task-definition: ${{ steps.api-task-def.outputs.task-definition }} # change to ui task-def when ready
+          task-definition: ${{ steps.ui-task-def.outputs.task-definition }}
           service: ${{ env.ECS_SERVICE }}
           cluster: ${{ env.ECS_CLUSTER }}
           wait-for-service-stability: true

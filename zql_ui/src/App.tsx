@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import MonacoInput from "./components/monaco-input";
 import { Button } from "./components/ui/button";
 import { callTranspile } from "./callApi";
@@ -10,18 +10,32 @@ function App() {
 
   const [zqlQuery, setZqlQuery] = useState(defaultZqlQuery);
   const [transpiledQuery, setTranspiledQuery] = useState("");
-  const [dataRows, setDataRows] = useState([]);
-  const [dataColumns, setDataColumns] = useState([]);
+  const [dataRows, setDataRows] = useState<any[]>([]);
+  const [dataColumns, setDataColumns] = useState<string[]>([]);
   const [errorMessage, setErrorMessage] = useState("");
 
   const handleTranspile = async () => {
     const transpiledResult = await callTranspile(zqlQuery);
-    console.log(transpiledResult); // Log the output of the transpile function
     setTranspiledQuery(transpiledResult.transpiledQuery);
     setDataRows(transpiledResult.dataRows);
     setDataColumns(transpiledResult.dataColumns);
     setErrorMessage(transpiledResult.errorMessage);
   };
+
+  const isMac = navigator.userAgent.includes("Mac");
+
+  const handleKeyDown = (event: KeyboardEvent) => {
+    if (event.metaKey && event.key === "Enter") {
+      handleTranspile();
+    }
+  };
+
+  useEffect(() => {
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [zqlQuery]); // Listen to changes in zqlQuery
 
   return (
     <div className="flex flex-col items-center justify-center mx-auto max-w-screen-lg px-4">
@@ -34,6 +48,7 @@ function App() {
             language={"zql"}
             value={zqlQuery}
             setValue={setZqlQuery}
+            onCtrlCmdEnter={handleTranspile}
           />
         </div>
         <div className="sm:w-1/2 sm:pl-2 flex flex-col items-center">
@@ -42,12 +57,15 @@ function App() {
             language={"sql"}
             value={transpiledQuery}
             setValue={(_) => {}}
+            onCtrlCmdEnter={handleTranspile}
             readOnly={true}
           />
         </div>
       </div>
       <div className="mt-4">
-        <Button onClick={handleTranspile}>Send it</Button>
+        <Button onClick={handleTranspile}>
+          Send it ({isMac ? "⌘" : "Ctrl"}+Enter)
+        </Button>
       </div>
 
       {dataColumns.length ? (

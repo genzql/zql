@@ -80,6 +80,7 @@ interface MonacoInputProps {
   language: string;
   value: string;
   setValue: (value: string) => void;
+  onCtrlCmdEnter?: () => void;
   readOnly?: boolean;
 }
 
@@ -87,6 +88,7 @@ const MonacoInput: React.FC<MonacoInputProps> = ({
   language,
   value,
   setValue,
+  onCtrlCmdEnter: onCtrlCmdEnter = () => null,
   readOnly = false,
 }) => {
   const editorRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null);
@@ -109,6 +111,14 @@ const MonacoInput: React.FC<MonacoInputProps> = ({
           setValue(editorValue);
         }
       });
+
+      // Add keydown event listener for Cmd+Enter or Ctrl+Enter
+      editorRef.current.addCommand(
+        monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter,
+        function () {
+          onCtrlCmdEnter();
+        }
+      );
     }
 
     return () => {

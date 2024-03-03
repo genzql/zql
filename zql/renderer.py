@@ -1,4 +1,5 @@
-from zql.grammar import AstNode, Grammar
+from zql.grammar import Grammar
+from zql.parser import AstNode
 from zql.types import SqlQuery
 
 

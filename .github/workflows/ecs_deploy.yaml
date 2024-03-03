@@ -2,15 +2,19 @@ name: PyTest and Deploy
 
 on:
   push:
-    branches: ["main"]
+    branches:
+      - main
+      - "build*"
 
 env:
   AWS_REGION: us-east-2
-  API_ECR_REPOSITORY: zql-app
   ECS_SERVICE: zql-app
   ECS_CLUSTER: zql
   ECS_TASK_DEFINITION: task_definition.json
+  API_ECR_REPOSITORY: zql-app
   API_CONTAINER_NAME: zql-app
+  UI_ECR_REPOSITORY: zql-ui
+  UI_CONTAINER_NAME: zql-ui
 
 permissions:
   contents: read
@@ -114,11 +118,11 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Configure AWS credentials
-        uses: configure-aws-credentials@v1
+        uses: aws-actions/configure-aws-credentials@v1
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-2
+          aws-region: ${{ env.AWS_REGION }}
           mask-aws-account-id: "no"
 
       - name: Login to Amazon ECR
@@ -132,7 +136,7 @@ jobs:
           IMAGE_TAG: ${{ github.sha }}
         run: |
           # Build a docker container and push it to ECR so that it can
-          docker build -t $ECR_REGISTRY/$UI_ECR_REPOSITORY:$IMAGE_TAG -f zql_ui/.
+          docker build -t $ECR_REGISTRY/$UI_ECR_REPOSITORY:$IMAGE_TAG zql_ui/.
 
           # Also tag with latest
           docker image tag $ECR_REGISTRY/$UI_ECR_REPOSITORY:$IMAGE_TAG $ECR_REGISTRY/$UI_ECR_REPOSITORY:latest

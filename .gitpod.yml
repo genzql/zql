@@ -1,5 +1,6 @@
 tasks:
   - init: |
+      echo "VITE_BASE_API_URL=$(gp url 80)" > zql_ui/.env.development
       poetry update
       docker-compose pull
   - command: docker-compose up

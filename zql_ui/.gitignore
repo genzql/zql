@@ -22,3 +22,9 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Some developers use GitPod, which sets a custom backend URL to an env var that
+# varies between GitPod instances. We should not commit this file to avoid
+# commiting those custom backend URLs, which need to be generated at GitPod
+# startup. The .env file is still committed as a fallback for local development.
+.env.development

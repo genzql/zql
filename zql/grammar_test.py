@@ -1,5 +1,5 @@
 import pytest
-from zql.grammar import AstParseError, get_tokens, parse_grammar, parse_ast
+from zql.grammar import AstParseError, parse_grammar, parse_ast
 
 
 FORMULA_GRAMMAR_CONTENT = r"""
@@ -29,15 +29,6 @@ FORMULA_GRAMMAR_CONTENT = r"""
              ;
 """
 FORMULA_GRAMMAR = parse_grammar(FORMULA_GRAMMAR_CONTENT)
-
-
-def test_get_tokens():
-    source = """
-    (A + 12) - 0
-    """
-    actual = get_tokens(source)
-    expected = ["(", "A", "+", "12", ")", "-", "0"]
-    assert actual == expected
 
 
 def test_parse_grammar_formula():

@@ -10,21 +10,22 @@ import { DataTablePaginationProps } from "./data-table";
 export function DataTablePagination<TData>({
   table,
 }: DataTablePaginationProps<TData>) {
-  const firstRowCount = table.getPaginationRowModel().rows[0]?.id ?? -1; // Default to 0 if rows[0] is undefined
-  const lastRowCount =
-    table.getPaginationRowModel().rows.slice(-1)[0]?.id ?? -1; // Default to 0 if rows[0] is undefined
+  const firstRowId = Number(table.getPaginationRowModel().rows[0]?.id ?? -1); // Default to 0 if rows[0] is undefined
+  const lastRowId = Number(
+    table.getPaginationRowModel().rows.slice(-1)[0]?.id ?? -1
+  ); // Default to 0 if rows[0] is undefined
   const totalRowCount = table.getPrePaginationRowModel().rows.length;
 
   return (
     <div className="flex items-center justify-between px-2">
       <div className="flex-1 text-sm text-muted-foreground">
-        Showing rows {firstRowCount + 1} to {lastRowCount + 1} of{" "}
-        {totalRowCount} row(s).
+        Showing rows {firstRowId + 1} to {lastRowId + 1} of {totalRowCount}{" "}
+        row(s).
       </div>
       <div className="flex items-center space-x-6 lg:space-x-8">
         <div className="flex w-[100px] items-center justify-center text-sm font-medium">
           Page {table.getState().pagination.pageIndex + 1} of{" "}
-          {table.getPageCount()}
+          {table.getPageCount() || 1}
         </div>
         <div className="flex items-center space-x-2">
           <Button

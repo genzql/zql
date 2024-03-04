@@ -53,7 +53,7 @@ export function HelpSheet({ children, setValue }: HelpSheetProps) {
     return (
       <div onClick={() => setValue(query)}>
         <Card className="flex flex-grow">
-          <CardHeader>
+          <CardHeader className="w-full">
             <CardTitle>{description}</CardTitle>
             <CardContent>{query}</CardContent>
           </CardHeader>
@@ -73,7 +73,7 @@ export function HelpSheet({ children, setValue }: HelpSheetProps) {
         <ScrollArea key="scroll-area">
           {exampleQueryProps.map((queryProp) => (
             <div key={queryProp.description} className="text-sm p-1 h-25">
-              <SheetClose>
+              <SheetClose className="w-full">
                 <ExampleQueryCard {...queryProp} />
               </SheetClose>
             </div>

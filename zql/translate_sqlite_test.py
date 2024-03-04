@@ -43,7 +43,6 @@ ORDER BY count(b) DESC
     """
     actual = translate(ZQL_GRAMMAR, raw_query, source_dialect="sqlite")
     expected = """
-
 its giving a, count(b)
 yass example
 let a cook

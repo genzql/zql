@@ -14,6 +14,7 @@ function App() {
   const [dataRows, setDataRows] = useState<any[]>([]);
   const [dataColumns, setDataColumns] = useState<string[]>([]);
   const [errorMessage, setErrorMessage] = useState("");
+  const [helpSheetOpen, setHelpSheetOpen] = useState(false);
 
   const handleTranspile = async (overrideQuery?: string) => {
     const transpiledResult = await callTranspile(
@@ -30,6 +31,9 @@ function App() {
   const handleKeyDown = (event: KeyboardEvent) => {
     if (event.metaKey && event.key === "Enter") {
       handleTranspile();
+    }
+    if (event.metaKey && event.key === "k") {
+      setHelpSheetOpen(!helpSheetOpen);
     }
   };
 
@@ -65,18 +69,20 @@ function App() {
           />
         </div>
       </div>
-      <div className="mt-4 flex justify-center space-x-4 py-2">
+      <div className="mt-4 flex justify-center space-x-3 py-2">
         <Button onClick={() => handleTranspile()}>
-          Send it ({isMac ? "⌘" : "Ctrl"}+Enter)
+          send it ({isMac ? "⌘" : "Ctrl"}+Enter)
         </Button>
         <HelpSheet
           value={zqlQuery}
+          open={helpSheetOpen}
+          onOpenChange={setHelpSheetOpen}
           setValue={(query) => {
             setZqlQuery(query);
             handleTranspile(query);
           }}
         >
-          <Button>Help!</Button>
+          <Button>get inspo ({isMac ? "⌘" : "Ctrl"}+K)</Button>
         </HelpSheet>
       </div>
 

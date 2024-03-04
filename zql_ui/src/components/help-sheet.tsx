@@ -48,6 +48,11 @@ const exampleQueryProps: QueryProps[] = [
     description: "tfw",
     query: "its giving\n\tsheeeeeesh\nyass peeps\ntfw name be 'vinesh'\nno cap",
   },
+  {
+    description: "fax",
+    query:
+      "its giving\n\tsheeeeeesh\nyass peeps\ntfw\n\tfave_color be 'blue'\n\tfax followers be 1400\nno cap",
+  },
 ];
 
 export function HelpSheet({

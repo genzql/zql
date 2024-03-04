@@ -117,6 +117,24 @@ function App() {
       >
         <FaGithub />
       </a>
+
+      <div>
+        <a
+          target="_blank"
+          href="https://github.com/vingkan"
+          rel="noopener noreferrer"
+        >
+          <Button variant={"link"}>vinesh</Button>
+        </a>
+        ·
+        <a
+          target="_blank"
+          href="https://github.com/tamjidrahman"
+          rel="noopener noreferrer"
+        >
+          <Button variant={"link"}>tamjid</Button>
+        </a>{" "}
+      </div>
     </div>
   );
 }

@@ -69,7 +69,7 @@ function App() {
           />
         </div>
       </div>
-      <div className="mt-4 flex justify-center space-x-3">
+      <div className="mt-4 flex justify-center space-x-3 py-2">
         <Button onClick={() => handleTranspile()}>
           send it ({isMac ? "⌘" : "Ctrl"}+Enter)
         </Button>
@@ -88,7 +88,9 @@ function App() {
 
       {dataColumns && dataColumns.length ? (
         <div className="flex flex-col">
-          <h1 className="text-2xl font-bold py-2"> sheeeesh that zql bussin</h1>
+          <h1 className="text-xl font-bold py-2 text-center">
+            sheeeesh that zql bussin
+          </h1>
           <DataTable columns={dataColumns} data={dataRows} />
         </div>
       ) : (
@@ -97,11 +99,12 @@ function App() {
 
       {errorMessage && (
         <div className="flex flex-col">
-          <h1 className="text-2xl font-bold py-2">
-            {" "}
-            that zql is a bit sus iykyk{" "}
+          <h1 className="text-xl font-bold py-2">
+            that zql is a bit sus iykyk
           </h1>
-          <div>{errorMessage}</div>
+          <div>
+            <pre>{errorMessage}</pre>
+          </div>
         </div>
       )}
     </div>

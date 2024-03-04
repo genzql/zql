@@ -88,7 +88,7 @@ expr_list         : expression comma expr_list
                   > "{expression}, {expr_list}"
                   | expression
                   ;
-expression        : single_expr operator single_expr
+expression        : single_expr1 operator single_expr2
                   | postfix_function
                   | single_expr
                   ;
@@ -103,6 +103,10 @@ single_expr       : function_expr
                   | quoted_expr
                   | float
                   | integer
+                  ;
+single_expr1      : single_expr
+                  ;
+single_expr2      : single_expr
                   ;
 quoted_expr       : @r\".*?\"
                   | @r\'.*?\'
@@ -166,7 +170,7 @@ table             : sub_query alias word
                   | sub_query
                   | table_name
                   ;
-table_name        : word alias word
+table_name        : word1 alias word2
                   | word non_keyword
                   | word
                   ;

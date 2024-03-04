@@ -22,10 +22,10 @@ def test_parse_grammar_formula():
             {"sequence": ["number"]},
         ],
         "open": [
-            {"literal": "(", "template": "(\n"},
+            {"literal": "(", "templates": [{"template": "(\n"}]},
         ],
         "close": [
-            {"literal": ")", "template": "\n)"},
+            {"literal": ")", "templates": [{"template": "\n)"}]},
         ],
         "word": [
             {"regex": r"[a-zA-Z][\w$]*"},
@@ -79,8 +79,21 @@ def test_parse_grammar_english():
             {"sequence": ["sentence"]},
         ],
         "sentence": [
-            {"sequence": ["name", "hello"], "dialects": ["yoda"]},
-            {"sequence": ["hello", "name"]},
+            {
+                "sequence": ["name", "hello"],
+                "dialects": ["yoda"],
+                "templates": [
+                    {"template": "{name} {hello}", "dialects": ["yoda"]},
+                    {"template": "{hello} {name}"}
+                ]
+            },
+            {
+                "sequence": ["hello", "name"],
+                "templates": [
+                    {"template": "{name} {hello}", "dialects": ["yoda"]},
+                    {"template": "{hello} {name}"}
+                ]
+            },
         ],
         "name": [
             {"regex": r"[a-z][\w$]*", "dialects": ["lowercase_english"]},

@@ -37,7 +37,6 @@ def render_with_grammar(
         raise QueryRenderError(f"Node should have a `type`: {ast}")
 
     template = maybe_get_template(lookup, ast)
-    print(ast.get("type"), template)
     if template:
         kwargs = {
             c.get("type"): render_with_grammar(grammar, lookup, c)
@@ -58,6 +57,34 @@ def render_with_grammar(
     raise QueryRenderError(f"Unable to render node: `{node_type}`.")
 
 
+def is_relevant_to_dialect(obj: dict, dialect: MaybeDialect) -> bool:
+    obj_dialects: list[str] = obj.get("dialects", [])
+    is_default_dialect = dialect is None and not obj_dialects
+    has_dialect = dialect is not None and dialect in obj_dialects
+    supports_any_dialect = not obj_dialects 
+    is_relevant = (
+        is_default_dialect
+        or has_dialect
+        or supports_any_dialect
+    )
+    return is_relevant
+
+
+def maybe_get_template_for_dialect(
+    rule: dict,
+    target_dialect: MaybeDialect
+) -> str | None:
+    templates: list[dict] = rule.get("templates")
+    if templates is None:
+        return None
+    
+    for template in templates:
+        if is_relevant_to_dialect(template, target_dialect):
+            return template.get("template")
+
+    return None
+    
+
 def get_template_lookup(
     grammar: Grammar,
     target_dialect: MaybeDialect
@@ -65,11 +92,8 @@ def get_template_lookup(
     template_lookup: TemplateLookup = {}
     for node, rules in grammar.items():
         for rule in rules:
-            if node == "sentence":
-                print(rule)
+            template = maybe_get_template_for_dialect(rule, target_dialect)
             rule_dialects: list[str] = rule.get("dialects", [])
-
-            template = rule.get("template")
             literal = rule.get("literal")
             sequence = rule.get("sequence")
 
@@ -87,16 +111,21 @@ def get_template_lookup(
                     else:
                         template = implicit_template
                 else:
-                    if rule_dialects and target_dialect in rule_dialects:
+                    if (
+                        (rule_dialects and target_dialect in rule_dialects)
+                        or (not rule_dialects)
+                    ):
                         template = implicit_template
 
             if template is None:
                 continue
 
             key = get_rule_key(node, rule)
+            if key in template_lookup:
+                break
+
             template_lookup[key] = template
 
-    print(template_lookup)
     return template_lookup
 
 
@@ -121,13 +150,11 @@ def maybe_get_template(lookup: TemplateLookup, ast: AstNode) -> Template | None:
     if children:
         rule_pattern = [child.get("type") for child in children]
         key = SPACE.join([node, *rule_pattern])
-        print("key", key)
         template = lookup.get(key)
         return template
 
     for rule_type in NON_CHILDREN_RULE_TYPES:
         key = SPACE.join([node, rule_type])
-        print("key", key)
         template = lookup.get(key)
         if template is not None:
             return template

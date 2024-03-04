@@ -101,9 +101,11 @@ root      : english
 english   : sentence
           ;
 sentence  : name hello < yoda
+          > "{name} {hello}" < yoda
           > "{hello} {name}"
           | hello name
           > "{name} {hello}" < yoda
+          > "{hello} {name}"
           ;
 name      : @r[a-z][\w$]* < lowercase_english
           | @r[a-zA-Z][\w$]*

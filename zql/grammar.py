@@ -12,6 +12,7 @@ SPACE = " "
 COMMA = ","
 NEWLINE = "\n"
 ESCAPED_NEWLINE = "\\n"
+TEMPLATES_KEY = "templates"
 ROOT = "root"
 
 
@@ -23,6 +24,7 @@ class GrammarParseError(Exception):
 
 
 def parse_rule(rule: str) -> dict:
+    is_template = rule.startswith(TEMPLATE)
     is_regex_rule = rule.startswith(REGEX_START)
     is_literal_rule = rule.startswith(QUOTE)
 
@@ -31,7 +33,7 @@ def parse_rule(rule: str) -> dict:
 
     has_no_dialect_symbol = dialect_index < 0
     has_dialect_symbol_in_quotes = (
-        is_literal_rule
+        (is_literal_rule or is_template)
         and close_quote_index > dialect_index
     )
     has_dialects = (
@@ -54,6 +56,10 @@ def parse_rule(rule: str) -> dict:
     elif is_literal_rule:
         literal = rule_content[1:-1]
         parsed_rule["literal"] = literal
+    elif is_template:
+        template_no_quotes = rule_content[3:-1]
+        template = template_no_quotes.replace(ESCAPED_NEWLINE, NEWLINE)
+        parsed_rule["template"] = template
     else:
         nodes = rule_content.split(SPACE)
         parsed_rule["sequence"] = nodes
@@ -107,12 +113,11 @@ def parse_grammar(content: str) -> Grammar:
         has_template_first = template_index < case_index
         is_template = has_template and (not has_case or has_template_first)
         if is_template:
-            raw_template = line[template_index+1:].strip()
+            raw_template = line[template_index:].strip()
             if not raw_template:
                 raise GrammarParseError(f"L{n}: Missing template after `>`.")
 
-            template_no_quotes = raw_template[1:-1]
-            template = template_no_quotes.replace(ESCAPED_NEWLINE, NEWLINE)
+            template = parse_rule(raw_template)
             current_rules = grammar[current_node]
             if not current_rules:
                 raise GrammarParseError(
@@ -120,10 +125,10 @@ def parse_grammar(content: str) -> Grammar:
                 )
 
             last_rule = current_rules[-1]
-            if "template" in last_rule:
-                raise GrammarParseError(f"L{n}: Repeat template for rule.")
+            if TEMPLATES_KEY not in last_rule:
+                last_rule[TEMPLATES_KEY] = []
 
-            last_rule["template"] = template
+            last_rule[TEMPLATES_KEY].append(template)
             continue
 
         if case_index < 0:

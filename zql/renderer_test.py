@@ -60,7 +60,12 @@ def test_render_fail_grammarless_unable_to_render():
 def test_render_fail_no_rule_key():
     with pytest.raises(QueryRenderError) as err:
         grammar_invalid_rule = {
-            "start": [{"bogus": "haha", "template": "you'll never find me"}]
+            "start": [
+                {
+                    "bogus": "haha",
+                    "templates": [{"template": "you'll never find me"}]
+                }
+            ]
         }
         render_query(grammar_invalid_rule, {"type": "start"})
     actual = str(err.value)

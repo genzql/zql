@@ -17,9 +17,9 @@ FORMULA_GRAMMAR_CONTENT = r"""
     close    : ")"
              > "\n)"
              ;
-    word     : r[a-zA-Z][\w$]*
+    word     : @r[a-zA-Z][\w$]*
              ;
-    number   : r[0-9]+
+    number   : @r[0-9]+
              ;
     operator : "+"
              | "-"
@@ -38,11 +38,11 @@ list     : num_list end
 num_list : num comma num_list
          | num
          ;
-num      : r[0-9]+
+num      : @r[0-9]+
          ;
 comma    : ","
          ;
-end      : r[0-9]+
+end      : @r[0-9]+
          ;
 """
 LIST_GRAMMAR = parse_grammar(LIST_GRAMMAR_CONTENT)
@@ -70,9 +70,9 @@ FUNCTION_GRAMMAR_CONTENT = r"""
              ;
     close    : ")"
              ;
-    word     : r[a-zA-Z][\w$]*
+    word     : @r[a-zA-Z][\w$]*
              ;
-    number   : r[0-9]+
+    number   : @r[0-9]+
              ;
     operator : add
              | subtract
@@ -93,3 +93,24 @@ FUNCTION_GRAMMAR_CONTENT = r"""
              ;
 """
 FUNCTION_GRAMMAR = parse_grammar(FUNCTION_GRAMMAR_CONTENT)
+
+
+ENGLISH_TRANSLATION_GRAMMAR_CONTENT = r"""
+root      : english
+          ;
+english   : sentence
+          ;
+sentence  : name hello < yoda
+          > "{hello} {name}"
+          | hello name
+          > "{name} {hello}" < yoda
+          ;
+name      : @r[a-z][\w$]* < lowercase_english
+          | @r[a-zA-Z][\w$]*
+          ;
+hello     : "hola" < spanish
+          | "salam" < bengali, arabic
+          | "hello"
+          ;
+"""
+ENGLISH_TRANSLATION_GRAMMAR = parse_grammar(ENGLISH_TRANSLATION_GRAMMAR_CONTENT)

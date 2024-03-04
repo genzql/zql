@@ -6,6 +6,7 @@ ZqlQuery = str
 SqlQuery = str
 AstNode = Dict
 Token = str
+MaybeDialect = str | None
 
 
 class NodeType(Enum):

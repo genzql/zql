@@ -81,7 +81,7 @@ select_expr       : star
                   > "{expression} {alias} {word}"
                   | expression
                   ;
-star              : r(shee)(e)*(sh)
+star              : @r(shee)(e)*(sh)
                   > "*"
                   ;
 expr_list         : expression comma expr_list
@@ -104,8 +104,8 @@ single_expr       : function_expr
                   | float
                   | integer
                   ;
-quoted_expr       : r\".*?\"
-                  | r\'.*?\'
+quoted_expr       : @r\".*?\"
+                  | @r\'.*?\'
                   ;
 float             : whole dot fractional
                   > "{whole}.{fractional}"
@@ -114,9 +114,9 @@ whole             : integer
                   ;
 fractional        : integer
                   ;
-integer           : r[0-9]+
+integer           : @r[0-9]+
                   ;
-word              : r[a-zA-Z][\w$]*
+word              : @r[a-zA-Z][\w$]*
                   ;
 word1             : word
                   ;
@@ -265,7 +265,7 @@ manipulation_stmt : insert_stmt
 insert_stmt       : insert_into db_table open_paren expr_list close_paren
                   > "{insert_into} {db_table} VALUES ({expr_list})"
                   ;
-non_keyword       : r\b(?!perchance\b|\bits\b|\byass\b|\bcome\b|\bbet\b|\btfw\b|\blet\b|\bcatch\b|\bngl\b|\bsay\b|\bwith\b|\bno\b)\w+\b
+non_keyword       : @r\b(?!perchance\b|\bits\b|\byass\b|\bcome\b|\bbet\b|\btfw\b|\blet\b|\bcatch\b|\bngl\b|\bsay\b|\bwith\b|\bno\b)\w+\b
                   ;
 with              : "perchance"
                   > "WITH"

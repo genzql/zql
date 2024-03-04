@@ -1,5 +1,9 @@
 from zql.grammar import parse_grammar
-from zql.sample_grammars import FORMULA_GRAMMAR_CONTENT, LIST_GRAMMAR_CONTENT
+from zql.sample_grammars import (
+    ENGLISH_TRANSLATION_GRAMMAR_CONTENT,
+    FORMULA_GRAMMAR_CONTENT,
+    LIST_GRAMMAR_CONTENT,
+)
 
 
 def test_parse_grammar_formula():
@@ -60,6 +64,32 @@ def test_parse_grammar_list():
         ],
         "end": [
             {"regex": r"[0-9]+"},
+        ],
+    }
+    assert actual == expected
+
+
+def test_parse_grammar_english():
+    actual = parse_grammar(ENGLISH_TRANSLATION_GRAMMAR_CONTENT)
+    expected = {
+        "root": [
+            {"sequence": ["english"]},
+        ],
+        "english": [
+            {"sequence": ["sentence"]},
+        ],
+        "sentence": [
+            {"sequence": ["name", "hello"], "dialects": ["yoda"]},
+            {"sequence": ["hello", "name"]},
+        ],
+        "name": [
+            {"regex": r"[a-z][\w$]*", "dialects": ["lowercase_english"]},
+            {"regex": r"[a-zA-Z][\w$]*"},
+        ],
+        "hello": [
+            {"literal": "hola", "dialects": ["spanish"]},
+            {"literal": "salam", "dialects": ["bengali", "arabic"]},
+            {"literal": "hello"},
         ],
     }
     assert actual == expected

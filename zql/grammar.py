@@ -4,10 +4,12 @@ import re
 DEF = ":"
 CASE = "|"
 TEMPLATE = ">"
+DIALECT = "<"
 END = ";"
-REGEX_START = "r"
+REGEX_START = "@r"
 QUOTE = "\""
 SPACE = " "
+COMMA = ","
 NEWLINE = "\n"
 ESCAPED_NEWLINE = "\\n"
 ROOT = "root"
@@ -21,14 +23,45 @@ class GrammarParseError(Exception):
 
 
 def parse_rule(rule: str) -> dict:
-    if rule.startswith(REGEX_START):
-        regex = rule[1:]
-        return {"regex": regex}
-    if rule.startswith(QUOTE):
-        literal = rule[1:-1]
-        return {"literal": literal}
-    nodes = rule.split(SPACE)
-    return {"sequence": nodes}
+    is_regex_rule = rule.startswith(REGEX_START)
+    is_literal_rule = rule.startswith(QUOTE)
+
+    dialect_index = rule.rfind(DIALECT)
+    close_quote_index = rule.rfind(QUOTE)
+
+    has_no_dialect_symbol = dialect_index < 0
+    has_dialect_symbol_in_quotes = (
+        is_literal_rule
+        and close_quote_index > dialect_index
+    )
+    has_dialects = (
+        not has_no_dialect_symbol
+        and not has_dialect_symbol_in_quotes
+    )
+
+    dialects: list[str] = []
+    rule_content = rule
+    if has_dialects:
+        raw_dialects = rule[dialect_index + 2:]
+        dialects = [d.strip() for d in raw_dialects.split(COMMA)]
+        rule_content = rule[:dialect_index - 1]
+
+
+    parsed_rule: dict = {}
+    if is_regex_rule:
+        regex = rule_content[2:]
+        parsed_rule["regex"] = regex
+    elif is_literal_rule:
+        literal = rule_content[1:-1]
+        parsed_rule["literal"] = literal
+    else:
+        nodes = rule_content.split(SPACE)
+        parsed_rule["sequence"] = nodes
+
+    if dialects:
+        parsed_rule["dialects"] = dialects
+
+    return parsed_rule
 
 
 def parse_grammar(content: str) -> Grammar:

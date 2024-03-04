@@ -18,6 +18,8 @@ type HelpSheetProps = {
   children: ReactNode; // Accepts any valid React node
   value: string;
   setValue: (value: string) => void;
+  open: boolean;
+  onOpenChange: (value: boolean) => void;
 };
 
 type QueryProps = {
@@ -48,7 +50,12 @@ const exampleQueryProps: QueryProps[] = [
   },
 ];
 
-export function HelpSheet({ children, setValue }: HelpSheetProps) {
+export function HelpSheet({
+  children,
+  setValue,
+  open,
+  onOpenChange,
+}: HelpSheetProps) {
   const ExampleQueryCard: React.FC<QueryProps> = ({ description, query }) => {
     return (
       <div onClick={() => setValue(query)}>
@@ -63,7 +70,7 @@ export function HelpSheet({ children, setValue }: HelpSheetProps) {
   };
 
   return (
-    <Sheet>
+    <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetTrigger asChild>{children}</SheetTrigger>
       <SheetContent className="overflow-auto">
         <SheetHeader>

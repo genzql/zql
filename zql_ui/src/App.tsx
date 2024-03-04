@@ -3,6 +3,7 @@ import MonacoInput from "./components/monaco-input";
 import { Button } from "./components/ui/button";
 import { callTranspile } from "./callApi";
 import { DataTable } from "./components/data-table";
+import { HelpSheet } from "./components/help-sheet";
 
 function App() {
   const defaultZqlQuery =
@@ -14,8 +15,10 @@ function App() {
   const [dataColumns, setDataColumns] = useState<string[]>([]);
   const [errorMessage, setErrorMessage] = useState("");
 
-  const handleTranspile = async () => {
-    const transpiledResult = await callTranspile(zqlQuery);
+  const handleTranspile = async (overrideQuery?: string) => {
+    const transpiledResult = await callTranspile(
+      overrideQuery ? overrideQuery : zqlQuery
+    );
     setTranspiledQuery(transpiledResult.transpiledQuery);
     setDataRows(transpiledResult.dataRows);
     setDataColumns(transpiledResult.dataColumns);
@@ -57,18 +60,27 @@ function App() {
             language={"sql"}
             value={transpiledQuery}
             setValue={(_) => {}}
-            onCtrlCmdEnter={handleTranspile}
+            onCtrlCmdEnter={() => handleTranspile()}
             readOnly={true}
           />
         </div>
       </div>
-      <div className="mt-4">
-        <Button onClick={handleTranspile}>
+      <div className="mt-4 flex justify-center space-x-4">
+        <Button onClick={() => handleTranspile()}>
           Send it ({isMac ? "⌘" : "Ctrl"}+Enter)
         </Button>
+        <HelpSheet
+          value={zqlQuery}
+          setValue={(query) => {
+            setZqlQuery(query);
+            handleTranspile(query);
+          }}
+        >
+          <Button>Help!</Button>
+        </HelpSheet>
       </div>
 
-      {dataColumns.length ? (
+      {dataColumns && dataColumns.length ? (
         <div className="flex flex-col">
           <h1 className="text-2xl font-bold py-2"> sheeeesh that zql bussin</h1>
           <DataTable columns={dataColumns} data={dataRows} />

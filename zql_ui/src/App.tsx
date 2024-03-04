@@ -4,6 +4,7 @@ import { Button } from "./components/ui/button";
 import { callTranspile } from "./callApi";
 import { DataTable } from "./components/data-table";
 import { HelpSheet } from "./components/help-sheet";
+import { FaGithub } from "react-icons/fa";
 
 function App() {
   const defaultZqlQuery =
@@ -107,6 +108,15 @@ function App() {
           </div>
         </div>
       )}
+      <a
+        target="_blank"
+        href="https://github.com/genzql/zql"
+        rel="noopener noreferrer"
+        aria-label="Github"
+        className="rounded p-2 text-xl hover:bg-accent hover:text-accent-foreground mt-10"
+      >
+        <FaGithub />
+      </a>
     </div>
   );
 }

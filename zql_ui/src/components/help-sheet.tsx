@@ -67,8 +67,8 @@ export function HelpSheet({ children, setValue }: HelpSheetProps) {
       <SheetTrigger asChild>{children}</SheetTrigger>
       <SheetContent className="overflow-auto">
         <SheetHeader>
-          <SheetTitle>Example ZQL queries</SheetTitle>
-          <SheetDescription>Pre-filled ZQL to get you started</SheetDescription>
+          <SheetTitle>Example zql queries</SheetTitle>
+          <SheetDescription>Pre-filled zql to get you started</SheetDescription>
         </SheetHeader>
         <ScrollArea key="scroll-area">
           {exampleQueryProps.map((queryProp) => (

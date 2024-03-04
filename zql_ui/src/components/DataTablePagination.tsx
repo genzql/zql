@@ -10,10 +10,10 @@ import { DataTablePaginationProps } from "./data-table";
 export function DataTablePagination<TData>({
   table,
 }: DataTablePaginationProps<TData>) {
-  const firstRowId = Number(table.getPaginationRowModel().rows[0]?.id ?? -1); // Default to 0 if rows[0] is undefined
+  const firstRowId = Number(table.getPaginationRowModel().rows[0]?.id ?? -1); // Default to -1 if rows[0] is undefined
   const lastRowId = Number(
     table.getPaginationRowModel().rows.slice(-1)[0]?.id ?? -1
-  ); // Default to 0 if rows[0] is undefined
+  ); // Default to -1 if rows[0] is undefined
   const totalRowCount = table.getPrePaginationRowModel().rows.length;
 
   return (

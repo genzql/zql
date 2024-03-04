@@ -61,7 +61,7 @@ def is_relevant_to_dialect(obj: dict, dialect: MaybeDialect) -> bool:
     obj_dialects: list[str] = obj.get("dialects", [])
     is_default_dialect = dialect is None and not obj_dialects
     has_dialect = dialect is not None and dialect in obj_dialects
-    supports_any_dialect = not obj_dialects 
+    supports_any_dialect = not obj_dialects
     is_relevant = (
         is_default_dialect
         or has_dialect

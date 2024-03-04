@@ -28,7 +28,7 @@ class TokensManager:
 def evaluate_literal(tokens: list[str], literal: str) -> AstNode:
     tokens_in_literal = len(literal.split(SPACE))
     peeked_tokens = SPACE.join(tokens[:tokens_in_literal]).casefold()
-    if peeked_tokens != literal:
+    if peeked_tokens != literal.casefold():
         raise AstParseError(f"Expected `{literal}`. Got `{peeked_tokens}`.")
     
     for _ in range(tokens_in_literal):
@@ -118,12 +118,18 @@ def evaluate_node(
     ast_node = None
     for rule in rules:
         rule_dialects: list[str] = rule.get("dialects", [])
-        is_dialect_rule = (
-            source_dialect is None
-            or not rule_dialects
-            or source_dialect in rule_dialects
+        is_default_dialect = source_dialect is None and not rule_dialects
+        has_dialect = (
+            source_dialect is not None
+            and source_dialect in rule_dialects
         )
-        if not is_dialect_rule:
+        supports_any_dialect = not rule_dialects
+        is_relevant = (
+            is_default_dialect
+            or has_dialect
+            or supports_any_dialect
+        )
+        if not is_relevant:
             continue
 
         try:

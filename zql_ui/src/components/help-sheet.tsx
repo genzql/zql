@@ -70,18 +70,14 @@ export function HelpSheet({ children, setValue }: HelpSheetProps) {
           <SheetTitle>Example ZQL queries</SheetTitle>
           <SheetDescription>Pre-filled ZQL to get you started</SheetDescription>
         </SheetHeader>
-        <ScrollArea>
-          <div className="p-4">
-            {exampleQueryProps.map((queryProp) => (
-              <>
-                <div key={queryProp.description} className="text-sm p-1 h-25">
-                  <SheetClose>
-                    <ExampleQueryCard {...queryProp} />
-                  </SheetClose>
-                </div>
-              </>
-            ))}
-          </div>
+        <ScrollArea key="scroll-area">
+          {exampleQueryProps.map((queryProp) => (
+            <div key={queryProp.description} className="text-sm p-1 h-25">
+              <SheetClose>
+                <ExampleQueryCard {...queryProp} />
+              </SheetClose>
+            </div>
+          ))}
         </ScrollArea>
         <SheetFooter></SheetFooter>
       </SheetContent>

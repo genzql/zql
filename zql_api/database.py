@@ -4,6 +4,8 @@ import pandas as pd
 TABLES: dict[str, str] = {
     "peeps": "tables/peeps.csv",
     "numbers": "tables/numbers.csv",
+    "chars": "tables/chars.csv",
+    "codes": "tables/codes.csv",
 }
 
 

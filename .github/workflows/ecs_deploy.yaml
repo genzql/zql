@@ -145,7 +145,7 @@ jobs:
           echo "image=$ECR_REGISTRY/$UI_ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
 
   deploy:
-    name: Deploy
+    name: deploy
     runs-on: ubuntu-latest
     environment: production
     needs: ["build-api", "build-ui"]

@@ -5,39 +5,12 @@ from pathlib import Path
 from fastapi import FastAPI, Request, Form, Depends
 from fastapi.templating import Jinja2Templates
 
+from zql_api.database import setup_db
 from zql import Zql, ZqlParserError
 
 from fastapi.middleware.cors import CORSMiddleware
 
 TEMPLATE_DIR = Path(__file__).resolve().parent / "templates"
-
-def setup_db(session):
-    session.execute("DROP TABLE IF EXISTS peeps;")
-    session.execute("""
-        CREATE TABLE peeps(
-            name text,
-            fave_color text,
-            followers int,
-            dank float
-        );
-    """)
-    session.execute("INSERT INTO peeps VALUES ('andrew', 'blue', 1700, 0.6);")
-    session.execute("INSERT INTO peeps VALUES ('bella', 'green', 1000, 0.4);")
-    session.execute("INSERT INTO peeps VALUES ('hugo', 'red', 1400, 0.5);")
-    session.execute("INSERT INTO peeps VALUES ('vinesh', 'green', 2700, 0.9);")
-    session.execute("INSERT INTO peeps VALUES ('tamjid', '?', 1100, 0.9);")
-    session.execute("INSERT INTO peeps VALUES ('laura', '?', 1500, 0.5);")
-    session.execute("INSERT INTO peeps VALUES ('nancy', 'pastel', 23, 0.1);")
-    session.execute("INSERT INTO peeps VALUES ('lauren', 'orange', 15, 0.9);")
-    session.execute("INSERT INTO peeps VALUES ('lauren', 'turquoise', 15, 0.9);")
-    session.execute("INSERT INTO peeps VALUES ('david', 'black', 29, 0.7);")
-    session.execute("INSERT INTO peeps VALUES ('anshul', 'burgundy', 20, 0.9);")
-    session.execute("INSERT INTO peeps VALUES ('steph', 'purple', 41, 0.2);")
-    session.execute("INSERT INTO peeps VALUES ('stacy', 'yellow', 20, 0.3);")
-    session.execute("INSERT INTO peeps VALUES ('nina', 'turquoise', 2, 0.8);")
-    session.execute("INSERT INTO peeps VALUES ('megan', 'blue', 1400, 0.7);")
-    session.connection.commit()
-
 
 templates = Jinja2Templates(directory=TEMPLATE_DIR)
 
@@ -62,7 +35,7 @@ app.add_middleware(
 
 connection = sqlite3.connect("zql.db")
 db_session = connection.cursor()
-setup_db(db_session)
+setup_db(connection)
 
 
 def get_result_dicts(rows: list[tuple], column_names: list[str]) -> list[dict]:

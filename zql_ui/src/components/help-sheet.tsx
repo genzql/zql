@@ -1,5 +1,4 @@
 import { ReactNode } from "react";
-// import { Label } from "@/components/ui/label";
 import {
   Sheet,
   SheetClose,
@@ -11,8 +10,9 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { ScrollArea } from "@radix-ui/react-scroll-area";
-// import { Button } from "./ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
+import { exampleQueries } from "./exampleQueries";
+import { exampleQuery } from "./exampleQueries";
 
 type HelpSheetProps = {
   children: ReactNode; // Accepts any valid React node
@@ -22,47 +22,19 @@ type HelpSheetProps = {
   onOpenChange: (value: boolean) => void;
 };
 
-type QueryProps = {
-  description: string;
-  query: string;
-};
-
-const exampleQueryProps: QueryProps[] = [
-  {
-    description: "its giving",
-    query: "its giving 1\nno cap",
-  },
-  {
-    description: "yass",
-    query: "its giving\n\tname,\n\tfave_color\nyass peeps\nno cap",
-  },
-  {
-    description: "sheeeeeesh",
-    query: "its giving\n\tsheeeeeesh\nyass peeps\nno cap",
-  },
-  {
-    description: "say less",
-    query: "its giving\n\tsheeeeeesh\nyass peeps\nsay less 3\nno cap",
-  },
-  {
-    description: "tfw",
-    query: "its giving\n\tsheeeeeesh\nyass peeps\ntfw name be 'vinesh'\nno cap",
-  },
-];
-
 export function HelpSheet({
   children,
   setValue,
   open,
   onOpenChange,
 }: HelpSheetProps) {
-  const ExampleQueryCard: React.FC<QueryProps> = ({ description, query }) => {
+  const ExampleQueryCard: React.FC<exampleQuery> = (exampleQuery) => {
     return (
-      <div onClick={() => setValue(query)}>
+      <div onClick={() => setValue(exampleQuery.query)}>
         <Card className="flex flex-grow">
           <CardHeader className="w-full">
-            <CardTitle>{description}</CardTitle>
-            <CardContent>{query}</CardContent>
+            <CardTitle>{exampleQuery.title}</CardTitle>
+            <CardContent>{exampleQuery.query}</CardContent>
           </CardHeader>
         </Card>
       </div>
@@ -74,14 +46,16 @@ export function HelpSheet({
       <SheetTrigger asChild>{children}</SheetTrigger>
       <SheetContent className="overflow-auto">
         <SheetHeader>
-          <SheetTitle>Example zql queries</SheetTitle>
-          <SheetDescription>Pre-filled zql to get you started</SheetDescription>
+          <SheetTitle>inspo zql queries</SheetTitle>
+          <SheetDescription>
+            pre-filled zql that you know is bussin'
+          </SheetDescription>
         </SheetHeader>
         <ScrollArea key="scroll-area">
-          {exampleQueryProps.map((queryProp) => (
-            <div key={queryProp.description} className="text-sm p-1 h-25">
+          {exampleQueries.map((exampleQuery) => (
+            <div key={exampleQuery.title} className="text-sm p-1 h-25">
               <SheetClose className="w-full">
-                <ExampleQueryCard {...queryProp} />
+                <ExampleQueryCard {...exampleQuery} />
               </SheetClose>
             </div>
           ))}

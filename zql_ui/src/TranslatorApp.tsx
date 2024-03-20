@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import MonacoInput from "./components/monaco-input";
 import { Button } from "./components/ui/button";
 import { callTranslate } from "./callApi";
-import { DataTable } from "./components/data-table";
 import { HelpSheet } from "./components/help-sheet";
 import { exampleSqliteQueries } from "./components/exampleQueries";
 import { FaGithub } from "react-icons/fa";
@@ -16,8 +15,6 @@ function TranslatorApp() {
 
   const [sqlQuery, setSqlQuery] = useState(defaultSqlQuery);
   const [transpiledQuery, setTranspiledQuery] = useState("");
-  const [dataRows, setDataRows] = useState<any[]>([]);
-  const [dataColumns, setDataColumns] = useState<string[]>([]);
   const [errorMessage, setErrorMessage] = useState("");
   const [helpSheetOpen, setHelpSheetOpen] = useState(false);
 
@@ -94,17 +91,6 @@ function TranslatorApp() {
           <Button>get inspo ({isMac ? "⌘" : "Ctrl"}+K)</Button>
         </HelpSheet>
       </div>
-
-      {dataColumns && dataColumns.length ? (
-        <div className="flex flex-col">
-          <h1 className="text-xl font-bold py-2 text-center">
-            sheeeesh that zql bussin
-          </h1>
-          <DataTable columns={dataColumns} data={dataRows} />
-        </div>
-      ) : (
-        <div />
-      )}
 
       {errorMessage && (
         <div className="flex flex-col">

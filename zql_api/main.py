@@ -46,18 +46,20 @@ def get_result_dicts(rows: list[tuple], column_names: list[str]) -> list[dict]:
     results = [dict(zip(column_names, row)) for row in rows]
     return results
 
-@app.post("/transpile")
-async def transpile_query(query: str = Form(...)):
-    """Transpile ZQL to SQL"""
+@app.post("/translate")
+async def translate_query(source: str, target: str, query: str = Form(...)):
+    """Translate to and from ZQL and different SQL dialects."""
+    sql: str | None = None
+    error: str | None = None
     try:
-        return Zql().parse(query)
+        sql = Zql().translate(query, source, target)
     except ZqlParserError as zpe:
-        return str(zpe)
-    return transpiled_query, error_message
+        error = str(zpe)
+    return {"query": sql, "error": error}
 
 @app.post("/run")
 async def run_query(query: str = Form(...)) -> dict:
-    """Transpile ZQL to SQL"""
+    """Transpile ZQL to SQLite and execute."""
     error_message: str | None = None
     transpiled_query: str = ""
     try:

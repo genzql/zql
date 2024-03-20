@@ -3,7 +3,7 @@ import FormData from "form-data";
 
 const BASE_API_URL = import.meta.env.VITE_BASE_API_URL;
 
-export async function callTranspile(input: string) {
+export async function callRunQuery(input: string) {
   try {
     const formData = new FormData();
     formData.append("query", input);
@@ -24,6 +24,34 @@ export async function callTranspile(input: string) {
       dataColumns: [],
       errorMessage:
         "Transpilation failed. Please check your input and try again.",
+    };
+  }
+}
+
+export async function callTranslate(
+  input: string,
+  source: string,
+  target: string
+) {
+  try {
+    const formData = new FormData();
+    formData.append("query", input);
+
+    const response = await axios.post(
+      `${BASE_API_URL}/translate`,
+      formData,
+      { params: { source, target } }
+    );
+
+    return {
+      query: response.data["query"] || "",
+      error: response.data["error"],
+    };
+  } catch (error) {
+    console.error("Translation failed:", error);
+    return {
+      query: "",
+      error: "Translation failed. Please check your input and try again.",
     };
   }
 }

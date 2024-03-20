@@ -1,9 +1,9 @@
-export type exampleQuery = {
+export type ExampleQuery = {
   title: string;
   query: string;
 };
 
-export const exampleQueries: exampleQuery[] = [
+export const exampleZqlQueries: ExampleQuery[] = [
   {
     title: "its giving",
     query: "its giving 1\nno cap",
@@ -45,5 +45,21 @@ no cap`,
 its giving
   name, dank
 yass blue_locked`,
+  },
+];
+
+export const exampleSqliteQueries = [
+  {
+    title: "select all",
+    query: `SELECT *
+FROM table
+LIMIT 5;`
+  },
+  {
+    title: "group by and having",
+    query: `SELECT a, SUM(b) AS total
+FROM table
+GROUP BY a, b
+HAVING a < 10 AND b >= 20;`
   },
 ];

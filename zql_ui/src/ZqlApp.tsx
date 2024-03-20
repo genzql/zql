@@ -1,12 +1,13 @@
 import { useState, useEffect } from "react";
 import MonacoInput from "./components/monaco-input";
 import { Button } from "./components/ui/button";
-import { callTranspile } from "./callApi";
+import { callRunQuery } from "./callApi";
 import { DataTable } from "./components/data-table";
 import { HelpSheet } from "./components/help-sheet";
+import { exampleZqlQueries } from "./components/exampleQueries";
 import { FaGithub } from "react-icons/fa";
 
-function App() {
+function ZqlApp() {
   const defaultZqlQuery =
     "its giving\n\tname,\n\tfave_color,\n\tfollowers\nyass peeps\nsay less 3\nno cap";
 
@@ -18,7 +19,7 @@ function App() {
   const [helpSheetOpen, setHelpSheetOpen] = useState(false);
 
   const handleTranspile = async (overrideQuery?: string) => {
-    const transpiledResult = await callTranspile(
+    const transpiledResult = await callRunQuery(
       overrideQuery ? overrideQuery : zqlQuery
     );
     setTranspiledQuery(transpiledResult.transpiledQuery);
@@ -82,6 +83,9 @@ function App() {
             setZqlQuery(query);
             handleTranspile(query);
           }}
+          title="inspo zql queries"
+          description="pre-filled zql that you know is bussin'"
+          exampleQueries={exampleZqlQueries}
         >
           <Button>get inspo ({isMac ? "⌘" : "Ctrl"}+K)</Button>
         </HelpSheet>
@@ -139,4 +143,4 @@ function App() {
   );
 }
 
-export default App;
+export default ZqlApp;

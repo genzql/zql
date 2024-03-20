@@ -11,8 +11,7 @@ import {
 } from "@/components/ui/sheet";
 import { ScrollArea } from "@radix-ui/react-scroll-area";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
-import { exampleQueries } from "./exampleQueries";
-import { exampleQuery } from "./exampleQueries";
+import { ExampleQuery } from "./exampleQueries";
 
 type HelpSheetProps = {
   children: ReactNode; // Accepts any valid React node
@@ -20,6 +19,9 @@ type HelpSheetProps = {
   setValue: (value: string) => void;
   open: boolean;
   onOpenChange: (value: boolean) => void;
+  title: string,
+  description: string,
+  exampleQueries: ExampleQuery[],
 };
 
 export function HelpSheet({
@@ -27,8 +29,11 @@ export function HelpSheet({
   setValue,
   open,
   onOpenChange,
+  title,
+  description,
+  exampleQueries,
 }: HelpSheetProps) {
-  const ExampleQueryCard: React.FC<exampleQuery> = (exampleQuery) => {
+  const ExampleQueryCard: React.FC<ExampleQuery> = (exampleQuery) => {
     return (
       <div onClick={() => setValue(exampleQuery.query)}>
         <Card className="flex flex-grow">
@@ -46,10 +51,8 @@ export function HelpSheet({
       <SheetTrigger asChild>{children}</SheetTrigger>
       <SheetContent className="overflow-auto">
         <SheetHeader>
-          <SheetTitle>inspo zql queries</SheetTitle>
-          <SheetDescription>
-            pre-filled zql that you know is bussin'
-          </SheetDescription>
+          <SheetTitle>{title}</SheetTitle>
+          <SheetDescription>{description}</SheetDescription>
         </SheetHeader>
         <ScrollArea key="scroll-area">
           {exampleQueries.map((exampleQuery) => (

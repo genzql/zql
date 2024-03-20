@@ -81,8 +81,12 @@ select_expr       : star
                   > "{expression} {alias} {word}"
                   | expression
                   ;
-star              : @r(shee)(e)*(sh)
-                  > "*"
+star              : "*" < sqlite
+                  > "*" < sqlite
+                  > "sheesh"
+                  | @r(shee)(e)*(sh)
+                  > "*" < sqlite
+                  > "sheesh"
                   ;
 expr_list         : expression comma expr_list
                   > "{expression}, {expr_list}"

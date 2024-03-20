@@ -31,6 +31,21 @@ no cap
     assert actual == expected
 
 
+def test_select_star_query():
+    raw_query = """
+SELECT *
+FROM example
+;
+    """
+    actual = translate(ZQL_GRAMMAR, raw_query, source_dialect="sqlite")
+    expected = """
+its giving sheesh
+yass example
+no cap
+    """.strip()
+    assert actual == expected
+
+
 def test_groupby_having_with_multiple_fields_and_sort():
     raw_query = """
 SELECT a, count(b)

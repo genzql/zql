@@ -1,5 +1,5 @@
 import re
-from zql.grammar import ROOT, Grammar
+from zql.grammar import ROOT, Grammar, is_relevant_to_dialect
 from zql.cleaner import get_tokens_string_safe
 from zql.types import MaybeDialect
 
@@ -117,19 +117,7 @@ def evaluate_node(
     error = None
     ast_node = None
     for rule in rules:
-        rule_dialects: list[str] = rule.get("dialects", [])
-        is_default_dialect = source_dialect is None and not rule_dialects
-        has_dialect = (
-            source_dialect is not None
-            and source_dialect in rule_dialects
-        )
-        supports_any_dialect = not rule_dialects
-        is_relevant = (
-            is_default_dialect
-            or has_dialect
-            or supports_any_dialect
-        )
-        if not is_relevant:
+        if not is_relevant_to_dialect(rule, source_dialect):
             continue
 
         try:

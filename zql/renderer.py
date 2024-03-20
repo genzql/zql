@@ -1,4 +1,4 @@
-from zql.grammar import Grammar
+from zql.grammar import Grammar, is_relevant_to_dialect
 from zql.parser import AstNode
 from zql.types import SqlQuery, MaybeDialect
 
@@ -57,19 +57,6 @@ def render_with_grammar(
     raise QueryRenderError(f"Unable to render node: `{node_type}`.")
 
 
-def is_relevant_to_dialect(obj: dict, dialect: MaybeDialect) -> bool:
-    obj_dialects: list[str] = obj.get("dialects", [])
-    is_default_dialect = dialect is None and not obj_dialects
-    has_dialect = dialect is not None and dialect in obj_dialects
-    supports_any_dialect = not obj_dialects
-    is_relevant = (
-        is_default_dialect
-        or has_dialect
-        or supports_any_dialect
-    )
-    return is_relevant
-
-
 def maybe_get_template_for_dialect(
     rule: dict,
     target_dialect: MaybeDialect
@@ -104,18 +91,9 @@ def get_template_lookup(
                 nodes = ["{" + name + "}" for name in sequence]
                 implicit_template = SPACE.join(nodes)
 
-            if template is None and implicit_template is not None:
-                if target_dialect is None:
-                    if rule_dialects:
-                        continue
-                    else:
-                        template = implicit_template
-                else:
-                    if (
-                        (rule_dialects and target_dialect in rule_dialects)
-                        or (not rule_dialects)
-                    ):
-                        template = implicit_template
+            no_template = template is None and implicit_template is not None
+            if no_template and is_relevant_to_dialect(rule, target_dialect):
+                template = implicit_template
 
             if template is None:
                 continue

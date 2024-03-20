@@ -1,10 +1,10 @@
 import re
-from zql.grammar import ROOT, Grammar
+from zql.grammar import ROOT, Grammar, is_relevant_to_dialect
 from zql.cleaner import get_tokens_string_safe
+from zql.types import MaybeDialect
 
 
 SPACE = " "
-
 
 AstNode = dict
 
@@ -28,7 +28,7 @@ class TokensManager:
 def evaluate_literal(tokens: list[str], literal: str) -> AstNode:
     tokens_in_literal = len(literal.split(SPACE))
     peeked_tokens = SPACE.join(tokens[:tokens_in_literal]).casefold()
-    if peeked_tokens != literal:
+    if peeked_tokens != literal.casefold():
         raise AstParseError(f"Expected `{literal}`. Got `{peeked_tokens}`.")
     
     for _ in range(tokens_in_literal):
@@ -51,12 +51,18 @@ def evaluate_regex(tokens: list[str], regex: str) -> AstNode:
 def evaluate_sequence(
     grammar: Grammar,
     tokens_manager: TokensManager,
-    sequence: list[str]
+    sequence: list[str],
+    source_dialect: MaybeDialect
 ) -> AstNode:
     mutable_tokens_manager = tokens_manager.copy()
     children: list[AstNode] = []
     for node in sequence:
-        ast_node = evaluate_node(grammar, mutable_tokens_manager, node)
+        ast_node = evaluate_node(
+            grammar,
+            mutable_tokens_manager,
+            node,
+            source_dialect
+        )
         children.append(ast_node)
 
     tokens_manager.set_tokens(mutable_tokens_manager.tokens)
@@ -66,7 +72,8 @@ def evaluate_sequence(
 def evaluate_rule(
     grammar: Grammar,
     tokens_manager: TokensManager,
-    rule: dict
+    rule: dict,
+    source_dialect: MaybeDialect
 ) -> AstNode:
     tokens = tokens_manager.tokens
     literal = rule.get("literal")
@@ -82,7 +89,12 @@ def evaluate_rule(
     sequence = rule.get("sequence")
     if sequence is not None:
         mutable_tokens_manager = tokens_manager.copy()
-        ast_node = evaluate_sequence(grammar, mutable_tokens_manager, sequence)
+        ast_node = evaluate_sequence(
+            grammar,
+            mutable_tokens_manager,
+            sequence,
+            source_dialect
+        )
         mutated_tokens = mutable_tokens_manager.tokens
         tokens_manager.set_tokens(mutated_tokens)
         return ast_node
@@ -93,7 +105,8 @@ def evaluate_rule(
 def evaluate_node(
     grammar: Grammar,
     tokens_manager: TokensManager,
-    node: str
+    node: str,
+    source_dialect: MaybeDialect
 ) -> AstNode:
     rules = grammar.get(node, [])
     if not rules:
@@ -104,9 +117,17 @@ def evaluate_node(
     error = None
     ast_node = None
     for rule in rules:
+        if not is_relevant_to_dialect(rule, source_dialect):
+            continue
+
         try:
             mutable_tokens_manager = tokens_manager.copy()
-            rule_node = evaluate_rule(grammar, mutable_tokens_manager, rule)
+            rule_node = evaluate_rule(
+                grammar,
+                mutable_tokens_manager,
+                rule,
+                source_dialect
+            )
 
             remaining_tokens = mutable_tokens_manager.tokens
             if node == ROOT and remaining_tokens:
@@ -136,10 +157,14 @@ def evaluate_node(
     return ast_node
 
 
-def parse_ast(grammar: Grammar, source: str) -> AstNode:
+def parse_ast(
+    grammar: Grammar,
+    source: str,
+    source_dialect: MaybeDialect = None
+) -> AstNode:
     tokens = get_tokens_string_safe(source)
     tokens_manager = TokensManager(tokens)
-    root = evaluate_node(grammar, tokens_manager, ROOT)
+    root = evaluate_node(grammar, tokens_manager, ROOT, source_dialect)
 
     remaining_tokens = tokens_manager.tokens
     if remaining_tokens:

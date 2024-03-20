@@ -8,7 +8,7 @@ MULTI_LINE_COMMENT_START = ["/", "*"]
 MULTI_LINE_COMMENT_END = ["*", "/"]
 NEWLINE = "\n"
 WHITESPACE_REGEX = re.compile(r"\s+")
-NEED_SPACE_AROUND_CHARS = [",", ".", "(", ")", "+", "-", "*", "/", "="]
+NEED_SPACE_AROUND_CHARS = [";", ",", ".", "(", ")", "+", "-", "*", "/", "="]
 QUOTES = {"\"", "'"}
 
 

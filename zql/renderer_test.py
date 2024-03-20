@@ -1,7 +1,7 @@
 import pytest
 from zql.parser import parse_ast
 from zql.renderer import QueryRenderError, render_query
-from zql.sample_grammars import FUNCTION_GRAMMAR
+from zql.sample_grammars import FUNCTION_GRAMMAR, ENGLISH_TRANSLATION_GRAMMAR
 
 
 def test_render_simple():
@@ -60,8 +60,69 @@ def test_render_fail_grammarless_unable_to_render():
 def test_render_fail_no_rule_key():
     with pytest.raises(QueryRenderError) as err:
         grammar_invalid_rule = {
-            "start": [{"bogus": "haha", "template": "you'll never find me"}]
+            "start": [
+                {
+                    "bogus": "haha",
+                    "templates": [{"template": "you'll never find me"}]
+                }
+            ]
         }
         render_query(grammar_invalid_rule, {"type": "start"})
     actual = str(err.value)
     assert actual == "Unable to determine pattern of node: `start`."
+
+
+def test_render_english_to_spanish():
+    actual = render_query(
+        ENGLISH_TRANSLATION_GRAMMAR,
+        {
+            "type": "english",
+            "children": [
+                {
+                    "type": "sentence",
+                    "children": [
+                        {"type": "hello", "value": "hello"},
+                        {"type": "name", "value": "tamjid"},
+                    ],
+                },
+            ],
+        },
+        target_dialect="spanish"
+    )
+    assert actual == "hola tamjid"
+
+
+def test_render_spanish_to_english():
+    actual = render_query(ENGLISH_TRANSLATION_GRAMMAR, {
+        "type": "english",
+        "children": [
+            {
+                "type": "sentence",
+                "children": [
+                    {"type": "hello", "value": "hola"},
+                    {"type": "name", "value": "tamjid"},
+                ],
+            },
+        ],
+    })
+    assert actual == "hello tamjid"
+
+
+def test_render_spanish_to_bengali():
+    actual = render_query(
+        ENGLISH_TRANSLATION_GRAMMAR,
+        {
+            "type": "english",
+            "children": [
+                {
+                    "type": "sentence",
+                    "children": [
+                        {"type": "hello", "value": "hola"},
+                        {"type": "name", "value": "tamjid"},
+                    ],
+                },
+            ],
+        },
+        target_dialect="bengali"
+    )
+    assert actual == "salam tamjid"

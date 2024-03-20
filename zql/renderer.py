@@ -1,6 +1,6 @@
-from zql.grammar import Grammar
+from zql.grammar import Grammar, is_relevant_to_dialect
 from zql.parser import AstNode
-from zql.types import SqlQuery
+from zql.types import SqlQuery, MaybeDialect
 
 
 RuleKey = tuple[str, list[str]]
@@ -17,8 +17,12 @@ class QueryRenderError(Exception):
     pass
 
 
-def render_query(grammar: Grammar, ast: AstNode) -> SqlQuery:
-    template_lookup = get_template_lookup(grammar)
+def render_query(
+    grammar: Grammar,
+    ast: AstNode,
+    target_dialect: MaybeDialect = None
+) -> SqlQuery:
+    template_lookup = get_template_lookup(grammar, target_dialect)
     return render_with_grammar(grammar, template_lookup, ast)
 
 
@@ -53,15 +57,51 @@ def render_with_grammar(
     raise QueryRenderError(f"Unable to render node: `{node_type}`.")
 
 
-def get_template_lookup(grammar: Grammar) -> TemplateLookup:
+def maybe_get_template_for_dialect(
+    rule: dict,
+    target_dialect: MaybeDialect
+) -> str | None:
+    templates: list[dict] = rule.get("templates")
+    if templates is None:
+        return None
+    
+    for template in templates:
+        if is_relevant_to_dialect(template, target_dialect):
+            return template.get("template")
+
+    return None
+    
+
+def get_template_lookup(
+    grammar: Grammar,
+    target_dialect: MaybeDialect
+) -> TemplateLookup:
     template_lookup: TemplateLookup = {}
     for node, rules in grammar.items():
         for rule in rules:
-            template = rule.get("template")
+            template = maybe_get_template_for_dialect(rule, target_dialect)
+            rule_dialects: list[str] = rule.get("dialects", [])
+            literal = rule.get("literal")
+            sequence = rule.get("sequence")
+
+            implicit_template = None
+            if literal:
+                implicit_template = literal
+            if sequence:
+                nodes = ["{" + name + "}" for name in sequence]
+                implicit_template = SPACE.join(nodes)
+
+            no_template = template is None and implicit_template is not None
+            if no_template and is_relevant_to_dialect(rule, target_dialect):
+                template = implicit_template
+
             if template is None:
                 continue
 
             key = get_rule_key(node, rule)
+            if key in template_lookup:
+                break
+
             template_lookup[key] = template
 
     return template_lookup

@@ -1,6 +1,10 @@
 import pytest
 from zql.parser import AstParseError, parse_ast
-from zql.sample_grammars import FORMULA_GRAMMAR, LIST_GRAMMAR
+from zql.sample_grammars import (
+    ENGLISH_TRANSLATION_GRAMMAR,
+    FORMULA_GRAMMAR,
+    LIST_GRAMMAR,
+)
 
 
 def test_parse_ast_formula_simple():
@@ -118,6 +122,44 @@ def test_parse_ast_list_simple():
                 ],
             },
             {"type": "end", "value": "0"},
+        ],
+    }
+    assert actual == expected
+
+
+def test_parse_ast_english_simple():
+    actual = parse_ast(ENGLISH_TRANSLATION_GRAMMAR, "hello tamjid")
+    expected = {
+        "type": "english",
+        "children": [
+            {
+                "type": "sentence",
+                "children": [
+                    {"type": "hello", "value": "hello"},
+                    {"type": "name", "value": "tamjid"},
+                ],
+            },
+        ],
+    }
+    assert actual == expected
+
+
+def test_parse_ast_english_simple_from_spanish():
+    actual = parse_ast(
+        ENGLISH_TRANSLATION_GRAMMAR,
+        "hola tamjid",
+        source_dialect="spanish"
+    )
+    expected = {
+        "type": "english",
+        "children": [
+            {
+                "type": "sentence",
+                "children": [
+                    {"type": "hello", "value": "hola"},
+                    {"type": "name", "value": "tamjid"},
+                ],
+            },
         ],
     }
     assert actual == expected

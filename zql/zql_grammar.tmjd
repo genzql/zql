@@ -81,19 +81,20 @@ select_expr       : star
                   > "{expression} {alias} {word}"
                   | expression
                   ;
-star              : r(shee)(e)*(sh)
+star              : @r(shee)(e)*(sh)
                   > "*"
                   ;
 expr_list         : expression comma expr_list
                   > "{expression}, {expr_list}"
                   | expression
                   ;
-expression        : single_expr operator single_expr
+expression        : single_expr1 operator single_expr2
                   | postfix_function
                   | single_expr
                   ;
 postfix_function  : single_expr postfix_expr
-                  > "{postfix_expr}({single_expr})"
+                  > "{postfix_expr}({single_expr})" < sqlite
+                  > "{single_expr} {postfix_expr}"
                   ;
 postfix_expr      : sum
                   ;
@@ -104,8 +105,12 @@ single_expr       : function_expr
                   | float
                   | integer
                   ;
-quoted_expr       : r\".*?\"
-                  | r\'.*?\'
+single_expr1      : single_expr
+                  ;
+single_expr2      : single_expr
+                  ;
+quoted_expr       : @r\".*?\"
+                  | @r\'.*?\'
                   ;
 float             : whole dot fractional
                   > "{whole}.{fractional}"
@@ -114,9 +119,9 @@ whole             : integer
                   ;
 fractional        : integer
                   ;
-integer           : r[0-9]+
+integer           : @r[0-9]+
                   ;
-word              : r[a-zA-Z][\w$]*
+word              : @r[a-zA-Z][\w$]*
                   ;
 word1             : word
                   ;
@@ -166,7 +171,8 @@ table             : sub_query alias word
                   | sub_query
                   | table_name
                   ;
-table_name        : word alias word
+table_name        : word1 alias word2
+                  | word < sqlite
                   | word non_keyword
                   | word
                   ;
@@ -188,14 +194,21 @@ condition_list    : expression cond_operator condition_list
                   > "{expression}\n{cond_operator} {condition_list}"
                   | expression
                   ;
-groupby_clause    : groupby_start expr_list groupby_end
-                  > "GROUP BY {expr_list}"
+groupby_clause    : groupby_start expr_list < sqlite
+                  > "GROUP BY {expr_list}" < sqlite
+                  > "let {expr_list} cook"
+                  | groupby_start expr_list groupby_end
+                  > "GROUP BY {expr_list}" < sqlite
+                  > "let {expr_list} cook"
                   ;
-having_clause     : having_start condition_list having_end
-                  > "HAVING {condition_list}"
+having_clause     : having_start condition_list < sqlite
+                  > "HAVING {condition_list}" < sqlite
+                  > "catch these {condition_list} hands" 
+                  | having_start condition_list having_end
+                  > "HAVING {condition_list}" < sqlite
+                  > "catch these {condition_list} hands" 
                   ;
 orderby_clause    : orderby orderby_list
-                  > "ORDER BY {orderby_list}"
                   ;
 orderby_list      : orderby_expr comma orderby_list
                   > "{orderby_expr}, {orderby_list}"
@@ -263,30 +276,32 @@ db_table          : word dot word
 manipulation_stmt : insert_stmt
                   ;
 insert_stmt       : insert_into db_table open_paren expr_list close_paren
-                  > "{insert_into} {db_table} VALUES ({expr_list})"
+                  > "{insert_into} {db_table} VALUES ({expr_list})" < sqlite
                   ;
-non_keyword       : r\b(?!perchance\b|\bits\b|\byass\b|\bcome\b|\bbet\b|\btfw\b|\blet\b|\bcatch\b|\bngl\b|\bsay\b|\bwith\b|\bno\b)\w+\b
+non_keyword       : @r\b(?!with\b|\bselect\b|\bfrom\b|\bleft\b|\bright\b|\binner\b|\bfull\b|\bcross\b|\bon\b|\bwhere\b|\bgroup\b|\bhaving\b|\border\b|\bsay\b|\bunion\b|\b;\b)\w+\b < sqlite
+                  | @r\b(?!perchance\b|\bits\b|\byass\b|\bcome\b|\bbet\b|\btfw\b|\blet\b|\bcatch\b|\bngl\b|\bsay\b|\bwith\b|\bno\b)\w+\b
                   ;
-with              : "perchance"
-                  > "WITH"
+with              : "WITH" < sqlite
+                  | "perchance"
                   ;
-select            : "its giving"
-                  > "SELECT"
+select            : "SELECT" < sqlite
+                  | "its giving"
                   ;
-distinct          : "real ones"
-                  > "DISTINCT"
+distinct          : "DISTINCT" < sqlite
+                  | "real ones"
                   ;
 sum               : "af"
-                  > "SUM"
+                  > "SUM" < sqlite
+                  > "af"
                   ;
-from              : "yass"
-                  > "FROM"
+from              : "FROM" < sqlite
+                  | "yass"
                   ;
-join              : "come through"
-                  > "JOIN"
+join              : "JOIN" < sqlite
+                  | "come through"
                   ;
-join_on           : "bet"
-                  > "ON"
+join_on           : "ON" < sqlite
+                  | "bet"
                   ;
 join_type         : join_inner
                   | join_left
@@ -296,59 +311,62 @@ join_type         : join_inner
                   | join_full_outer
                   | join_cross
                   ;
-join_inner        : "inner"
-                  > "INNER"
+join_inner        : "INNER" < sqlite
+                  | "inner"
                   ;
-join_left         : "left"
-                  > "LEFT"
+join_left         : "LEFT" < sqlite
+                  | "left"
                   ;
-join_left_outer   : "left outer"
-                  > "LEFT OUTER"
+join_left_outer   : "LEFT OUTER" < sqlite
+                  | "left outer"
                   ;
-join_right        : "right"
-                  > "RIGHT"
+join_right        : "RIGHT" < sqlite
+                  | "right"
                   ;
-join_right_outer  : "right outer"
-                  > "RIGHT OUTER"
+join_right_outer  : "RIGHT OUTER" < sqlite
+                  | "right outer"
                   ;
-join_full_outer   : "full outer"
-                  > "FULL OUTER"
+join_full_outer   : "FULL OUTER" < sqlite
+                  | "full outer"
                   ;
-join_cross        : "cross"
-                  > "CROSS"
+join_cross        : "CROSS" < sqlite
+                  | "cross"
                   ;
-where             : "tfw"
-                  > "WHERE"
+where             : "WHERE" < sqlite
+                  | "tfw"
                   ;
-and               : "fax"
-                  > "AND"
+and               : "AND" < sqlite
+                  | "fax"
                   ;
-or                : "uh"
-                  > "OR"
+or                : "OR" < sqlite
+                  | "uh"
                   ;
-is                : "be"
-                  > "IS"
+is                : "IS" < sqlite
+                  | "be"
                   ;
-is_not            : "sike"
-                  > "IS NOT"
+is_not            : "IS NOT" < sqlite
+                  | "sike"
                   ;
-equal             : "be"
-                  > "="
+equal             : "=" < sqlite
+                  | "be"
                   ;
-not_equal         : "sike"
-                  > "!="
+not_equal         : "! =" < sqlite
+                  > "!=" < sqlite
+                  | "sike"
                   ;
-lte               : "kinda flops"
-                  > "<="
+lte               : "< =" < sqlite
+                  > "<=" < sqlite
+                  | "kinda flops"
                   ;
-gte               : "kinda bops"
-                  > ">="
+gte               : "> =" < sqlite
+                  > ">=" < sqlite
+                  | "kinda bops"
                   ;
-lt                : "flops"
-                  > "<"
+lt                : "<" < sqlite
+                  | "flops"
                   ;
-gt                : "bops"
-                  > ">"
+gt                : ">" < sqlite
+                  | "bops"
                   ;
 plus              : "+"
                   ;
@@ -358,39 +376,42 @@ multiply          : "*"
                   ;
 divide            : "/"
                   ;
-groupby_start     : "let"
+groupby_start     : "GROUP BY" < sqlite
+                  | "let"
                   ;
 groupby_end       : "cook"
                   ;
-having_start      : "catch these"
+having_start      : "HAVING" < sqlite
+                  | "catch these"
                   ;
 having_end        : "hands"
                   ;
-orderby           : "ngl"
+orderby           : "ORDER BY" < sqlite
+                  | "ngl"
                   ;
-nulls_first       : "high key yikes"
-                  > "NULLS FIRST"
+nulls_first       : "NULLS FIRST" < sqlite
+                  | "high key yikes"
                   ;
-nulls_last        : "low key yikes"
-                  > "NULLS LAST"
+nulls_last        : "NULLS LAST" < sqlite
+                  | "low key yikes"
                   ;
-asc               : "low key"
-                  > "ASC"
+asc               : "ASC" < sqlite
+                  | "low key"
                   ;
-desc              : "high key"
-                  > "DESC"
+desc              : "DESC" < sqlite
+                  | "high key"
                   ;
-limit             : "say less"
-                  > "LIMIT"
+limit             : "LIMIT" < sqlite
+                  | "say less"
                   ;
-union_all         : "with all the bois"
-                  > "UNION ALL"
+union_all         : "UNION ALL" < sqlite
+                  | "with all the bois"
                   ;
-union             : "with the bois"
-                  > "UNION"
+union             : "UNION" < sqlite
+                  | "with the bois"
                   ;
-explain           : "whats good with"
-                  > "EXPLAIN"
+explain           : "EXPLAIN" < sqlite
+                  | "whats good with"
                   ;
 dot               : "."
                   ;
@@ -400,30 +421,30 @@ open_paren        : "("
                   ;
 close_paren       : ")"
                   ;
-alias             : "be"
-                  > "AS"
+alias             : "AS" < sqlite
+                  | "be"
                   ;
-create_db         : "built different queen"
-                  > "CREATE DATABASE"
+create_db         : "CREATE DATABASE" < sqlite
+                  | "built different queen"
                   ;
-create_table      : "built different girlie"
-                  > "CREATE TABLE"
+create_table      : "CREATE TABLE" < sqlite
+                  | "built different girlie"
                   ;
-drop_db           : "yeet queen"
-                  > "DROP DATABASE"
+drop_db           : "DROP DATABASE" < sqlite
+                  | "yeet queen"
                   ;
-drop_table        : "yeet girlie"
-                  > "DROP TABLE"
+drop_table        : "DROP TABLE" < sqlite
+                  | "yeet girlie"
                   ;
-if_not_exists     : "or nah"
-                  > "IF NOT EXISTS"
+if_not_exists     : "IF NOT EXISTS" < sqlite
+                  | "or nah"
                   ;
-if_exists         : "or nah"
-                  > "IF EXISTS"
+if_exists         : "IF EXISTS" < sqlite
+                  | "or nah"
                   ;
-insert_into       : "pushin p into"
-                  > "INSERT INTO"
+insert_into       : "INSERT INTO" < sqlite
+                  | "pushin p into"
                   ;
-terminal          : "no cap"
-                  > ";"
+terminal          : ";" < sqlite
+                  | "no cap"
                   ;

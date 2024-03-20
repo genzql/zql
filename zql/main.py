@@ -1,9 +1,11 @@
 from zql.types import ZqlQuery, SqlQuery
-from zql.parser import AstParseError, parse_ast
+from zql.parser import AstParseError
 from zql.loader import get_zql_grammar
-from zql.renderer import QueryRenderError, render_query
+from zql.renderer import QueryRenderError
+from zql.translator import translate
 
 
+TARGET_DIALECT = "sqlite"
 ZQL_GRAMMAR = get_zql_grammar()
 
 
@@ -19,8 +21,7 @@ class Zql:
 
     def parse(self, raw: ZqlQuery) -> SqlQuery:
         try:
-            ast = parse_ast(ZQL_GRAMMAR, raw)
-            sql = render_query(ZQL_GRAMMAR, ast)
+            sql = translate(ZQL_GRAMMAR, raw, target_dialect=TARGET_DIALECT)
             return sql
         except AstParseError as ape:
             raise ZqlParserError(ape)

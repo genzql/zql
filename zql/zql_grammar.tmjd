@@ -22,6 +22,8 @@ cte_list          : aliased_cte comma cte_list
                   | aliased_cte
                   ;
 aliased_cte       : word alias sub_query
+                  | open_paren expression close_paren alias word
+                  > "({expression}) {alias} {word}"
                   ;
 sub_query         : open_paren simple_query close_paren 
                   > "{open_paren}\n{simple_query}\n{close_paren}"

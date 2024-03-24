@@ -163,6 +163,46 @@ no cap
     assert actual == expected
 
 
+def test_cte_sub_query():
+    raw_query = """
+WITH table AS (
+    SELECT a, b, c
+    FROM example
+)
+SELECT c, b, a
+FROM table
+;
+    """
+    actual = translate(ZQL_GRAMMAR, raw_query, source_dialect="sqlite")
+    expected = """
+perchance table be (
+its giving a, b, c
+yass example
+)
+its giving c, b, a
+yass table
+no cap
+    """.strip()
+    assert actual == expected
+
+
+def test_cte_sub_expression():
+    raw_query = """
+WITH (COUNT(DISTINCT b)) AS unique_count
+SELECT a, unique_count
+FROM example
+;
+    """
+    actual = translate(ZQL_GRAMMAR, raw_query, source_dialect="sqlite")
+    expected = """
+perchance (COUNT(real ones b)) be unique_count
+its giving a, unique_count
+yass example
+no cap
+    """.strip()
+    assert actual == expected
+
+
 def test_translate_to_self_groupby_having_with_multiple_fields_and_sort():
     original_query = """
 SELECT a, count(b)

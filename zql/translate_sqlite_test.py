@@ -88,6 +88,81 @@ no cap
     assert actual == expected
 
 
+def test_postfix_aggregation():
+    raw_query = """
+SELECT a, SUM(b)
+FROM example
+;
+    """
+    actual = translate(ZQL_GRAMMAR, raw_query, source_dialect="sqlite")
+    expected = """
+its giving a, b af
+yass example
+no cap
+    """.strip()
+    assert actual == expected
+
+
+def test_postfix_aggregation_with_alias():
+    raw_query = """
+SELECT a, SUM(b) AS total
+FROM example
+;
+    """
+    actual = translate(ZQL_GRAMMAR, raw_query, source_dialect="sqlite")
+    expected = """
+its giving a, b af be total
+yass example
+no cap
+    """.strip()
+    assert actual == expected
+
+
+def test_nested_function():
+    raw_query = """
+SELECT a, COUNT(IF(b, 1, 0)) AS total
+FROM example
+;
+    """
+    actual = translate(ZQL_GRAMMAR, raw_query, source_dialect="sqlite")
+    expected = """
+its giving a, COUNT(IF(b, 1, 0)) be total
+yass example
+no cap
+    """.strip()
+    assert actual == expected
+
+
+def test_nested_sum():
+    raw_query = """
+SELECT a, COUNT(IF(b, SUM(c), 0)) AS total
+FROM example
+;
+    """
+    actual = translate(ZQL_GRAMMAR, raw_query, source_dialect="sqlite")
+    expected = """
+its giving a, COUNT(IF(b, c af, 0)) be total
+yass example
+no cap
+    """.strip()
+    assert actual == expected
+
+
+def test_count_distinct():
+    raw_query = """
+SELECT a, COUNT(DISTINCT b) AS unique_b
+FROM example
+;
+    """
+    actual = translate(ZQL_GRAMMAR, raw_query, source_dialect="sqlite")
+    expected = """
+its giving a, COUNT(real ones b) be unique_b
+yass example
+no cap
+    """.strip()
+    assert actual == expected
+
+
 def test_translate_to_self_groupby_having_with_multiple_fields_and_sort():
     original_query = """
 SELECT a, count(b)

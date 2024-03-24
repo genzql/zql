@@ -74,9 +74,9 @@ select_expr_list  : select_expr comma select_expr_list
                   | select_expr
                   ;
 select_expr       : star
-                  | single_expr alias word
                   | postfix_function alias word
                   > "{postfix_function} {alias} {word}"
+                  | single_expr alias word
                   | open_paren expression close_paren alias word
                   > "{expression} {alias} {word}"
                   | expression
@@ -96,7 +96,10 @@ expression        : single_expr1 operator single_expr2
                   | postfix_function
                   | single_expr
                   ;
-postfix_function  : single_expr postfix_expr
+postfix_function  : postfix_expr open_paren single_expr close_paren < sqlite
+                  > "{postfix_expr}({single_expr})" < sqlite
+                  > "{single_expr} {postfix_expr}"
+                  | single_expr postfix_expr
                   > "{postfix_expr}({single_expr})" < sqlite
                   > "{single_expr} {postfix_expr}"
                   ;
@@ -164,6 +167,7 @@ function_args     : distinct arg_list
 function_name     : word
                   ;
 arg_list          : expression comma arg_list
+                  > "{expression}, {arg_list}"
                   | expression
                   ;
 from_clause       : from table join_list
@@ -298,7 +302,10 @@ select            : "SELECT" < sqlite
 distinct          : "DISTINCT" < sqlite
                   | "real ones"
                   ;
-sum               : "af"
+sum               : "SUM" < sqlite
+                  > "SUM" < sqlite
+                  > "af"
+                  | "af"
                   > "SUM" < sqlite
                   > "af"
                   ;

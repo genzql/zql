@@ -188,8 +188,12 @@ join_clause       : comma table
                   | join_with_type table join_on condition_list
                   > "{join_with_type} {table}\n{join_on} {condition_list}"
                   ;
-join_with_type    : join join_type
-                  > "{join_type} {join}"
+join_with_type    : join_type join < sqlite
+                  > "{join_type} {join}" < sqlite
+                  > "{join} {join_type}"
+                  | join join_type
+                  > "{join_type} {join}" < sqlite
+                  > "{join} {join_type}"
                   | join
                   ;
 where_clause      : where condition_list

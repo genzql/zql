@@ -69,6 +69,25 @@ no cap
     assert actual == expected
 
 
+def test_join_left():
+    raw_query = """
+SELECT a, b
+FROM table_a
+LEFT JOIN table_b
+ON c = d
+;
+    """
+    actual = translate(ZQL_GRAMMAR, raw_query, source_dialect="sqlite")
+    expected = """
+its giving a, b
+yass table_a
+come through left table_b
+bet c be d
+no cap
+    """.strip()
+    assert actual == expected
+
+
 def test_translate_to_self_groupby_having_with_multiple_fields_and_sort():
     original_query = """
 SELECT a, count(b)

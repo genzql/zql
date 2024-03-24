@@ -4,9 +4,9 @@ zql               : statement
                   ;
 statement         : query_stmt
                   | definition_stmt terminal
-                  > "{definition_stmt}{terminal}"
+                  > "{definition_stmt}\n{terminal}"
                   | manipulation_stmt terminal
-                  > "{manipulation_stmt}{terminal}"
+                  > "{manipulation_stmt}\n{terminal}"
                   ;
 query_stmt        : explain query
                   | query
@@ -78,9 +78,9 @@ select_expr_list  : select_expr comma select_expr_list
 select_expr       : star
                   | postfix_function alias word
                   > "{postfix_function} {alias} {word}"
-                  | single_expr alias word
                   | open_paren expression close_paren alias word
                   > "{expression} {alias} {word}"
+                  | single_expr alias word
                   | expression
                   ;
 star              : "*" < sqlite
@@ -107,8 +107,11 @@ postfix_function  : postfix_expr open_paren single_expr close_paren < sqlite
                   ;
 postfix_expr      : sum
                   ;
-single_expr       : function_expr
+single_expr       : sub_query
+                  | function_expr
                   | dot_expression
+                  | tuple
+                  | star
                   | word
                   | quoted_expr
                   | float
@@ -117,6 +120,8 @@ single_expr       : function_expr
 single_expr1      : single_expr
                   ;
 single_expr2      : single_expr
+                  ;
+tuple             : open_paren expr_list close_paren
                   ;
 quoted_expr       : @r\".*?\"
                   | @r\'.*?\'
@@ -154,6 +159,8 @@ comp_operator     : lte
                   | gte
                   | lt
                   | gt
+                  | like
+                  | in
                   ;
 math_operator     : plus
                   | minus
@@ -256,6 +263,10 @@ create_table_stmt : create_table db_table if_not_exists alias table_def
                   > "{create_table} {if_not_exists} {db_table}{table_def}"
                   | create_table db_table alias table_def
                   > "{create_table} {db_table}{table_def}"
+                  | create_table db_table if_not_exists table_def
+                  > "{create_table} {if_not_exists} {db_table}{table_def}"
+                  | create_table db_table table_def
+                  > "{create_table} {db_table}{table_def}"
                   ;
 table_def         : open_paren column_def_list close_paren
                   > "(\n{column_def_list}\n)"
@@ -267,11 +278,18 @@ column_def_list   : column_def comma column_def_list
                   ;
 column_def        : word column_type_expr
                   ;
-column_type_expr  : column_type expr_list
-                  | column_type
+column_type_expr  : bare_column_type column_mod
+                  | bare_column_type
                   ;
-column_type       : function_expr
+bare_column_type  : function_expr
                   | word
+                  ;
+column_mod        : primary_key
+                  | not_null
+                  ;
+primary_key       : "PRIMARY KEY"
+                  ;
+not_null          : "NOT NULL"
                   ;
 drop_stmt         : drop_db_stmt
                   | drop_table_stmt
@@ -289,8 +307,24 @@ db_table          : word dot word
                   ;
 manipulation_stmt : insert_stmt
                   ;
-insert_stmt       : insert_into db_table open_paren expr_list close_paren
-                  > "{insert_into} {db_table} VALUES ({expr_list})" < sqlite
+insert_stmt       : insert_into db_table insert_data
+                  ;
+insert_data       : insert_keys values insert_vals
+                  | values insert_vals
+                  > "{values} {insert_vals}" < sqlite
+                  > "{insert_vals}"
+                  | insert_vals
+                  > "VALUES {insert_vals}" < sqlite
+                  > "{insert_vals}"
+                  ;
+insert_expr_list  : open_paren expr_list close_paren
+                  > "({expr_list})"
+                  ;
+insert_keys       : insert_expr_list
+                  ;
+insert_vals       : insert_expr_list
+                  ;
+values            : "VALUES"
                   ;
 non_keyword       : @r\b(?!with\b|\bselect\b|\bfrom\b|\bleft\b|\bright\b|\binner\b|\bfull\b|\bcross\b|\bon\b|\bwhere\b|\bgroup\b|\bhaving\b|\border\b|\bsay\b|\bunion\b|\b;\b)\w+\b < sqlite
                   | @r\b(?!perchance\b|\bits\b|\byass\b|\bcome\b|\bbet\b|\btfw\b|\blet\b|\bcatch\b|\bngl\b|\bsay\b|\bwith\b|\bno\b)\w+\b
@@ -384,6 +418,11 @@ lt                : "<" < sqlite
                   ;
 gt                : ">" < sqlite
                   | "bops"
+                  ;
+like              : "LIKE"
+                  ;
+in                : "IN" < sqlite
+                  | "among"
                   ;
 plus              : "+"
                   ;

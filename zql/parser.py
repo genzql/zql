@@ -147,10 +147,10 @@ def evaluate_node(
         if error:
             raise error
 
+        tokens = tokens_manager.tokens
         remaining_source_sample = SPACE.join(tokens[:3])[:20]
         raise AstParseError(
-            f"Failed to parse `{current_node}` at: "
-            f"`{remaining_source_sample}`."
+            f"Failed to parse `{node}` at: `{remaining_source_sample}`."
         )
 
     ast_node = {"type": node, **ast_node}

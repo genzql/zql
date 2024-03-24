@@ -919,7 +919,8 @@ CREATE TABLE example(
     a int,
     b float,
     c text
-);
+)
+;
     """.strip()
     assert actual == expected
 
@@ -939,7 +940,8 @@ CREATE TABLE IF NOT EXISTS example(
     a int,
     b float,
     c text
-);
+)
+;
     """.strip()
     assert actual == expected
 
@@ -947,40 +949,40 @@ CREATE TABLE IF NOT EXISTS example(
 def test_create_database():
     raw_query = "built different queen db no cap"
     actual = Zql().parse(raw_query)
-    assert actual == "CREATE DATABASE db;"
+    assert actual == "CREATE DATABASE db\n;"
 
 
 def test_create_database_if_not_exists():
     raw_query = "built different queen db or nah no cap"
     actual = Zql().parse(raw_query)
-    assert actual == "CREATE DATABASE IF NOT EXISTS db;"
+    assert actual == "CREATE DATABASE IF NOT EXISTS db\n;"
 
 
 def test_drop_database():
     raw_query = "yeet queen db no cap"
     actual = Zql().parse(raw_query)
-    assert actual == "DROP DATABASE db;"
+    assert actual == "DROP DATABASE db\n;"
 
 
 def test_drop_database_if_not_exists():
     raw_query = "yeet queen db or nah no cap"
     actual = Zql().parse(raw_query)
-    assert actual == "DROP DATABASE IF EXISTS db;"
+    assert actual == "DROP DATABASE IF EXISTS db\n;"
 
 
 def test_drop_table():
     raw_query = "yeet girlie example no cap"
     actual = Zql().parse(raw_query)
-    assert actual == "DROP TABLE example;"
+    assert actual == "DROP TABLE example\n;"
 
 
 def test_drop_table_if_not_exists():
     raw_query = "yeet girlie example or nah no cap"
     actual = Zql().parse(raw_query)
-    assert actual == "DROP TABLE IF EXISTS example;"
+    assert actual == "DROP TABLE IF EXISTS example\n;"
 
 
 def test_insert():
     raw_query = "pushin p into example (1, \"A\") no cap"
     actual = Zql().parse(raw_query)
-    assert actual == "INSERT INTO example VALUES (1, \"A\");"
+    assert actual == "INSERT INTO example VALUES (1, \"A\")\n;"

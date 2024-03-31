@@ -1,9 +1,9 @@
-from zql.types import ZqlQuery, SqlQuery
-from zql.parser import AstParseError
-from zql.loader import get_zql_grammar
-from zql.renderer import QueryRenderError
-from zql.translator import translate
-from zql.types import MaybeDialect
+from .types import ZqlQuery, SqlQuery
+from .parser import AstParseError
+from .loader import get_zql_grammar
+from .renderer import QueryRenderError
+from .translator import translate
+from .types import MaybeDialect
 
 
 ZQL_DIALECT = "zql"

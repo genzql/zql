@@ -1,4 +1,4 @@
-from zql.grammar import parse_grammar
+from zql.genzql.grammar import parse_grammar
 
 
 FORMULA_GRAMMAR_CONTENT = r"""

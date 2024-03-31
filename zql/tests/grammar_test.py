@@ -1,5 +1,5 @@
-from zql.grammar import parse_grammar, is_relevant_to_dialect
-from zql.sample_grammars import (
+from zql.genzql.grammar import parse_grammar, is_relevant_to_dialect
+from zql.tests.sample_grammars import (
     ENGLISH_TRANSLATION_GRAMMAR_CONTENT,
     FORMULA_GRAMMAR_CONTENT,
     LIST_GRAMMAR_CONTENT,

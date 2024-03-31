@@ -1,7 +1,7 @@
-from zql.grammar import Grammar
-from zql.parser import parse_ast
-from zql.renderer import render_query
-from zql.types import MaybeDialect
+from .grammar import Grammar
+from .parser import parse_ast
+from .renderer import render_query
+from .types import MaybeDialect
 
 
 def translate(

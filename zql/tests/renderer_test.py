@@ -1,7 +1,10 @@
 import pytest
-from zql.parser import parse_ast
-from zql.renderer import QueryRenderError, render_query
-from zql.sample_grammars import FUNCTION_GRAMMAR, ENGLISH_TRANSLATION_GRAMMAR
+from zql.genzql.parser import parse_ast
+from zql.genzql.renderer import QueryRenderError, render_query
+from zql.tests.sample_grammars import (
+    FUNCTION_GRAMMAR,
+    ENGLISH_TRANSLATION_GRAMMAR,
+)
 
 
 def test_render_simple():

@@ -1,6 +1,6 @@
 import pytest
 
-from zql.main import Zql
+from zql import Zql
 
 
 zql_queries_expectations = [

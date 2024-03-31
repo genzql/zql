@@ -1,7 +1,7 @@
 import re
-from zql.grammar import ROOT, Grammar, is_relevant_to_dialect
-from zql.cleaner import get_tokens_string_safe
-from zql.types import MaybeDialect
+from .grammar import ROOT, Grammar, is_relevant_to_dialect
+from .cleaner import get_tokens_string_safe
+from .types import MaybeDialect
 
 
 SPACE = " "

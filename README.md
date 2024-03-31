@@ -23,3 +23,15 @@ Run unit tests:
 ```bash
 poetry run pytest
 ```
+
+## Releases
+
+Currently, we manually release new versions of the [`genzql`](https://pypi.org/project/genzql/) package to PyPI.
+
+Vinesh Kannan (vingkan@gmail.com) is the current release manager.
+
+```bash
+cd zql
+poetry build
+poetry publish --username __token__ --password pypi-token...
+```

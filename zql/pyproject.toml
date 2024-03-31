@@ -1,0 +1,29 @@
+[tool.poetry]
+name = "genzql"
+version = "0.1.1"
+description = "SQL for GenZ"
+authors = [
+    "Vinesh Kannan <vingkan@gmail.com>",
+    "Tamjid Rahman <tamjidarrahman@gmail.com>",
+]
+readme = "README.md"
+packages = [{ include = "genzql" }]
+
+
+[tool.poetry.dependencies]
+python = "^3.12"
+
+
+[tool.poetry.group.test.dependencies]
+pytest = "^8.0.0"
+
+
+[tool.poetry.group.dev.dependencies]
+black = "^24.1.1"
+pre-commit = "^3.6.0"
+flake8 = "^7.0.0"
+flake8-bugbear = "^24.1.17"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

@@ -1,6 +1,6 @@
 import re
 
-from zql.types import MaybeDialect
+from .types import MaybeDialect
 
 
 DEF = ":"

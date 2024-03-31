@@ -1,6 +1,6 @@
 import pytest
-from zql.parser import AstParseError, parse_ast
-from zql.sample_grammars import (
+from zql.genzql.parser import AstParseError, parse_ast
+from zql.tests.sample_grammars import (
     ENGLISH_TRANSLATION_GRAMMAR,
     FORMULA_GRAMMAR,
     LIST_GRAMMAR,

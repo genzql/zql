@@ -1,5 +1,5 @@
 import pytest
-from zql.main import Zql
+from zql.genzql.main import Zql
 
 
 def test_simple_select_query():

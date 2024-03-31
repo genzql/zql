@@ -1,6 +1,6 @@
-from zql.grammar import Grammar, is_relevant_to_dialect
-from zql.parser import AstNode
-from zql.types import SqlQuery, MaybeDialect
+from .grammar import Grammar, is_relevant_to_dialect
+from .parser import AstNode
+from .types import SqlQuery, MaybeDialect
 
 
 RuleKey = tuple[str, list[str]]

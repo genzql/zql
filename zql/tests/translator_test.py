@@ -1,7 +1,7 @@
 import pytest
-from zql.grammar import Grammar
-from zql.translator import translate
-from zql.sample_grammars import ENGLISH_TRANSLATION_GRAMMAR
+from zql.genzql.grammar import Grammar
+from zql.genzql.translator import translate
+from zql.tests.sample_grammars import ENGLISH_TRANSLATION_GRAMMAR
 
 
 def get_pairwise_translations(

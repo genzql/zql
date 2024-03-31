@@ -1,4 +1,4 @@
-from zql.cleaner import get_tokens, get_tokens_string_safe
+from zql.genzql.cleaner import get_tokens, get_tokens_string_safe
 
 
 def test_get_tokens():

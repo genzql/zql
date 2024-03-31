@@ -1,7 +1,7 @@
 import pytest
 
-from zql.loader import get_zql_grammar
-from zql.translator import translate
+from zql.genzql.loader import get_zql_grammar
+from zql.genzql.translator import translate
 
 
 NEWLINE = "\n"

@@ -1,4 +1,4 @@
-from zql.loader import get_zql_grammar
+from zql.genzql.loader import get_zql_grammar
 
 
 def test_parse_zql_grammar():

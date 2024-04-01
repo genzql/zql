@@ -115,8 +115,7 @@ def test_multi_where_and():
     expected = """
 SELECT a
 FROM example
-WHERE a = b
-AND a != c
+WHERE a = b AND a != c
 ;
     """.strip()
     assert actual == expected
@@ -134,8 +133,7 @@ def test_multi_where_or():
     expected = """
 SELECT a
 FROM example
-WHERE a = b
-OR a != c
+WHERE a = b OR a != c
 ;
     """.strip()
     assert actual == expected
@@ -154,9 +152,7 @@ def test_multi_where_and_or():
     expected = """
 SELECT a
 FROM example
-WHERE a = b
-AND a != c
-OR b = c
+WHERE a = b AND a != c OR b = c
 ;
     """.strip()
     assert actual == expected
@@ -590,13 +586,9 @@ def test_join_three_tables_multiple_conditions():
 SELECT a, b, c
 FROM table_a
 LEFT JOIN table_b
-ON a = b
-AND 1 = 1
-OR b != "quack"
+ON a = b AND 1 = 1 OR b != "quack"
 FULL OUTER JOIN table_c
-ON a != c
-AND 1 = 1
-OR c != "quack"
+ON a != c AND 1 = 1 OR c != "quack"
 ;
     """.strip()
     assert actual == expected
@@ -705,8 +697,7 @@ def test_groupby_having_with_multiple_fields():
 SELECT a, count(b)
 FROM example
 GROUP BY a
-HAVING count(b) > 10
-AND count(b) <= 100
+HAVING count(b) > 10 AND count(b) <= 100
 ;
     """.strip()
     assert actual == expected

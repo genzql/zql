@@ -24,6 +24,7 @@ cte_list          : aliased_cte comma cte_list
 aliased_cte       : word alias sub_query
                   | open_paren expression close_paren alias word
                   > "({expression}) {alias} {word}"
+                  | expression alias word
                   ;
 sub_query         : open_paren query close_paren 
                   > "{open_paren}\n{query}\n{close_paren}"
@@ -93,6 +94,9 @@ select_expr       : star
                   | expression
                   | single_expr
                   ;
+case_stmt         : case when expression then expression else expression end
+                  | case when expression then expression end
+                  ;
 star              : "*" < sqlite
                   > "*" < sqlite
                   > "sheesh"
@@ -104,16 +108,13 @@ expr_list         : expression comma expr_list
                   > "{expression}, {expr_list}"
                   | expression
                   ;
-expression        : non_cond_op_list
-                  | operator_pair
+expression        : case_stmt
                   | operator_list
+                  | operator_pair
                   | postfix_function
                   | single_expr
                   ;
-non_cond_op_list  : single_expr non_cond_op non_cond_op_list
-                  | single_expr
-                  ;
-operator_list     : single_expr non_cond_op operator_list
+operator_list     : single_expr operator operator_list
                   | single_expr
                   ;
 operator_pair     : single_expr operator single_expr2
@@ -136,6 +137,7 @@ single_expr       : sub_query
 single_value      : dot_expression
                   | tuple
                   | star
+                  | null
                   | word
                   | quoted_expr
                   | float
@@ -165,18 +167,12 @@ word2             : word
 dot_expression    : word1 dot word2
                   > "{word1}.{word2}"
                   ;
-operator          : equal
+operator          : double_equal
+                  | equal
                   | not_equal
-                  | is
                   | is_not
+                  | is
                   | cond_operator
-                  | comp_operator
-                  | math_operator
-                  ;
-non_cond_op       : equal
-                  | not_equal
-                  | is
-                  | is_not
                   | comp_operator
                   | math_operator
                   ;
@@ -189,6 +185,7 @@ comp_operator     : lte
                   | gt
                   | like
                   | in
+                  | between
                   ;
 math_operator     : plus
                   | minus
@@ -330,9 +327,19 @@ bare_column_type  : function_expr
 column_mod        : primary_key
                   | not_null
                   ;
-primary_key       : "PRIMARY KEY"
+primary_key       : "PRIMARY KEY" < sqlite
+                  > "PRIMARY KEY" < sqlite
+                  > "is prime"
+                  | "is prime"
+                  > "PRIMARY KEY" < sqlite
+                  > "is prime"
                   ;
-not_null          : "NOT NULL"
+not_null          : "NOT NULL" < sqlite
+                  > "NOT NULL" < sqlite
+                  > "no yikes"
+                  | "no yikes"
+                  > "NOT NULL" < sqlite
+                  > "no yikes"
                   ;
 drop_stmt         : drop_db_stmt
                   | drop_table_stmt
@@ -369,8 +376,8 @@ insert_vals       : insert_expr_list
                   ;
 values            : "VALUES"
                   ;
-non_keyword       : @r\b(?!with\b|\bselect\b|\bfrom\b|\bleft\b|\bright\b|\binner\b|\bfull\b|\bcross\b|\bon\b|\bwhere\b|\bgroup\b|\bhaving\b|\border\b|\bsay\b|\bunion\b|\b;\b)\w+\b < sqlite
-                  | @r\b(?!perchance\b|\bits\b|\byass\b|\bcome\b|\bbet\b|\btfw\b|\blet\b|\bcatch\b|\bngl\b|\bsay\b|\bwith\b|\bno\b)\w+\b
+non_keyword       : @r\b(?!with\b|\bselect\b|\bfrom\b|\bleft\b|\bright\b|\binner\b|\bfull\b|\bcross\b|\bon\b|\bwhere\b|\bgroup\b|\bhaving\b|\border\b|\bsay\b|\bunion\b|\bcase\b|\bwhen\b|\bthen\b|\belse\b|\bend\b|\null\b|\b;\b)\w+\b < sqlite
+                  | @r\b(?!perchance\b|\bits\b|\byass\b|\bcome\b|\bbet\b|\btfw\b|\blet\b|\bcatch\b|\bngl\b|\bsay\b|\bwith\b|\bsuppose\b|\byou\b|\breally\b|\byikes\b|\bno\b)\w+\b
                   ;
 with              : "WITH" < sqlite
                   | "perchance"
@@ -380,6 +387,48 @@ select            : "SELECT" < sqlite
                   ;
 distinct          : "DISTINCT" < sqlite
                   | "real ones"
+                  ;
+case              : "CASE" < sqlite
+                  > "CASE" < sqlite
+                  > "suppose"
+                  | "suppose"
+                  > "CASE" < sqlite
+                  > "suppose"
+                  ;
+when              : "WHEN" < sqlite
+                  > "WHEN" < sqlite
+                  > "you have"
+                  | "you have"
+                  > "WHEN" < sqlite
+                  > "you have"
+                  ;
+then              : "THEN" < sqlite
+                  > "THEN" < sqlite
+                  > "you finna"
+                  | "you finna"
+                  > "THEN" < sqlite
+                  > "you finna"
+                  ;
+else              : "ELSE" < sqlite
+                  > "ELSE" < sqlite
+                  > "no worries"
+                  | "no worries"
+                  > "ELSE" < sqlite
+                  > "no worries"
+                  ;
+end               : "END" < sqlite
+                  > "END" < sqlite
+                  > "its chill"
+                  | "its chill"
+                  > "END" < sqlite
+                  > "its chill"
+                  ;
+null              : "NULL" < sqlite
+                  > "NULL" < sqlite
+                  > "yikes"
+                  | "yikes"
+                  > "NULL" < sqlite
+                  > "yikes"
                   ;
 sum               : "SUM" < sqlite
                   > "SUM" < sqlite
@@ -448,6 +497,10 @@ is_not            : "IS NOT" < sqlite
 equal             : "=" < sqlite
                   | "be"
                   ;
+double_equal      : "= =" < sqlite
+                  > "==" < sqlite
+                  | "really be"
+                  ;
 not_equal         : "! =" < sqlite
                   > "!=" < sqlite
                   | "sike"
@@ -470,6 +523,9 @@ like              : "LIKE"
                   ;
 in                : "IN" < sqlite
                   | "among"
+                  ;
+between           : "BETWEEN" < sqlite
+                  | "tween"
                   ;
 plus              : "+"
                   ;

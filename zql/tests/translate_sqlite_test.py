@@ -51,8 +51,7 @@ def test_groupby_having_with_multiple_fields_and_sort():
 SELECT a, count(b)
 FROM example
 GROUP BY a
-HAVING count(b) > 10
-AND count(b) <= 100
+HAVING count(b) > 10 AND count(b) <= 100
 ORDER BY count(b) DESC
 ;
     """
@@ -61,8 +60,7 @@ ORDER BY count(b) DESC
 its giving a, count(b)
 yass example
 let a cook
-catch these count(b) bops 10
-fax count(b) kinda flops 100 hands
+catch these count(b) bops 10 fax count(b) kinda flops 100 hands
 ngl count(b) high key
 no cap
     """.strip()
@@ -208,8 +206,7 @@ def test_translate_to_self_groupby_having_with_multiple_fields_and_sort():
 SELECT a, count(b)
 FROM example
 GROUP BY a
-HAVING count(b) > 10
-AND count(b) <= 100
+HAVING count(b) > 10 AND count(b) <= 100
 ORDER BY count(b) DESC
 ;
     """.strip()

@@ -11,7 +11,7 @@ packages = [{ include = "genzql" }]
 
 
 [tool.poetry.dependencies]
-python = "^3.12"
+python = "^3.5"
 
 
 [tool.poetry.group.test.dependencies]

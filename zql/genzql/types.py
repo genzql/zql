@@ -1,12 +1,12 @@
 from enum import Enum
-from typing import Dict
+from typing import Dict, Optional
 
 
 ZqlQuery = str
 SqlQuery = str
 AstNode = Dict
 Token = str
-MaybeDialect = str | None
+MaybeDialect = Optional[str]
 
 
 class NodeType(Enum):

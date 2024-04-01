@@ -1,4 +1,7 @@
 import pytest
+
+from typing import List, Tuple
+
 from zql.genzql.grammar import Grammar
 from zql.genzql.translator import translate
 from zql.tests.sample_grammars import ENGLISH_TRANSLATION_GRAMMAR
@@ -9,8 +12,8 @@ def get_pairwise_translations(
     grammar: Grammar,
     default_dialect: str,
     dialect_map: dict
-) -> list[tuple[str, dict]]:
-    res: list[tuple[str, dict]] = []
+) -> List[Tuple[str, dict]]:
+    res: List[Tuple[str, dict]] = []
     for source_dialect in dialect_map:
         for target_dialect in dialect_map:
             source_name = source_dialect or default_dialect
@@ -36,7 +39,7 @@ SENTENCES_BY_DIALECT = {
 }
 
 
-TRANSLATE_TEST_CASES: list[tuple[str, dict]] = [
+TRANSLATE_TEST_CASES: List[Tuple[str, dict]] = [
     *get_pairwise_translations(
         "english_translation",
         ENGLISH_TRANSLATION_GRAMMAR,

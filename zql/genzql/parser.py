@@ -1,4 +1,7 @@
 import re
+
+from typing import List
+
 from .grammar import ROOT, Grammar, is_relevant_to_dialect
 from .cleaner import get_tokens_string_safe
 from .types import MaybeDialect
@@ -15,17 +18,17 @@ class AstParseError(Exception):
 
 class TokensManager:
 
-    def __init__(self, tokens: list[str]):
+    def __init__(self, tokens: List[str]):
         self.tokens = tokens
 
-    def set_tokens(self, tokens: list[str]):
+    def set_tokens(self, tokens: List[str]):
         self.tokens = tokens
 
     def copy(self):
         return TokensManager(list(self.tokens))
 
 
-def evaluate_literal(tokens: list[str], literal: str) -> AstNode:
+def evaluate_literal(tokens: List[str], literal: str) -> AstNode:
     tokens_in_literal = len(literal.split(SPACE))
     peeked_tokens = SPACE.join(tokens[:tokens_in_literal]).casefold()
     if peeked_tokens != literal.casefold():
@@ -36,7 +39,7 @@ def evaluate_literal(tokens: list[str], literal: str) -> AstNode:
     return {"value": literal}
 
 
-def evaluate_regex(tokens: list[str], regex: str) -> AstNode:
+def evaluate_regex(tokens: List[str], regex: str) -> AstNode:
     if not tokens:
         raise AstParseError(f"Expected match for `{regex}`, not end of input.")
 
@@ -51,11 +54,11 @@ def evaluate_regex(tokens: list[str], regex: str) -> AstNode:
 def evaluate_sequence(
     grammar: Grammar,
     tokens_manager: TokensManager,
-    sequence: list[str],
+    sequence: List[str],
     source_dialect: MaybeDialect
 ) -> AstNode:
     mutable_tokens_manager = tokens_manager.copy()
-    children: list[AstNode] = []
+    children: List[AstNode] = []
     for node in sequence:
         ast_node = evaluate_node(
             grammar,

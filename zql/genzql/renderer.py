@@ -1,11 +1,13 @@
+from typing import Dict, List, Optional, Tuple
+
 from .grammar import Grammar, is_relevant_to_dialect
 from .parser import AstNode
 from .types import SqlQuery, MaybeDialect
 
 
-RuleKey = tuple[str, list[str]]
+RuleKey = Tuple[str, List[str]]
 Template = str
-TemplateLookup = dict[RuleKey, Template]
+TemplateLookup = Dict[RuleKey, Template]
 
 
 SPACE = " "
@@ -60,8 +62,8 @@ def render_with_grammar(
 def maybe_get_template_for_dialect(
     rule: dict,
     target_dialect: MaybeDialect
-) -> str | None:
-    templates: list[dict] = rule.get("templates")
+) -> Optional[str]:
+    templates: List[dict] = rule.get("templates")
     if templates is None:
         return None
     
@@ -80,7 +82,7 @@ def get_template_lookup(
     for node, rules in grammar.items():
         for rule in rules:
             template = maybe_get_template_for_dialect(rule, target_dialect)
-            rule_dialects: list[str] = rule.get("dialects", [])
+            rule_dialects: List[str] = rule.get("dialects", [])
             literal = rule.get("literal")
             sequence = rule.get("sequence")
 
@@ -121,7 +123,10 @@ def get_rule_key(node: str, rule: dict) -> RuleKey:
     raise QueryRenderError(f"Unable to determine pattern of node: `{node}`.")
 
 
-def maybe_get_template(lookup: TemplateLookup, ast: AstNode) -> Template | None:
+def maybe_get_template(
+    lookup: TemplateLookup,
+    ast: AstNode
+) -> Optional[Template]:
     node = ast.get("type")
     children = ast.get("children", [])
 

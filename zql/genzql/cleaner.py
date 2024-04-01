@@ -1,5 +1,7 @@
 import re
 
+from typing import List, Optional
+
 
 SPACE = " "
 COMMENT_CHAR = "-"
@@ -11,7 +13,7 @@ NEED_SPACE_AROUND_CHARS = [";", ",", ".", "(", ")", "+", "-", "*", "/", "="]
 QUOTES = {"\"", "'"}
 
 
-def get_tokens(source: str) -> list[str]:
+def get_tokens(source: str) -> List[str]:
     """
     Converts a raw source string to a list of tokens.
     - Strips whitespace from either side.
@@ -27,14 +29,14 @@ def get_tokens(source: str) -> list[str]:
     return tokens
 
 
-def is_single_line_comment_at(i: int, chars: list[str]) -> bool:
+def is_single_line_comment_at(i: int, chars: List[str]) -> bool:
     """Checks if a single line comment starts at position `i` of `chars`."""
     if len(chars) <= i + 1:
         return False
     return chars[i] == COMMENT_CHAR and chars[i + 1] == COMMENT_CHAR
 
 
-def is_multi_line_comment_at(i: int, chars: list[str]) -> bool:
+def is_multi_line_comment_at(i: int, chars: List[str]) -> bool:
     """Checks if a multi line comment starts at position `i` of `chars`."""
     if len(chars) <= i + 1:
         return False
@@ -44,7 +46,7 @@ def is_multi_line_comment_at(i: int, chars: list[str]) -> bool:
     )
 
 
-def is_end_of_multi_line_comment_at(i: int, chars: list[str]) -> bool:
+def is_end_of_multi_line_comment_at(i: int, chars: List[str]) -> bool:
     """Checks if a multi line comment ends at position `i` of `chars`."""
     if len(chars) <= i + 1:
         return False
@@ -54,7 +56,7 @@ def is_end_of_multi_line_comment_at(i: int, chars: list[str]) -> bool:
     )
 
 
-def get_tokens_string_safe(source: str) -> list[str]:
+def get_tokens_string_safe(source: str) -> List[str]:
     """
     Converts a raw source string to a list of tokens.
     - Strips whitespace from either side.
@@ -66,9 +68,9 @@ def get_tokens_string_safe(source: str) -> list[str]:
     """
     chars: str = source.strip()
     # Scan characters to accumulate tokens
-    tokens: list[str] = []
-    token_chars: list[str] = []
-    open_quote: str | None = None
+    tokens: List[str] = []
+    token_chars: List[str] = []
+    open_quote: Optional[str] = None
     ignore_next: bool = False
     is_single_line_comment: bool = False
     is_multi_line_comment: bool = False

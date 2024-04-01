@@ -1,5 +1,7 @@
 import re
 
+from typing import Dict, List
+
 from .types import MaybeDialect
 
 
@@ -18,7 +20,7 @@ TEMPLATES_KEY = "templates"
 ROOT = "root"
 
 
-Grammar = dict[str, list[dict]]
+Grammar = Dict[str, List[dict]]
 
 
 class GrammarParseError(Exception):
@@ -43,7 +45,7 @@ def parse_rule(rule: str) -> dict:
         and not has_dialect_symbol_in_quotes
     )
 
-    dialects: list[str] = []
+    dialects: List[str] = []
     rule_content = rule
     if has_dialects:
         raw_dialects = rule[dialect_index + 2:]
@@ -153,7 +155,7 @@ def parse_grammar(content: str) -> Grammar:
 
 
 def is_relevant_to_dialect(obj: dict, dialect: MaybeDialect) -> bool:
-    obj_dialects: list[str] = obj.get("dialects", [])
+    obj_dialects: List[str] = obj.get("dialects", [])
     is_default_dialect = dialect is None and not obj_dialects
     has_dialect = dialect is not None and dialect in obj_dialects
     supports_any_dialect = not obj_dialects

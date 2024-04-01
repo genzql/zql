@@ -1,5 +1,7 @@
 import pytest
 
+from typing import List
+
 from zql.genzql.loader import get_zql_grammar
 from zql.genzql.translator import translate
 
@@ -14,7 +16,7 @@ SEMICOLON = ";"
 ZQL_GRAMMAR = get_zql_grammar()
 
 
-QUERIES: list[str] = [
+QUERIES: List[str] = [
 # Basic data selection from a single table
 """
 SELECT name, age FROM users;

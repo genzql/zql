@@ -25,8 +25,8 @@ aliased_cte       : word alias sub_query
                   | open_paren expression close_paren alias word
                   > "({expression}) {alias} {word}"
                   ;
-sub_query         : open_paren simple_query close_paren 
-                  > "{open_paren}\n{simple_query}\n{close_paren}"
+sub_query         : open_paren query close_paren 
+                  > "{open_paren}\n{query}\n{close_paren}"
                   ;
 simple_query      : select_query
                   ;
@@ -59,9 +59,14 @@ orderby_query     : orderby_clause limit_query
                   | orderby_clause
                   | limit_query
                   ;
-limit_query       : limit_clause union_query
-                  > "{limit_clause}\n{union_query}"
+limit_query       : limit_clause offset_query
+                  > "{limit_clause}\n{offset_query}"
                   | limit_clause
+                  | offset_query
+                  ;
+offset_query      : offset_clause union_query
+                  > "{offset_clause}\n{union_query}"
+                  | offset_clause
                   | union_query
                   ;
 union_query       : union_clause simple_query
@@ -80,8 +85,13 @@ select_expr       : star
                   > "{postfix_function} {alias} {word}"
                   | open_paren expression close_paren alias word
                   > "{expression} {alias} {word}"
+                  | open_paren expression close_paren
+                  > "{expression}"
                   | single_expr alias word
+                  | expression alias word
+                  | postfix_function
                   | expression
+                  | single_expr
                   ;
 star              : "*" < sqlite
                   > "*" < sqlite
@@ -94,9 +104,21 @@ expr_list         : expression comma expr_list
                   > "{expression}, {expr_list}"
                   | expression
                   ;
-expression        : single_expr1 operator single_expr2
+expression        : non_cond_op_list
+                  | operator_pair
+                  | operator_list
                   | postfix_function
                   | single_expr
+                  ;
+non_cond_op_list  : single_expr non_cond_op non_cond_op_list
+                  | single_expr
+                  ;
+operator_list     : single_expr non_cond_op operator_list
+                  | single_expr
+                  ;
+operator_pair     : single_expr operator single_expr2
+                  ;
+single_expr2      : single_expr
                   ;
 postfix_function  : postfix_expr open_paren single_expr close_paren < sqlite
                   > "{postfix_expr}({single_expr})" < sqlite
@@ -109,7 +131,9 @@ postfix_expr      : sum
                   ;
 single_expr       : sub_query
                   | function_expr
-                  | dot_expression
+                  | single_value
+                  ;
+single_value      : dot_expression
                   | tuple
                   | star
                   | word
@@ -117,11 +141,8 @@ single_expr       : sub_query
                   | float
                   | integer
                   ;
-single_expr1      : single_expr
-                  ;
-single_expr2      : single_expr
-                  ;
 tuple             : open_paren expr_list close_paren
+                  | open_square expr_list close_square
                   ;
 quoted_expr       : @r\".*?\"
                   | @r\'.*?\'
@@ -152,6 +173,13 @@ operator          : equal
                   | comp_operator
                   | math_operator
                   ;
+non_cond_op       : equal
+                  | not_equal
+                  | is
+                  | is_not
+                  | comp_operator
+                  | math_operator
+                  ;
 cond_operator     : and
                   | or
                   ;
@@ -167,7 +195,10 @@ math_operator     : plus
                   | multiply
                   | divide
                   ;
-function_expr     : function_name open_paren function_args close_paren
+function_expr     : postfixable_fn
+                  | function_name open_paren close_paren
+                  > "{function_name}()"
+                  | function_name open_paren function_args close_paren
                   > "{function_name}({function_args})"
                   ;
 function_args     : distinct arg_list
@@ -178,6 +209,13 @@ function_name     : word
 arg_list          : expression comma arg_list
                   > "{expression}, {arg_list}"
                   | expression
+                  ;
+postfixable_fn    : postfix_expr open_paren single_value close_paren < sqlite
+                  > "{postfix_expr}({single_value})" < sqlite
+                  > "{single_value} {postfix_expr}"
+                  | single_value postfix_expr
+                  > "{postfix_expr}({single_value})" < sqlite
+                  > "{single_value} {postfix_expr}"
                   ;
 from_clause       : from table join_list
                   > "{from} {table}\n{join_list}"
@@ -200,6 +238,7 @@ join_list         : join_clause join_list
 join_clause       : comma table 
                   | join_with_type table join_on condition_list
                   > "{join_with_type} {table}\n{join_on} {condition_list}"
+                  | join_with_type table
                   ;
 join_with_type    : join_type join < sqlite
                   > "{join_type} {join}" < sqlite
@@ -245,6 +284,10 @@ direction         : nulls_first
 limit_clause      : limit limit_amount
                   ;
 limit_amount      : integer
+                  ;
+offset_clause     : offset offset_amount
+                  ;
+offset_amount     : integer
                   ;
 union_clause      : union_all
                   | union
@@ -361,6 +404,7 @@ join_type         : join_inner
                   | join_right_outer
                   | join_full_outer
                   | join_cross
+                  | join_array
                   ;
 join_inner        : "INNER" < sqlite
                   | "inner"
@@ -382,6 +426,9 @@ join_full_outer   : "FULL OUTER" < sqlite
                   ;
 join_cross        : "CROSS" < sqlite
                   | "cross"
+                  ;
+join_array        : "ARRAY" < sqlite
+                  | "array"
                   ;
 where             : "WHERE" < sqlite
                   | "tfw"
@@ -460,6 +507,9 @@ desc              : "DESC" < sqlite
 limit             : "LIMIT" < sqlite
                   | "say less"
                   ;
+offset            : "OFFSET" < sqlite
+                  | "after"
+                  ;
 union_all         : "UNION ALL" < sqlite
                   | "with all the bois"
                   ;
@@ -476,6 +526,10 @@ comma             : ","
 open_paren        : "("
                   ;
 close_paren       : ")"
+                  ;
+open_square       : "["
+                  ;
+close_square      : "]"
                   ;
 alias             : "AS" < sqlite
                   | "be"

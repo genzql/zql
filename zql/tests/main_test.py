@@ -1,5 +1,7 @@
 import pytest
+
 from zql.genzql.main import Zql
+from zql.tests.helpers import normalize_query
 
 
 def test_simple_select_query():
@@ -14,7 +16,7 @@ SELECT a, b
 FROM example
 ;
     """.strip()
-    assert actual == expected
+    assert normalize_query(actual) == normalize_query(expected)
 
 
 def test_simple_select_query_with_limit():
@@ -31,7 +33,7 @@ FROM example
 LIMIT 10
 ;
     """.strip()
-    assert actual == expected
+    assert normalize_query(actual) == normalize_query(expected)
 
 
 def test_select_integer_without_from():
@@ -44,7 +46,7 @@ def test_select_integer_without_from():
 SELECT 6
 ;
     """.strip()
-    assert actual == expected
+    assert normalize_query(actual) == normalize_query(expected)
 
 
 def test_select_float_without_from():
@@ -57,7 +59,7 @@ def test_select_float_without_from():
 SELECT 6.04
 ;
     """.strip()
-    assert actual == expected
+    assert normalize_query(actual) == normalize_query(expected)
 
 
 def test_select_without_from_string_expression_single_quotes():
@@ -70,7 +72,7 @@ def test_select_without_from_string_expression_single_quotes():
 SELECT 'hello'
 ;
     """.strip()
-    assert actual == expected
+    assert normalize_query(actual) == normalize_query(expected)
 
 
 def test_select_without_from_string_expression_double_quotes():
@@ -83,7 +85,7 @@ def test_select_without_from_string_expression_double_quotes():
 SELECT "hello"
 ;
     """.strip()
-    assert actual == expected
+    assert normalize_query(actual) == normalize_query(expected)
 
 
 def test_single_where():
@@ -100,7 +102,7 @@ FROM example
 WHERE a = b
 ;
     """.strip()
-    assert actual == expected
+    assert normalize_query(actual) == normalize_query(expected)
 
 
 def test_multi_where_and():
@@ -118,7 +120,7 @@ FROM example
 WHERE a = b AND a != c
 ;
     """.strip()
-    assert actual == expected
+    assert normalize_query(actual) == normalize_query(expected)
 
 
 def test_multi_where_or():
@@ -136,7 +138,7 @@ FROM example
 WHERE a = b OR a != c
 ;
     """.strip()
-    assert actual == expected
+    assert normalize_query(actual) == normalize_query(expected)
 
 
 def test_multi_where_and_or():
@@ -155,7 +157,7 @@ FROM example
 WHERE a = b AND a != c OR b = c
 ;
     """.strip()
-    assert actual == expected
+    assert normalize_query(actual) == normalize_query(expected)
 
 
 def test_single_where_string_expression():
@@ -172,7 +174,7 @@ FROM example
 WHERE a = 'ahh'
 ;
     """.strip()
-    assert actual == expected
+    assert normalize_query(actual) == normalize_query(expected)
 
 
 def test_select_star_short_sheesh():
@@ -187,7 +189,7 @@ SELECT *
 FROM example
 ;
     """.strip()
-    assert actual == expected
+    assert normalize_query(actual) == normalize_query(expected)
 
 
 def test_select_star_long_sheesh():
@@ -202,7 +204,7 @@ SELECT *
 FROM example
 ;
     """.strip()
-    assert actual == expected
+    assert normalize_query(actual) == normalize_query(expected)
 
 
 def test_select_distinct():
@@ -217,7 +219,7 @@ SELECT DISTINCT a, b, c
 FROM example
 ;
     """.strip()
-    assert actual == expected
+    assert normalize_query(actual) == normalize_query(expected)
 
 
 def test_select_math_expressions():
@@ -232,7 +234,7 @@ SELECT a, b + c, d * e, f / g, h - i
 FROM example
 ;
     """.strip()
-    assert actual == expected
+    assert normalize_query(actual) == normalize_query(expected)
 
 
 def test_select_column_alias():
@@ -247,7 +249,7 @@ SELECT a, b AS flower
 FROM example
 ;
     """.strip()
-    assert actual == expected
+    assert normalize_query(actual) == normalize_query(expected)
 
 
 def test_select_expression_alias():
@@ -262,7 +264,7 @@ SELECT a, b = c AS is_equal
 FROM example
 ;
     """.strip()
-    assert actual == expected
+    assert normalize_query(actual) == normalize_query(expected)
 
 
 def test_select_multiple_aliases():
@@ -281,7 +283,7 @@ SELECT a AS x, b, c + d AS yo, e
 FROM example
 ;
     """.strip()
-    assert actual == expected
+    assert normalize_query(actual) == normalize_query(expected)
 
 
 def test_select_postfix_alias():
@@ -296,7 +298,7 @@ SELECT a, SUM(b) AS total_b
 FROM example
 ;
     """.strip()
-    assert actual == expected
+    assert normalize_query(actual) == normalize_query(expected)
 
 
 def test_respect_case():
@@ -313,7 +315,7 @@ FROM example
 WHERE a = "hELlO"
 ;
     """.strip()
-    assert actual == expected
+    assert normalize_query(actual) == normalize_query(expected)
 
 
 def test_single_line_comments():
@@ -337,7 +339,7 @@ SELECT a, b, c
 FROM example
 ;
     """.strip()
-    assert actual == expected
+    assert normalize_query(actual) == normalize_query(expected)
 
 
 def test_inline_comments():
@@ -357,7 +359,7 @@ SELECT a, b, c
 FROM example
 ;
     """.strip()
-    assert actual == expected
+    assert normalize_query(actual) == normalize_query(expected)
 
 
 def test_multiline_comments():
@@ -389,7 +391,7 @@ SELECT a, b, c
 FROM example
 ;
     """.strip()
-    assert actual == expected
+    assert normalize_query(actual) == normalize_query(expected)
 
 
 def test_simple_select_union():
@@ -406,7 +408,7 @@ UNION
 SELECT a, b, c
 ;
     """.strip()
-    assert actual == expected
+    assert normalize_query(actual) == normalize_query(expected)
 
 
 def test_simple_select_union_all():
@@ -423,7 +425,7 @@ UNION ALL
 SELECT a, b, c
 ;
     """.strip()
-    assert actual == expected
+    assert normalize_query(actual) == normalize_query(expected)
 
 
 def test_select_where_union():
@@ -444,7 +446,7 @@ SELECT a, b, c
 WHERE y = 100
 ;
     """.strip()
-    assert actual == expected
+    assert normalize_query(actual) == normalize_query(expected)
 
 
 def test_select_where_union_all():
@@ -465,7 +467,7 @@ SELECT a, b, c
 WHERE y = 100
 ;
     """.strip()
-    assert actual == expected
+    assert normalize_query(actual) == normalize_query(expected)
 
 
 def test_join_two_tables():
@@ -484,7 +486,7 @@ LEFT JOIN table_b
 ON a = b
 ;
     """.strip()
-    assert actual == expected
+    assert normalize_query(actual) == normalize_query(expected)
 
 
 def test_join_two_tables_explicit_columns():
@@ -503,7 +505,7 @@ LEFT JOIN table_b
 ON table_a.a = table_b.b
 ;
     """.strip()
-    assert actual == expected
+    assert normalize_query(actual) == normalize_query(expected)
 
 
 def test_join_two_tables_explicit_columns_explicit_table_aliases():
@@ -522,7 +524,7 @@ LEFT JOIN table_b AS tb
 ON ta.a = tb.b
 ;
     """.strip()
-    assert actual == expected
+    assert normalize_query(actual) == normalize_query(expected)
 
 
 def test_join_two_tables_explicit_columns_implicit_table_aliaes():
@@ -541,7 +543,7 @@ LEFT JOIN table_b tb
 ON ta.a = tb.b
 ;
     """.strip()
-    assert actual == expected
+    assert normalize_query(actual) == normalize_query(expected)
 
 
 def test_join_three_tables():
@@ -564,7 +566,7 @@ FULL OUTER JOIN table_c
 ON a != c
 ;
     """.strip()
-    assert actual == expected
+    assert normalize_query(actual) == normalize_query(expected)
 
 
 def test_join_three_tables_multiple_conditions():
@@ -591,7 +593,7 @@ FULL OUTER JOIN table_c
 ON a != c AND 1 = 1 OR c != "quack"
 ;
     """.strip()
-    assert actual == expected
+    assert normalize_query(actual) == normalize_query(expected)
 
 
 def test_groupby_one_field_simple_aggregation():
@@ -608,7 +610,7 @@ FROM example
 GROUP BY a
 ;
     """.strip()
-    assert actual == expected
+    assert normalize_query(actual) == normalize_query(expected)
 
 
 def test_groupby_one_field_sum_aggregation():
@@ -625,7 +627,7 @@ FROM example
 GROUP BY a
 ;
     """.strip()
-    assert actual == expected
+    assert normalize_query(actual) == normalize_query(expected)
 
 
 def test_groupby_one_field_distinct_aggregation():
@@ -642,7 +644,7 @@ FROM example
 GROUP BY a
 ;
     """.strip()
-    assert actual == expected
+    assert normalize_query(actual) == normalize_query(expected)
 
 
 def test_groupby_multiple_fields():
@@ -659,7 +661,7 @@ FROM example
 GROUP BY a, b, c, d
 ;
     """.strip()
-    assert actual == expected
+    assert normalize_query(actual) == normalize_query(expected)
 
 
 def test_groupby_having_with_one_field():
@@ -678,7 +680,7 @@ GROUP BY a
 HAVING count(b) > 10
 ;
     """.strip()
-    assert actual == expected
+    assert normalize_query(actual) == normalize_query(expected)
 
 
 def test_groupby_having_with_multiple_fields():
@@ -700,7 +702,7 @@ GROUP BY a
 HAVING count(b) > 10 AND count(b) <= 100
 ;
     """.strip()
-    assert actual == expected
+    assert normalize_query(actual) == normalize_query(expected)
 
 
 def test_orderby_one_field_desc():
@@ -717,7 +719,7 @@ FROM example
 ORDER BY b DESC
 ;
     """.strip()
-    assert actual == expected
+    assert normalize_query(actual) == normalize_query(expected)
 
 
 def test_orderby_one_field_asc():
@@ -734,7 +736,7 @@ FROM example
 ORDER BY b ASC
 ;
     """.strip()
-    assert actual == expected
+    assert normalize_query(actual) == normalize_query(expected)
 
 
 def test_orderby_one_field_nulls_first():
@@ -751,7 +753,7 @@ FROM example
 ORDER BY b NULLS FIRST
 ;
     """.strip()
-    assert actual == expected
+    assert normalize_query(actual) == normalize_query(expected)
 
 
 def test_orderby_one_field_nulls_last():
@@ -768,7 +770,7 @@ FROM example
 ORDER BY b NULLS LAST
 ;
     """.strip()
-    assert actual == expected
+    assert normalize_query(actual) == normalize_query(expected)
 
 
 def test_orderby_multiple_fields():
@@ -788,7 +790,7 @@ FROM example
 ORDER BY b DESC, c NULLS LAST, d NULLS FIRST, e ASC
 ;
     """.strip()
-    assert actual == expected
+    assert normalize_query(actual) == normalize_query(expected)
 
 
 def test_common_table_expressions():
@@ -829,7 +831,7 @@ SELECT a
 FROM my_cte_c
 ;
     """.strip()
-    assert actual == expected
+    assert normalize_query(actual) == normalize_query(expected)
 
 
 def test_select_from_sub_query_without_alias():
@@ -850,7 +852,7 @@ FROM example
 )
 ;
     """.strip()
-    assert actual == expected
+    assert normalize_query(actual) == normalize_query(expected)
 
 
 def test_select_from_sub_query_with_alias():
@@ -871,7 +873,7 @@ FROM example
 ) AS sub
 ;
     """.strip()
-    assert actual == expected
+    assert normalize_query(actual) == normalize_query(expected)
 
 
 def test_select_from_sub_query_with_implicit_alias():
@@ -892,7 +894,7 @@ FROM example
 ) sub
 ;
     """.strip()
-    assert actual == expected
+    assert normalize_query(actual) == normalize_query(expected)
 
 
 def test_create_table():
@@ -913,7 +915,7 @@ CREATE TABLE example(
 )
 ;
     """.strip()
-    assert actual == expected
+    assert normalize_query(actual) == normalize_query(expected)
 
 
 def test_create_table_if_not_exists():
@@ -934,7 +936,7 @@ CREATE TABLE IF NOT EXISTS example(
 )
 ;
     """.strip()
-    assert actual == expected
+    assert normalize_query(actual) == normalize_query(expected)
 
 
 def test_create_database():

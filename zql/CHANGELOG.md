@@ -2,6 +2,29 @@
 
 ## Version 0
 
+### 0.3.0
+
+Introduces a breaking change:
+
+- `NOT NULL` is now `is valid` instead of `no yikes`
+
+And supports additional language features:
+
+- `PRAGMA table_info(...)` to describe table schemas (`rizz ...`)
+- Support multiple `WHEN ... THEN ...` clauses in `CASE` statements
+- Support cool zql data types:
+    - `BIGINT` --> `zaddyint`
+    - `MEDIUMINT` --> jk we couldn't think of anything for this one so its the same
+    - `SMALLINT` --> `smolint`
+    - `TINYINT` --> `smolestint`
+    - `BOOLEAN` --> `bool`
+- Cosmetic: Show each expression on a new line for:
+    - `SELECT` expressions
+    - `JOIN` conditions
+    - `GROUP BY` expressions
+    - `HAVING` expressions
+- Cosmetic: Show each `WHEN`, `THEN`, `ELSE` expression on a new line in `CASE` statements
+
 ### 0.2.1
 
 Now supports additional language features:

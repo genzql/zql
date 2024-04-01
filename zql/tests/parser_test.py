@@ -1,4 +1,5 @@
 import pytest
+
 from zql.genzql.parser import AstParseError, parse_ast
 from zql.tests.sample_grammars import (
     ENGLISH_TRANSLATION_GRAMMAR,

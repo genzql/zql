@@ -78,8 +78,9 @@ select_clause     : select distinct select_expr_list
                   | select select_expr_list
                   ;
 select_expr_list  : select_expr comma select_expr_list
-                  > "{select_expr}, {select_expr_list}"
+                  > "\n  {select_expr}, {select_expr_list}"
                   | select_expr
+                  > "\n  {select_expr}"
                   ;
 select_expr       : star
                   | postfix_function alias word
@@ -94,8 +95,24 @@ select_expr       : star
                   | expression
                   | single_expr
                   ;
-case_stmt         : case when expression then expression else expression end
-                  | case when expression then expression end
+case_stmt         : case when_then_list case_else case_end
+                  | case when_then_list case_end
+                  ;
+when_then_list    : when_then_clause when_then_list
+                  | when_then_clause
+                  ;
+when_then_clause  : when expr1 then expr2
+                  > "\n  {when} {expr1}\n    {then} {expr2}"
+                  ;
+case_else         : else expression
+                  > "\n  {else} {expression}"
+                  ;
+case_end          : end
+                  > "\n{end}"
+                  ;
+expr1             : expression
+                  ;
+expr2             : expression
                   ;
 star              : "*" < sqlite
                   > "*" < sqlite
@@ -107,6 +124,11 @@ star              : "*" < sqlite
 expr_list         : expression comma expr_list
                   > "{expression}, {expr_list}"
                   | expression
+                  ;
+groupby_expr_list : expression comma groupby_expr_list
+                  > "\n  {expression}, {groupby_expr_list}"
+                  | expression
+                  > "\n  {expression}"
                   ;
 expression        : case_stmt
                   | operator_list
@@ -120,6 +142,13 @@ operator_list     : single_expr operator operator_list
 operator_pair     : single_expr operator single_expr2
                   ;
 single_expr2      : single_expr
+                  ;
+non_cond_expr     : non_cond_op_list
+                  | postfix_function
+                  | single_expr
+                  ;
+non_cond_op_list  : single_expr non_cond_operator non_cond_op_list
+                  | single_expr
                   ;
 postfix_function  : postfix_expr open_paren single_expr close_paren < sqlite
                   > "{postfix_expr}({single_expr})" < sqlite
@@ -167,19 +196,22 @@ word2             : word
 dot_expression    : word1 dot word2
                   > "{word1}.{word2}"
                   ;
-operator          : double_equal
-                  | equal
-                  | not_equal
-                  | is_not
-                  | is
-                  | cond_operator
+operator          : cond_operator
                   | comp_operator
+                  | math_operator
+                  ;
+non_cond_operator : comp_operator
                   | math_operator
                   ;
 cond_operator     : and
                   | or
                   ;
-comp_operator     : lte
+comp_operator     : double_equal
+                  | equal
+                  | not_equal
+                  | is_not
+                  | is
+                  | lte
                   | gte
                   | lt
                   | gt
@@ -247,16 +279,16 @@ join_with_type    : join_type join < sqlite
                   ;
 where_clause      : where condition_list
                   ;
-condition_list    : expression cond_operator condition_list
-                  > "{expression}\n{cond_operator} {condition_list}"
-                  | expression
+condition_list    : non_cond_expr cond_operator condition_list
+                  > "{non_cond_expr}\n  {cond_operator} {condition_list}"
+                  | non_cond_expr
                   ;
-groupby_clause    : groupby_start expr_list < sqlite
-                  > "GROUP BY {expr_list}" < sqlite
-                  > "let {expr_list} cook"
-                  | groupby_start expr_list groupby_end
-                  > "GROUP BY {expr_list}" < sqlite
-                  > "let {expr_list} cook"
+groupby_clause    : groupby_start groupby_expr_list < sqlite
+                  > "GROUP BY {groupby_expr_list}" < sqlite
+                  > "let {groupby_expr_list} cook"
+                  | groupby_start groupby_expr_list groupby_end
+                  > "GROUP BY {groupby_expr_list}" < sqlite
+                  > "let {groupby_expr_list} cook"
                   ;
 having_clause     : having_start condition_list < sqlite
                   > "HAVING {condition_list}" < sqlite
@@ -291,6 +323,7 @@ union_clause      : union_all
                   ;
 definition_stmt   : create_stmt
                   | drop_stmt
+                  | describe_stmt
                   ;
 create_stmt       : create_db_stmt
                   | create_table_stmt
@@ -308,6 +341,20 @@ create_table_stmt : create_table db_table if_not_exists alias table_def
                   | create_table db_table table_def
                   > "{create_table} {db_table}{table_def}"
                   ;
+describe_stmt     : pragma_describe open_paren db_table close_paren < sqlite
+                  > "{pragma_describe}({db_table})" < sqlite
+                  > "{pragma_describe} {db_table}"
+                  | pragma_describe db_table
+                  > "{pragma_describe}({db_table})" < sqlite
+                  > "{pragma_describe} {db_table}"
+                  ;
+pragma_describe   : "PRAGMA table_info" < sqlite
+                  > "PRAGMA table_info" < sqlite
+                  > "rizz"
+                  | "rizz"
+                  > "PRAGMA table_info" < sqlite
+                  > "rizz"
+                  ;
 table_def         : open_paren column_def_list close_paren
                   > "(\n{column_def_list}\n)"
                   ;
@@ -318,11 +365,18 @@ column_def_list   : column_def comma column_def_list
                   ;
 column_def        : word column_type_expr
                   ;
-column_type_expr  : bare_column_type column_mod
+column_type_expr  : cool_column_type column_mod
+                  | cool_column_type
+                  | bare_column_type column_mod
                   | bare_column_type
                   ;
 bare_column_type  : function_expr
                   | word
+                  ;
+cool_column_type  : tinyint
+                  | smallint
+                  | bigint
+                  | boolean
                   ;
 column_mod        : primary_key
                   | not_null
@@ -336,10 +390,38 @@ primary_key       : "PRIMARY KEY" < sqlite
                   ;
 not_null          : "NOT NULL" < sqlite
                   > "NOT NULL" < sqlite
-                  > "no yikes"
-                  | "no yikes"
+                  > "is valid"
+                  | "is valid"
                   > "NOT NULL" < sqlite
-                  > "no yikes"
+                  > "is valid"
+                  ;
+tinyint           : "TINYINT" < sqlite
+                  > "TINYINT" < sqlite
+                  > "smolestint"
+                  | "smolestint"
+                  > "TINYINT" < sqlite
+                  > "smolestint"
+                  ;
+smallint          : "SMALLINT" < sqlite
+                  > "SMALLINT" < sqlite
+                  > "smolint"
+                  | "smolint"
+                  > "SMALLINT" < sqlite
+                  > "smolint"
+                  ;
+bigint            : "BIGINT" < sqlite
+                  > "BIGINT" < sqlite
+                  > "zaddyint"
+                  | "zaddyint"
+                  > "BIGINT" < sqlite
+                  > "zaddyint"
+                  ;
+boolean           : "BOOLEAN" < sqlite
+                  > "BOOLEAN" < sqlite
+                  > "bool"
+                  | "bool"
+                  > "BOOLEAN" < sqlite
+                  > "bool"
                   ;
 drop_stmt         : drop_db_stmt
                   | drop_table_stmt
@@ -376,8 +458,8 @@ insert_vals       : insert_expr_list
                   ;
 values            : "VALUES"
                   ;
-non_keyword       : @r\b(?!with\b|\bselect\b|\bfrom\b|\bleft\b|\bright\b|\binner\b|\bfull\b|\bcross\b|\bon\b|\bwhere\b|\bgroup\b|\bhaving\b|\border\b|\bsay\b|\bunion\b|\bcase\b|\bwhen\b|\bthen\b|\belse\b|\bend\b|\null\b|\b;\b)\w+\b < sqlite
-                  | @r\b(?!perchance\b|\bits\b|\byass\b|\bcome\b|\bbet\b|\btfw\b|\blet\b|\bcatch\b|\bngl\b|\bsay\b|\bwith\b|\bsuppose\b|\byou\b|\breally\b|\byikes\b|\bno\b)\w+\b
+non_keyword       : @r\b(?!with\b|\bselect\b|\bfrom\b|\bleft\b|\bright\b|\binner\b|\bfull\b|\bcross\b|\bon\b|\bwhere\b|\bgroup\b|\bhaving\b|\border\b|\bsay\b|\bunion\b|\bcase\b|\bwhen\b|\bthen\b|\belse\b|\bend\b|\null\b|\pragma\b|\b;\b)\w+\b < sqlite
+                  | @r\b(?!perchance\b|\bits\b|\byass\b|\bcome\b|\bbet\b|\btfw\b|\blet\b|\bcatch\b|\bngl\b|\bsay\b|\bwith\b|\bsuppose\b|\byou\b|\breally\b|\byikes\b|\brizz\b|\bno\b)\w+\b
                   ;
 with              : "WITH" < sqlite
                   | "perchance"

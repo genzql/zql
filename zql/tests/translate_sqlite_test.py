@@ -1,5 +1,6 @@
 from zql.genzql.loader import get_zql_grammar
 from zql.genzql.translator import translate
+from zql.tests.helpers import normalize_query
 
 
 ZQL_GRAMMAR = get_zql_grammar()
@@ -17,7 +18,7 @@ its giving a, b
 yass example
 no cap
     """.strip()
-    assert actual == expected
+    assert normalize_query(actual) == normalize_query(expected)
 
 
 def test_simple_select_query_lowercase_single_line():
@@ -28,7 +29,7 @@ its giving a, b
 yass example
 no cap
     """.strip()
-    assert actual == expected
+    assert normalize_query(actual) == normalize_query(expected)
 
 
 def test_select_star_query():
@@ -43,7 +44,7 @@ its giving sheesh
 yass example
 no cap
     """.strip()
-    assert actual == expected
+    assert normalize_query(actual) == normalize_query(expected)
 
 
 def test_groupby_having_with_multiple_fields_and_sort():
@@ -64,7 +65,7 @@ catch these count(b) bops 10 fax count(b) kinda flops 100 hands
 ngl count(b) high key
 no cap
     """.strip()
-    assert actual == expected
+    assert normalize_query(actual) == normalize_query(expected)
 
 
 def test_join_left():
@@ -83,7 +84,7 @@ come through left table_b
 bet c be d
 no cap
     """.strip()
-    assert actual == expected
+    assert normalize_query(actual) == normalize_query(expected)
 
 
 def test_postfix_aggregation():
@@ -98,7 +99,7 @@ its giving a, b af
 yass example
 no cap
     """.strip()
-    assert actual == expected
+    assert normalize_query(actual) == normalize_query(expected)
 
 
 def test_postfix_aggregation_with_alias():
@@ -113,7 +114,7 @@ its giving a, b af be total
 yass example
 no cap
     """.strip()
-    assert actual == expected
+    assert normalize_query(actual) == normalize_query(expected)
 
 
 def test_nested_function():
@@ -128,7 +129,7 @@ its giving a, COUNT(IF(b, 1, 0)) be total
 yass example
 no cap
     """.strip()
-    assert actual == expected
+    assert normalize_query(actual) == normalize_query(expected)
 
 
 def test_nested_sum():
@@ -143,7 +144,7 @@ its giving a, COUNT(IF(b, c af, 0)) be total
 yass example
 no cap
     """.strip()
-    assert actual == expected
+    assert normalize_query(actual) == normalize_query(expected)
 
 
 def test_count_distinct():
@@ -158,7 +159,7 @@ its giving a, COUNT(real ones b) be unique_b
 yass example
 no cap
     """.strip()
-    assert actual == expected
+    assert normalize_query(actual) == normalize_query(expected)
 
 
 def test_cte_sub_query():
@@ -181,7 +182,7 @@ its giving c, b, a
 yass table
 no cap
     """.strip()
-    assert actual == expected
+    assert normalize_query(actual) == normalize_query(expected)
 
 
 def test_cte_sub_expression():
@@ -198,7 +199,7 @@ its giving a, unique_count
 yass example
 no cap
     """.strip()
-    assert actual == expected
+    assert normalize_query(actual) == normalize_query(expected)
 
 
 def test_translate_to_self_groupby_having_with_multiple_fields_and_sort():
@@ -212,4 +213,4 @@ ORDER BY count(b) DESC
     """.strip()
     zql = translate(ZQL_GRAMMAR, original_query, source_dialect="sqlite")
     actual = translate(ZQL_GRAMMAR, zql, target_dialect="sqlite")
-    assert actual == original_query
+    assert normalize_query(actual) == normalize_query(original_query)

@@ -1,4 +1,5 @@
 import pytest
+
 from zql.genzql.parser import parse_ast
 from zql.genzql.renderer import QueryRenderError, render_query
 from zql.tests.sample_grammars import (

@@ -4,13 +4,7 @@ from typing import List
 
 from zql.genzql.loader import get_zql_grammar
 from zql.genzql.translator import translate
-
-
-NEWLINE = "\n"
-SPACE = " "
-OPEN_PAREN = "("
-CLOSE_PAREN = ")"
-SEMICOLON = ";"
+from zql.tests.helpers import normalize_query
 
 
 ZQL_GRAMMAR = get_zql_grammar()
@@ -96,15 +90,6 @@ UNION
 SELECT name FROM contractors;
 """,
 ]
-
-
-def normalize_query(query: str) -> str:
-    normal = SPACE.join(query.split(NEWLINE))
-    normal = normal.replace(OPEN_PAREN + SPACE, OPEN_PAREN)
-    normal = normal.replace(SPACE + CLOSE_PAREN, CLOSE_PAREN)
-    normal = normal.replace(SPACE + SEMICOLON, SEMICOLON)
-    normal = normal.strip()
-    return normal
 
 
 @pytest.mark.parametrize("query", [q.strip() for q in QUERIES])

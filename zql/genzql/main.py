@@ -34,7 +34,7 @@ class Zql:
         except AstParseError as ape:
             raise ZqlParserError(ape)
         except QueryRenderError as qre:
-            raise ZqlParserError(ape)
+            raise ZqlParserError(qre)
 
     def translate(self, raw: str, source: str, target: str) -> str:
         source_dialect = get_dialect_from_name(source)

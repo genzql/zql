@@ -2,6 +2,20 @@
 
 ## Version 0
 
+### 0.3.1
+
+Now supports additional language features:
+
+- `INTERSECTS` (`with the same bois`)
+- `CAST(x AS type)` (`trust(x be type)`)
+- Fix join type rule order so that outer joins of different types can be parsed
+- Allow functions to take star `*` (`sheesh`) as their sole argument
+- Allow aliases to be quoted names
+- Allow table names to be dotted expressions
+- Allow dotted expressions to contain quoted names
+- Allow dotted expressions to have as many dot references as needed
+- Allow table names in data definition and data manipulation statements to have as many dot references as needed
+
 ### 0.3.0
 
 Introduces a breaking change:

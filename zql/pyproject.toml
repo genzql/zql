@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "genzql"
-version = "0.3.0"
+version = "0.3.1"
 description = "SQL for GenZ"
 authors = [
     "Vinesh Kannan <vingkan@gmail.com>",

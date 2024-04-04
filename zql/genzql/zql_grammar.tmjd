@@ -78,8 +78,9 @@ select_clause     : select distinct select_expr_list
                   | select select_expr_list
                   ;
 select_expr_list  : select_expr comma select_expr_list
-                  > "{select_expr}, {select_expr_list}"
+                  > "\n  {select_expr}, {select_expr_list}"
                   | select_expr
+                  > "\n  {select_expr}"
                   ;
 select_expr       : star
                   | postfix_function alias alias_name

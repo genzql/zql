@@ -6,6 +6,7 @@ TABLES: dict[str, str] = {
     "numbers": "tables/numbers.csv",
     "chars": "tables/chars.csv",
     "codes": "tables/codes.csv",
+    "runes": "tables/runes.csv",
 }
 
 
